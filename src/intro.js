@@ -4,7 +4,8 @@
 // cinematic people come to resent.
 
 import { view, COL } from './config.js';
-import { player, focusY } from './player.js';
+import { player, focusY, FOCUS_DY } from './player.js';
+import { START_PX } from './map.js';
 import { centreCamera, followCamera, overlay } from './renderer.js';
 import { drawTextCentered, textWidth } from './font.js';
 import { anyPressed } from './input.js';
@@ -13,8 +14,11 @@ import { SITE } from './data/projects.js';
 // There is no outside any more, so there is no arrival walk. Instead the
 // camera opens high on the north arches — where the two banners are — and
 // drifts down to the droid standing on the medallion, then the title lands.
+// The end of the pan is wherever the droid is standing, taken from the map
+// rather than written down here — the atrium has been resized twice and a
+// hand-typed number goes stale silently, leaving the camera short of the droid.
 const PAN_FROM = { x: 320, y: 128 };
-const PAN_TO = { x: 320, y: 242 };
+const PAN_TO = { x: START_PX.x, y: START_PX.y - FOCUS_DY };
 const PAN_SECONDS = 2.2;
 
 const VISIT_KEY = 'harish-museum-visited';

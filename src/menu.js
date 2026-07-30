@@ -35,21 +35,17 @@ export function isMenuOpen() {
 }
 
 /**
- * A single framed picture, shown in the same window as the exhibit lists. It is
- * a list of one: the left rail would be a column with a single row in it, so it
- * is hidden and the detail pane gets the whole window.
+ * One thing, shown in the same window as the exhibit lists. It is a list of
+ * one: the left rail would be a column with a single row in it, so it is hidden
+ * and the detail pane gets the whole window.
  */
-export function openArtwork(art, closedCallback) {
-  entries = [{
-    title: art.title,
-    tagline: art.caption,
-    image: art.image || null,
-  }];
+function openSingle(entry, blurb, closedCallback) {
+  entries = [entry];
   index = 0;
   onClose = closedCallback || null;
 
-  titleEl.textContent = art.title;
-  blurbEl.textContent = 'On the wall';
+  titleEl.textContent = entry.title;
+  blurbEl.textContent = blurb;
   root.classList.add('is-single');
 
   renderList();
@@ -59,6 +55,23 @@ export function openArtwork(art, closedCallback) {
   root.hidden = false;
   requestAnimationFrame(() => root.classList.add('is-open'));
   listEl.focus();
+}
+
+/** A framed picture off a wall. */
+export function openArtwork(art, closedCallback) {
+  openSingle({
+    title: art.title,
+    tagline: art.caption,
+    image: art.image || null,
+  }, 'On the wall', closedCallback);
+}
+
+/**
+ * A document — the résumé off the atrium wall, or the rules off the lectern.
+ * These arrive already in entry shape, so they pass straight through.
+ */
+export function openDocument(entry, blurb, closedCallback) {
+  openSingle(entry, blurb || '', closedCallback);
 }
 
 export function openMenu(wingId, closedCallback) {

@@ -12,7 +12,9 @@
 //     │AUTOMATIONS│          │ PERSONAL  │     north wings
 //     └─────┰─────┘          └─────┰─────┘
 //     ┌─────┸──────────────────────┸─────┐
+//     │            ▤ résumé              │
 //     │             ATRIUM               │     you start here
+//     │             ▢ rules              │
 //     └─────┰──────────────────────┰─────┘
 //     ┌─────┸─────┐          ┌─────┸─────┐
 //     │  CLIENT   │          │ ABOUT ME  │     south wings
@@ -27,15 +29,15 @@ import {
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
-  drawLightPool, drawInlay, drawBanner,
-  drawColumn, drawVitrine, drawStatue, drawRug, drawSconce,
+  drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
+  drawVitrine, drawStatue, drawRug, drawSconce,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
-import { PAINTINGS, ABOUT } from './data/projects.js';
+import { PAINTINGS, ABOUT, RESUME, RULES } from './data/projects.js';
 
 export const MAP_W = 40;
-export const MAP_H = 32;
+export const MAP_H = 36;
 
 // Rooms are an odd number of tiles wide and arches an odd number too, so both
 // centre on a tile rather than a tile boundary. That is what lets every arch
@@ -43,26 +45,31 @@ export const MAP_H = 32;
 // the exhibit is straight ahead, with nothing to steer around.
 //
 // [x, y, w, h]
+// The atrium is seven deep rather than three: it has to hold the compass, the
+// résumé above it and the lectern below without any of the three crowding the
+// others. The extra four rows go on the south side and the south half of the
+// building moves down with them, which keeps the north wings' wall thickness —
+// and their picture rail — exactly as it was.
 const REGIONS = [
   { rect: [10, 4, 9, 7], floor: 'wood', indoor: true, wing: 'automations' },
   { rect: [21, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [11, 14, 18, 3], floor: 'marble', indoor: true },
-  { rect: [10, 20, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [21, 20, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
+  { rect: [11, 14, 18, 7], floor: 'marble', indoor: true },
+  { rect: [10, 24, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [21, 24, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
   // is how thick the walls are. These replaced the old connecting corridors.
   { rect: [12, 11, 5, 3], floor: 'marble', indoor: true },
   { rect: [23, 11, 5, 3], floor: 'marble', indoor: true },
-  { rect: [12, 17, 5, 3], floor: 'marble', indoor: true },
-  { rect: [23, 17, 5, 3], floor: 'marble', indoor: true },
+  { rect: [12, 21, 5, 3], floor: 'marble', indoor: true },
+  { rect: [23, 21, 5, 3], floor: 'marble', indoor: true },
 ];
 
 // The building's footprint. Every tile inside it that isn't floor is solid
 // masonry, which is what fills the courtyards between the wings — a radius
 // around each room can't, because those courtyards open onto the map edge.
 // It reaches y=0 so the north wings get a full three-tile-tall wall above them.
-const MASONRY = [0, 0, 40, 32];
+const MASONRY = [0, 0, 40, 36];
 
 // Each wing gets its own accent, used on its rug, its vitrines and the icon
 // floating in its case, so the four rooms don't read as one room repeated.
@@ -74,16 +81,16 @@ const MASONRY = [0, 0, 40, 32];
 export const WING_ROOMS = {
   automations: { cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations', accent: '#2E4A52' },
   personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
-  client: { cx: 14, cy: 23, entry: 'north', rail: 18, label: 'Client Work', accent: '#2F3A55' },
+  client: { cx: 14, cy: 27, entry: 'north', rail: 22, label: 'Client Work', accent: '#2F3A55' },
   about: {
-    cx: 25, cy: 23, entry: 'north', rail: 18, label: 'About Me',
+    cx: 25, cy: 27, entry: 'north', rail: 22, label: 'About Me',
     accent: '#33373C', theatre: true,
   },
 };
 
 // The row of each wall that carries pictures and sconces (the "picture field",
 // two tiles above the floor it stands on).
-const RAIL = { northWings: 2, atrium: 12, southWings: 18 };
+const RAIL = { northWings: 2, atrium: 12, southWings: 22 };
 
 // Wing names, on banners hung across each arch. The first attempt put them as
 // inscriptions on the atrium floor, but the south pair sat on the very last row
@@ -93,8 +100,8 @@ const RAIL = { northWings: 2, atrium: 12, southWings: 18 };
 const BANNERS = [
   [232, 14 * TILE, 'AUTOMATIONS'],
   [408, 14 * TILE, 'PERSONAL'],
-  [232, 17 * TILE, 'CLIENT WORK'],
-  [408, 17 * TILE, 'ABOUT ME'],
+  [232, 21 * TILE, 'CLIENT WORK'],
+  [408, 21 * TILE, 'ABOUT ME'],
 ];
 
 // Wall sconces: [tile x, rail row]. Their pools are painted with the rest of
@@ -109,12 +116,14 @@ const SCONCES = [
 // Arch mouths, for the brass thresholds laid across them.
 const THRESHOLDS = [
   [12, 13, 5], [23, 13, 5],   // atrium -> north wings
-  [12, 17, 5], [23, 17, 5],   // atrium -> south wings
+  [12, 21, 5], [23, 21, 5],   // atrium -> south wings
 ];
 
-// The building's centre line, and where you start.
+// The building's centre line, and where you start. The atrium's middle row is
+// 17: everything laid out in it — compass, résumé, lectern — hangs off that.
 const AXIS = 320;
-export const START_PX = { x: AXIS, y: 15 * TILE + 12 };
+const ATRIUM_MID = 17;
+export const START_PX = { x: AXIS, y: ATRIUM_MID * TILE + 12 };
 
 /* ------------------------------------------------------------------ */
 
@@ -129,6 +138,7 @@ export const map = {
   props: [],
   colliders: [],
   artworks: [],   // framed pictures you can walk up to and read
+  documents: [],  // the résumé on the wall, the rules on the lectern
   seats: [],      // benches you can sit on
   people: [],     // characters you can talk to
   screen: null,   // the cinema screen, if the theatre is built
@@ -177,6 +187,11 @@ export function artworkNear(px, py) {
   return nearest(map.artworks, px, py, 26);
 }
 
+/** The résumé or the rules, if you're standing at one. */
+export function documentNear(px, py) {
+  return nearest(map.documents, px, py, 28);
+}
+
 /** The bench you could sit on, or null. */
 export function seatNear(px, py) {
   return nearest(map.seats, px, py, 26);
@@ -193,7 +208,7 @@ export function personNear(px, py) {
  * standing at the wall, a bench is what is left.
  */
 export function interactableNear(px, py) {
-  return plinthNear(px, py) || personNear(px, py)
+  return plinthNear(px, py) || personNear(px, py) || documentNear(px, py)
     || artworkNear(px, py) || seatNear(px, py);
 }
 
@@ -325,7 +340,7 @@ function renderBackground() {
   // --- skylight, then the things laid into the floor ---
   // Light goes down first. Painting it over the rugs instead bleaches them
   // until they read as pools of water rather than textiles.
-  drawLightPool(c, AXIS - 60, 14 * TILE, 120, 48, 0.55);
+  drawLightPool(c, AXIS - 80, ATRIUM_MID * TILE - 32, 160, 80, 0.55);
   for (const w of Object.values(WING_ROOMS)) {
     // no skylight over a cinema — the screen is the only light in that room
     if (w.theatre) continue;
@@ -336,7 +351,7 @@ function renderBackground() {
     drawLightPool(c, sx * TILE - 20, (ry + 2) * TILE, 56, 40, 0.8);
   }
 
-  drawInlay(c, AXIS, 15 * TILE + 8, 21);
+  drawInlay(c, AXIS, ATRIUM_MID * TILE + 8, 21);
   for (const w of Object.values(WING_ROOMS)) {
     const mid = roomCentre(w);
     drawRug(c, mid.x, mid.y, 5 * TILE, 3 * TILE, w.accent);
@@ -429,8 +444,7 @@ function decorate(c) {
     const offsets = w.entry === 'south' ? [-3, -1, 1, 3] : [-4, -3, 3, 4];
     hangSymmetric(c, w.cx, w.rail, offsets, id);
   }
-  // and across the atrium's own wall, symmetric about the building's axis
-  hangSymmetric(c, 20, RAIL.atrium, [-3, -2, 1, 2], 'atrium');
+  dressAtrium(c);
 
   // ---- depth-sorted props ----
 
@@ -474,13 +488,6 @@ function decorate(c) {
     }
   }
 
-  // A pair of columns at each end of the atrium. The atrium is three tiles
-  // deep now, so anything in the middle of it is in the way.
-  for (const cx of [11, 28]) {
-    addProp({ kind: 'column', x: cx * TILE + 8, y: 16 * TILE + 14 });
-    map.colliders.push({ x: cx * TILE + 1, y: 16 * TILE + 4, w: 14, h: 10 });
-  }
-
   // things you bump into, and things you can sit on
   for (const p of map.props) {
     if (p.kind === 'plant') map.colliders.push({ x: p.x - 6, y: p.y - 9, w: 12, h: 9 });
@@ -494,6 +501,64 @@ function decorate(c) {
 
   // draw order is fixed, so sort once rather than every frame
   map.props.sort((a, b) => a.y - b.y);
+}
+
+/**
+ * The atrium. A museum hangs its charter by the door; this one hangs the résumé
+ * there instead — a single sheet on the wall above the compass — with the house
+ * rules lying open on a lectern below it.
+ *
+ * The pictures go down the side walls. Those walls run away from the camera and
+ * have no face to hang anything on, so they are drawn with the same cheated
+ * perspective as the cinema screen. There were columns here before, which is
+ * what the pictures replace.
+ */
+function dressAtrium(c) {
+  // the résumé, dead centre above the compass
+  drawNotice(c, AXIS, RAIL.atrium * TILE + 4);
+  map.documents.push({
+    x: AXIS,
+    y: (RAIL.atrium + 2) * TILE + 14,     // the floor tile you read it from
+    label: 'Resume',                      // the bitmap font has no accents
+    blurb: 'On the wall',
+    doc: RESUME,
+  });
+
+  // The lectern below it, with the rules open on it. The 6px drop clears the
+  // book off the compass's brass ring — any higher and it reads as standing on
+  // the inlay rather than at the foot of it.
+  const lx = AXIS;
+  const ly = (ATRIUM_MID + 3) * TILE + 6;
+  addProp({ kind: 'lectern', x: lx, y: ly });
+  // The block is the foot, not the whole drawn height — a lectern is tall, and
+  // blocking all of it would leave a sliver of floor to read it from.
+  map.colliders.push({ x: lx - 9, y: ly - 10, w: 18, h: 10 });
+  map.documents.push({
+    x: lx, y: ly, label: 'The rules', blurb: 'Open on the lectern', doc: RULES,
+    lift: 52,   // the bubble clears the book rather than sitting on it
+  });
+
+  // three pictures down each side wall, each level with the one opposite
+  const captions = (PAINTINGS && PAINTINGS.atrium) || [];
+  let slot = 0;
+  for (const [side, wallX] of [['w', 11 * TILE], ['e', 29 * TILE]]) {
+    for (const row of [ATRIUM_MID - 2, ATRIUM_MID, ATRIUM_MID + 2]) {
+      const y = row * TILE + 8;
+      drawSideFrame(c, wallX, y, side, row * 7 + slot);
+      const info = captions[slot];
+      if (info) {
+        map.artworks.push({
+          x: wallX + (side === 'w' ? 22 : -22),
+          y,
+          title: info.title,
+          caption: info.caption,
+          image: info.image || null,
+          label: 'Painting',
+        });
+      }
+      slot += 1;
+    }
+  }
 }
 
 /**
@@ -579,7 +644,7 @@ export function drawProp(c, p, ox, oy, t) {
     case 'person': drawPerson(c, x, y, t, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
-    case 'column': drawColumn(c, x, y); break;
+    case 'lectern': drawLectern(c, x, y, t); break;
     case 'statue': drawStatue(c, x, y); break;
     case 'vitrine': drawVitrine(c, x, y, p.accent); break;
     case 'banner': {

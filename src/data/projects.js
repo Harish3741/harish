@@ -174,8 +174,50 @@ export const PAINTINGS = {
   // The About Me wing is a cinema and hangs nothing, so this key is unused.
   // It stays here so the four wings still read as a set.
   about: [null, null, null, null],
-  // the atrium's own wall, above the entrance to the north wings
-  atrium: [null, null, null, null],
+  // The atrium hangs six, three down each side wall: west top to bottom first,
+  // then east. Nothing goes on its end wall — the résumé has that.
+  atrium: [null, null, null, null, null, null],
+};
+
+// ---------------------------------------------------------------------------
+// THE RÉSUMÉ AND THE RULES
+//
+// Two things you can read in the atrium: the sheet of paper on the wall above
+// the compass, and the book lying open on the lectern below it. Both take the
+// same fields as a project entry, so `highlights`, `tech` and `links` all work.
+//
+// For the résumé, `links` is where the PDF goes — a file next to the page
+// ('resume.pdf'), a data URI, or a link to wherever it already lives.
+// ---------------------------------------------------------------------------
+
+export const RESUME = {
+  title: 'Harish — résumé',
+  tagline: 'The short version, on one page.',
+  description: 'Replace this paragraph with the summary you would put at the '
+    + 'top of a CV: what you do, who you do it for, and what you are looking '
+    + 'for next. Everything below is the same shape as a project entry.',
+  highlights: [
+    'A line per role, or per thing you are proud of.',
+    'Delete any of these fields and they simply stop rendering.',
+  ],
+  tech: ['Python', 'JavaScript', 'n8n', 'Postgres'],
+  links: [],
+};
+
+export const RULES = {
+  title: 'House rules',
+  tagline: 'Pinned open on the lectern, as museums do.',
+  description: 'You are a small hovering droid in a museum of things Harish '
+    + 'has built. There is no way out and nothing to lose — walk into any wing '
+    + 'and read whatever is in it.',
+  highlights: [
+    'Arrow keys or WASD to walk.',
+    'E, Enter or Space to look at whatever you are standing in front of.',
+    'Esc closes anything that is open.',
+    'The plinth in the middle of a wing opens that wing\'s work.',
+    'Sit in the cinema chair in the About Me wing and the film starts.',
+    'Leave the droid alone for a while and it powers down. Any key wakes it.',
+  ],
 };
 
 // ---------------------------------------------------------------------------

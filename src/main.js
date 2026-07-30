@@ -18,7 +18,9 @@ import {
 import {
   player, spawnAt, movePlayer, updatePlayer, drawPlayer, focusY, toggleSeat, rouse,
 } from './player.js';
-import { initMenu, openMenu, openArtwork, isMenuOpen, closeMenu } from './menu.js';
+import {
+  initMenu, openMenu, openArtwork, openDocument, isMenuOpen, closeMenu,
+} from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
   initScreening, openScreening, closeScreening, isScreeningOpen,
@@ -146,6 +148,10 @@ function update(dt, ts) {
       // the person by the door: their summary is the wing's own entries
       clearHeldKeys();
       openMenu(near.wing, clearHeldKeys);
+    } else if (near.doc) {
+      // the résumé on the wall, or the rules open on the lectern
+      clearHeldKeys();
+      openDocument(near.doc, near.blurb, clearHeldKeys);
     } else if (near.caption !== undefined) {
       clearHeldKeys();
       openArtwork(near, clearHeldKeys);
@@ -269,13 +275,13 @@ function drawPrompt(ts, ox, oy) {
   const label = near.label.toUpperCase();
   const hint = near.id ? 'PRESS  E'
     : near.wing ? 'PRESS  E  TO  TALK'
-      : near.caption !== undefined ? 'PRESS  E  TO  READ'
+      : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
         : near.theatre ? 'PRESS  E  TO  WATCH'
           : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
   const x = Math.round(near.x - ox);
   const bob = Math.round(Math.sin(ts / 400) * 1.5);
-  const y = Math.round(near.y - oy) - (near.id ? 60 : 34) + bob;
+  const y = Math.round(near.y - oy) - (near.lift || (near.id ? 60 : 34)) + bob;
 
   ctx.save();
   ctx.globalAlpha = promptPulse;

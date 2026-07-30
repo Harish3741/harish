@@ -763,42 +763,149 @@ export function drawLightPool(ctx, px, py, w, h, intensity = 1) {
 /* Architecture and furniture                                          */
 /* ------------------------------------------------------------------ */
 
-/** A fluted column. (px, py) is the bottom-centre. */
-export function drawColumn(ctx, px, py) {
+/**
+ * A picture on a wall that runs away from the camera — the atrium's east and
+ * west walls. Face-on frames can't be used there: those walls are seen from
+ * above, not from the front. So the frame is turned on its side and given the
+ * same cheated perspective as the cinema screen, standing a few pixels proud of
+ * the wall with the light down the edge that looks into the room.
+ *
+ * (wallX, cy) is the point on the wall's inner face the picture centres on;
+ * `side` is which wall it is, 'w' or 'e'.
+ */
+export function drawSideFrame(ctx, wallX, cy, side, seed) {
+  const h = hash(seed, 5);
+  const ht = 22 + Math.floor(h * 397) % 3 * 4;   // 22, 26 or 30 tall
+  const d = 7;                                   // how far it stands proud
+  const y = cy - Math.floor(ht / 2);
+  const x = side === 'w' ? wallX : wallX - d;
+  const lit = side === 'w' ? x + d - 1 : x;      // the edge facing the room
+
+  // shadow cast along the wall
+  ctx.fillStyle = 'rgba(59, 42, 34, 0.18)';
+  ctx.fillRect(side === 'w' ? x + d : x - 2, y + 2, 2, ht);
+
+  // frame
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x, y, d, ht);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(x, y, d, 1);
+  ctx.fillRect(x, y + ht - 1, d, 1);
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.35)';
+  ctx.fillRect(side === 'w' ? x : x + d - 1, y, 1, ht);
+
+  // the canvas, seen edge-on: a band of colour with the light along one side
+  const inks = ['#7C6494', '#4F8296', '#9A6B4E', '#5D8A64', '#96525F', '#3F5A7A'];
+  ctx.fillStyle = inks[Math.floor(h * 613) % inks.length];
+  ctx.fillRect(x + 1, y + 2, d - 2, ht - 4);
+  ctx.fillStyle = 'rgba(255, 245, 220, 0.20)';
+  ctx.fillRect(x + 1, y + 2, d - 2, Math.floor((ht - 4) * 0.4));
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.fillRect(x + 1, y + ht - 6, d - 2, 4);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx.fillRect(lit, y + 1, 1, ht - 2);
+
+  // wall label, on the room side of the frame
+  ctx.fillStyle = 'rgba(251, 243, 228, 0.55)';
+  ctx.fillRect(side === 'w' ? x + d + 1 : x - 3, cy - 3, 2, 6);
+}
+
+/**
+ * A single sheet of paper on the wall, waiting to be read. Deliberately blank —
+ * it's the résumé, and what's on it lives in the panel that opens, not in eight
+ * pixels of pretend text.
+ */
+export function drawNotice(ctx, px, py) {
+  const w = 13;
+  const ht = 18;
+  const x = px - Math.floor(w / 2);
+
+  // it hangs a little off the wall, so it casts
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.22)';
+  ctx.fillRect(x + 2, py + 2, w, ht);
+
+  // the sheet
+  ctx.fillStyle = COL.paper;
+  ctx.fillRect(x, py, w, ht);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+  ctx.fillRect(x, py, w, 1);
+  ctx.fillStyle = 'rgba(122, 98, 70, 0.45)';
+  ctx.fillRect(x, py + ht - 1, w, 1);
+  ctx.fillRect(x + w - 1, py, 1, ht);
+
+  // the corner nearest the light curls forward
+  ctx.fillStyle = 'rgba(122, 98, 70, 0.30)';
+  ctx.fillRect(x + w - 4, py + ht - 3, 3, 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.fillRect(x + w - 4, py + ht - 4, 3, 1);
+
+  // brass pin at the top, and the wall label under it
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(px - 1, py - 2, 2, 3);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(px - 1, py, 2, 1);
+  ctx.fillStyle = 'rgba(251, 243, 228, 0.55)';
+  ctx.fillRect(px - 3, py + ht + 2, 6, 2);
+}
+
+/**
+ * A reading lectern with a book open on it. The pages breathe very slightly, so
+ * that in a still room it is the thing that looks alive and asks to be read.
+ * (px, py) is the bottom-centre.
+ */
+export function drawLectern(ctx, px, py, t = 0) {
   ctx.fillStyle = COL.shadow;
   ctx.fillRect(px - 10, py - 3, 20, 3);
   ctx.fillStyle = 'rgba(59, 42, 34, 0.13)';
-  ctx.fillRect(px - 13, py - 2, 26, 2);
+  ctx.fillRect(px - 12, py - 2, 24, 2);
 
-  // base
-  ctx.fillStyle = COL.wallFace;
-  ctx.fillRect(px - 8, py - 7, 16, 5);
-  ctx.fillStyle = COL.wallFaceHi;
-  ctx.fillRect(px - 8, py - 7, 16, 1);
-  ctx.fillStyle = COL.baseboard;
-  ctx.fillRect(px - 8, py - 3, 16, 1);
+  // splayed foot
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(px - 9, py - 6, 18, 4);
+  ctx.fillStyle = COL.wood;
+  ctx.fillRect(px - 9, py - 6, 18, 1);
 
-  // shaft, lit from the left
-  ctx.fillStyle = COL.wallFace;
-  ctx.fillRect(px - 6, py - 38, 12, 31);
-  ctx.fillStyle = COL.wallFaceHi;
-  ctx.fillRect(px - 6, py - 38, 4, 31);
-  ctx.fillStyle = 'rgba(138, 110, 76, 0.22)';
-  ctx.fillRect(px + 3, py - 38, 3, 31);
-
-  // flutes
-  ctx.fillStyle = 'rgba(138, 110, 76, 0.28)';
-  ctx.fillRect(px - 3, py - 36, 1, 28);
-  ctx.fillRect(px, py - 36, 1, 28);
-  ctx.fillRect(px + 3, py - 36, 1, 28);
-
-  // capital
-  ctx.fillStyle = COL.wallFace;
-  ctx.fillRect(px - 8, py - 44, 16, 6);
-  ctx.fillStyle = COL.wallFaceHi;
-  ctx.fillRect(px - 9, py - 45, 18, 2);
+  // stem
+  ctx.fillStyle = COL.wood;
+  ctx.fillRect(px - 3, py - 16, 6, 11);
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(px + 1, py - 16, 2, 11);
   ctx.fillStyle = COL.brassDim;
-  ctx.fillRect(px - 8, py - 39, 16, 1);
+  ctx.fillRect(px - 3, py - 12, 6, 1);
+
+  // the sloped desk, seen from above and behind
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(px - 11, py - 24, 22, 9);
+  ctx.fillStyle = COL.wood;
+  ctx.fillRect(px - 11, py - 24, 22, 1);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(px - 11, py - 16, 22, 1);
+
+  // the book, open at the middle. The two leaves lift a pixel out of phase.
+  const lift = Math.round(Math.sin(t / 900));
+  const rift = Math.round(Math.sin(t / 900 + 1.7));
+  ctx.fillStyle = COL.paper;
+  ctx.fillRect(px - 10, py - 27 + lift, 9, 10);
+  ctx.fillRect(px + 1, py - 27 + rift, 9, 10);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+  ctx.fillRect(px - 10, py - 27 + lift, 9, 1);
+  ctx.fillRect(px + 1, py - 27 + rift, 9, 1);
+  ctx.fillStyle = 'rgba(122, 98, 70, 0.35)';
+  ctx.fillRect(px - 10, py - 18 + lift, 9, 1);
+  ctx.fillRect(px + 1, py - 18 + rift, 9, 1);
+
+  // the spine, and a suggestion of lines on each page
+  ctx.fillStyle = COL.velvetDark;
+  ctx.fillRect(px - 1, py - 27, 2, 10);
+  ctx.fillStyle = 'rgba(122, 98, 70, 0.40)';
+  for (let j = 0; j < 3; j++) {
+    ctx.fillRect(px - 9, py - 24 + j * 3 + lift, 7, 1);
+    ctx.fillRect(px + 2, py - 24 + j * 3 + rift, 7, 1);
+  }
+
+  // ribbon marker, hanging out of the bottom
+  ctx.fillStyle = COL.velvet;
+  ctx.fillRect(px - 1, py - 17, 2, 4);
 }
 
 /** A low glass vitrine. (px, py) is the bottom-centre. */

@@ -11,9 +11,14 @@ central atrium.
 | South-west | Client work |
 | South-east | About me |
 
-You start in the middle of the atrium. Walk to the plinth in the middle of a
-wing, press <kbd>E</kbd>, and the exhibit list opens. There is no way in or out
-— the museum is the whole world, and every wing is about two seconds away.
+You start in the middle of the atrium, standing on the compass. Walk to the
+plinth in the middle of a wing, press <kbd>E</kbd>, and the exhibit list opens.
+There is no way in or out — the museum is the whole world, and every wing is
+about two seconds away.
+
+The atrium itself holds two things to read: the résumé, on a sheet of paper
+hung on the wall above the compass, and the house rules, lying open on a
+lectern below it.
 
 ---
 
@@ -57,6 +62,25 @@ up to and read, and leaving it `null` keeps the frame as decoration.
 
 `image` is optional and takes any URL a browser can load. A data URI keeps the
 picture inside the file, which is what the standalone build needs.
+
+The atrium hangs six, three down each side wall — `PAINTINGS.atrium` runs west
+top-to-bottom, then east. Its end wall carries the résumé instead.
+
+### The résumé and the rules
+
+`RESUME` and `RULES`, same file. Both take the same fields as a project entry,
+so `highlights`, `tech` and `links` all work; anything you leave out doesn't
+render. `links` on the résumé is where a PDF goes — a file next to the page, a
+data URI, or a link to wherever it already lives.
+
+```js
+export const RESUME = {
+  title: 'Harish — résumé',
+  tagline: 'The short version, on one page.',
+  description: '…',
+  links: [{ label: 'Download PDF', url: 'resume.pdf' }],
+};
+```
 
 ### The screening room
 
@@ -114,7 +138,7 @@ modules declare the same top-level name.
 | | |
 | --- | --- |
 | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> | walk |
-| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture, sit on a bench |
+| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture or the résumé, sit on a bench |
 | <kbd>Esc</kbd> | close whatever is open |
 
 Leave the droid alone for nine seconds and it powers down; any key wakes it.
@@ -174,6 +198,13 @@ A few decisions worth knowing about, if you come back to this later:
   centres on a tile rather than a tile boundary, which is what lets each arch
   line up exactly with the plinth behind it. Before they were aligned, a bench
   sat in one doorway and the droid could wedge itself on it.
+
+- **Walls that run away from the camera get cheated perspective.** A top-down
+  view only gives you a face to hang things on where a wall runs left to right;
+  the atrium's side walls and the cinema's screen wall are seen from above and
+  have none. So those are drawn turned on their side, standing a few pixels
+  proud of the wall with the light down the edge that faces the room — the same
+  licence every top-down game takes with doorways.
 
 - **The background is baked once.** Floors, walls and wall-mounted art render
   into an offscreen canvas at load, and each frame blits the visible slice of

@@ -3,7 +3,7 @@
 // — architecture is mostly rectangles, and code is far easier to tweak than a
 // 28-line string array.
 
-import { COL, DROID_PAL, TILE } from './config.js';
+import { COL, DROID_PAL, THEATRE, TILE } from './config.js';
 
 /* ------------------------------------------------------------------ */
 /* Sprite grids                                                        */
@@ -66,6 +66,32 @@ const DROID_RIGHT = [
   '................',
 ];
 
+// A general standing person. Deliberately generic for now: the palette lives
+// in data/projects.js so hair, skin and clothes can be changed without touching
+// the sprite.
+const PERSON = [
+  '................',
+  '.....######.....',
+  '....########....',
+  '...#KKKKKKKK#...',
+  '...#KKKKKKKK#...',
+  '...#KSSSSSSK#...',
+  '...#SSSSSSSS#...',
+  '...#SESSSSES#...',
+  '...#SSS##SSS#...',
+  '....########....',
+  '..##TTTTTTTT##..',
+  '.#STTTTTTTTTTS#.',
+  '.#STTTTTTTTTTS#.',
+  '..#TTTTTTTTTT#..',
+  '..#PPPP##PPPP#..',
+  '...#PPP##PPP#...',
+  '...#OOO##OOO#...',
+];
+
+// eyes closed, for the idle blink
+const PERSON_BLINK = PERSON.map((row, i) => (i === 7 ? '...#SS####SS#...' : row));
+
 // Blink frame: the visor goes dark for a couple of frames.
 const DROID_DOWN_BLINK = DROID_DOWN.map((row, i) =>
   i === 8 ? '.#CVVVVVVVVVVC#.' : row
@@ -100,7 +126,16 @@ function makeSprite(grid, pal, { mirror = false } = {}) {
 
 export const SPRITES = {};
 
-export function buildSprites() {
+export function buildSprites(personPal) {
+  const pal = personPal || {
+    '#': '#2A1B1C', K: '#2E2018', S: '#C98F63', E: '#241A15',
+    T: '#7A2A31', P: '#2E2A38', O: '#1E1A18',
+  };
+  SPRITES.person = {
+    idle: makeSprite(PERSON, pal),
+    blink: makeSprite(PERSON_BLINK, pal),
+  };
+
   SPRITES.droid = {
     down: makeSprite(DROID_DOWN, DROID_PAL),
     up: makeSprite(DROID_UP, DROID_PAL),
@@ -197,6 +232,22 @@ export function drawGrass(ctx, px, py, tx, ty) {
   ctx.fillRect(px + Math.floor(hash(tx + 1, ty) * 12), py + Math.floor(h * 12), 1, 2);
 }
 
+/** Theatre carpet: deep red, with a woven diamond that only just shows. */
+export function drawCarpet(ctx, px, py, tx, ty) {
+  ctx.fillStyle = (tx + ty) % 2 === 0 ? THEATRE.carpetA : THEATRE.carpetB;
+  ctx.fillRect(px, py, TILE, TILE);
+
+  ctx.fillStyle = 'rgba(255, 210, 190, 0.035)';
+  for (let j = 0; j < TILE; j += 4) {
+    for (let i = 0; i < TILE; i += 4) {
+      if (((i + j) >> 2) % 2 === 0) ctx.fillRect(px + i, py + j, 2, 2);
+    }
+  }
+  ctx.fillStyle = THEATRE.carpetLine;
+  ctx.fillRect(px, py, TILE, 1);
+  ctx.fillRect(px, py, 1, TILE);
+}
+
 /* ------------------------------------------------------------------ */
 /* Walls                                                               */
 /* ------------------------------------------------------------------ */
@@ -233,7 +284,19 @@ export function drawWallTop(ctx, px, py, tx, ty) {
  * gives a real dado / picture field / cornice elevation instead of a single
  * flat strip, which is most of what makes a room read as a room.
  */
-export function drawWallFace(ctx, px, py, depth) {
+export function drawWallFace(ctx, px, py, depth, theme) {
+  const T = theme === 'theatre' ? {
+    face: THEATRE.wallFace, hi: THEATRE.wallFaceHi, base: THEATRE.baseboard,
+    panel: 'rgba(0, 0, 0, 0.30)', panelHi: 'rgba(168, 64, 74, 0.22)',
+    panelLo: 'rgba(0, 0, 0, 0.35)', rail: 'rgba(220, 166, 70, 0.55)',
+    light: 'rgba(255, 240, 230, 0.10)',
+  } : {
+    face: COL.wallFace, hi: COL.wallFaceHi, base: COL.baseboard,
+    panel: 'rgba(154, 124, 88, 0.24)', panelHi: 'rgba(255, 250, 238, 0.45)',
+    panelLo: 'rgba(120, 94, 64, 0.30)', rail: null,
+    light: 'rgba(255, 250, 238, 0.35)',
+  };
+
   if (depth === 2) {
     // cornice: roof mass above, then crown moulding stepping out
     ctx.fillStyle = COL.wallTop;
@@ -241,51 +304,55 @@ export function drawWallFace(ctx, px, py, depth) {
     ctx.fillStyle = 'rgba(48, 34, 22, 0.28)';
     ctx.fillRect(px, py + 7, TILE, 1);
 
-    ctx.fillStyle = COL.wallFaceHi;
+    ctx.fillStyle = T.hi;
     ctx.fillRect(px, py + 8, TILE, 3);
-    ctx.fillStyle = COL.wallFace;
+    ctx.fillStyle = T.face;
     ctx.fillRect(px, py + 11, TILE, 2);
-    ctx.fillStyle = COL.baseboard;
+    ctx.fillStyle = T.base;
     ctx.fillRect(px, py + 13, TILE, 1);
-    ctx.fillStyle = COL.wallFace;
+    ctx.fillStyle = T.face;
     ctx.fillRect(px, py + 14, TILE, 2);
     return;
   }
 
   if (depth === 1) {
     // the picture field: plaster, brighter at the top where light falls
-    ctx.fillStyle = COL.wallFace;
+    ctx.fillStyle = T.face;
     ctx.fillRect(px, py, TILE, TILE);
-    ctx.fillStyle = 'rgba(255, 250, 238, 0.35)';
+    ctx.fillStyle = T.light;
     ctx.fillRect(px, py, TILE, 5);
     // picture rail
-    ctx.fillStyle = COL.baseboard;
+    ctx.fillStyle = T.base;
     ctx.fillRect(px, py + 2, TILE, 1);
-    ctx.fillStyle = COL.wallFaceHi;
+    ctx.fillStyle = T.hi;
     ctx.fillRect(px, py + 3, TILE, 1);
+    if (T.rail) {
+      ctx.fillStyle = T.rail;
+      ctx.fillRect(px, py + 4, TILE, 1);
+    }
     return;
   }
 
   // depth 0 — dado rail, wainscot panelling, baseboard, contact shadow
-  ctx.fillStyle = COL.wallFace;
+  ctx.fillStyle = T.face;
   ctx.fillRect(px, py, TILE, TILE);
 
-  ctx.fillStyle = COL.baseboard;
+  ctx.fillStyle = T.base;
   ctx.fillRect(px, py + 4, TILE, 1);
-  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillStyle = T.hi;
   ctx.fillRect(px, py + 5, TILE, 1);
 
   // panelled wainscot: one recessed panel per tile
-  ctx.fillStyle = 'rgba(154, 124, 88, 0.24)';
+  ctx.fillStyle = T.panel;
   ctx.fillRect(px + 2, py + 7, TILE - 4, 5);
-  ctx.fillStyle = 'rgba(255, 250, 238, 0.45)';
+  ctx.fillStyle = T.panelHi;
   ctx.fillRect(px + 2, py + 7, TILE - 4, 1);
-  ctx.fillStyle = 'rgba(120, 94, 64, 0.30)';
+  ctx.fillStyle = T.panelLo;
   ctx.fillRect(px + 2, py + 11, TILE - 4, 1);
 
-  ctx.fillStyle = COL.baseboard;
+  ctx.fillStyle = T.base;
   ctx.fillRect(px, py + 13, TILE, 3);
-  ctx.fillStyle = 'rgba(58, 42, 30, 0.45)';
+  ctx.fillStyle = 'rgba(20, 10, 12, 0.45)';
   ctx.fillRect(px, py + 15, TILE, 1);
 }
 
@@ -1069,6 +1136,141 @@ export function drawBanner(ctx, px, py, w, accent) {
     ctx.fillStyle = COL.brass;
     ctx.fillRect(x + i + 2, py + 20, 2, 1);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* The screening room                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A cinema screen standing against the west wall, facing into the room. In a
+ * top-down view a screen on a side wall would be edge-on and unreadable, so it
+ * is drawn with a little cheated perspective — the same licence a top-down game
+ * takes with every doorway. (px, py) is the bottom-centre of its frame.
+ */
+export function drawScreen(ctx, px, py, w, h, t, playing) {
+  const x = px - Math.floor(w / 2);
+  const y = py - h;
+
+  // the light it throws across the carpet, breathing slightly
+  const pulse = playing ? 0.55 + Math.sin(t / 260) * 0.18 : 0.28;
+  for (let i = 5; i >= 1; i--) {
+    ctx.fillStyle = `rgba(190, 214, 232, ${(0.030 * pulse * i).toFixed(3)})`;
+    ctx.fillRect(x + w - 2, y + i * 3, i * 13, h - i * 6);
+  }
+
+  // black surround
+  ctx.fillStyle = '#141013';
+  ctx.fillRect(x - 3, y - 4, w + 6, h + 6);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x - 3, y - 4, w + 6, 1);
+  ctx.fillRect(x - 3, y + h + 1, w + 6, 1);
+
+  // the surface: pale and scanning when playing, dark and matte when not
+  ctx.fillStyle = playing ? THEATRE.screen : THEATRE.screenDim;
+  ctx.fillRect(x, y, w, h);
+
+  if (playing) {
+    ctx.fillStyle = 'rgba(120, 150, 178, 0.20)';
+    for (let j = (Math.floor(t / 55) % 6); j < h; j += 6) {
+      ctx.fillRect(x, y + j, w, 1);
+    }
+  } else {
+    // standby: a masked black surround and a single slow glint travelling down
+    // it, so it still reads as glass rather than as a slab of wall
+    ctx.fillStyle = 'rgba(10, 8, 12, 0.55)';
+    ctx.fillRect(x, y, w, 3);
+    ctx.fillRect(x, y + h - 3, w, 3);
+    const g = (t / 34) % (h + 40) - 20;
+    ctx.fillStyle = 'rgba(200, 220, 236, 0.16)';
+    ctx.fillRect(x, y + Math.max(0, Math.min(h - 6, g)), w, 6);
+  }
+
+  // sheen down the left edge, away from the room
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.fillRect(x, y, 2, h);
+
+  // velvet drapes gathered at top and bottom
+  for (const dy of [y - 4, y + h - 5]) {
+    ctx.fillStyle = THEATRE.velvet;
+    ctx.fillRect(x - 4, dy, w + 8, 9);
+    ctx.fillStyle = THEATRE.velvetDark;
+    for (let i = 0; i < w + 8; i += 4) ctx.fillRect(x - 4 + i, dy, 2, 9);
+    ctx.fillStyle = THEATRE.velvetHi;
+    ctx.fillRect(x - 4, dy, w + 8, 1);
+  }
+}
+
+/** A velvet armchair. `facing` is 'left' or 'right'. (px, py) is bottom-centre. */
+export function drawArmchair(ctx, px, py, facing = 'left') {
+  const flip = facing === 'left' ? 1 : -1;
+  ctx.fillStyle = 'rgba(20, 8, 10, 0.40)';
+  ctx.fillRect(px - 10, py - 2, 20, 3);
+
+  // legs
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(px - 8, py - 5, 3, 4);
+  ctx.fillRect(px + 5, py - 5, 3, 4);
+
+  // seat cushion
+  ctx.fillStyle = THEATRE.velvet;
+  ctx.fillRect(px - 10, py - 17, 20, 12);
+  ctx.fillStyle = THEATRE.velvetHi;
+  ctx.fillRect(px - 10, py - 17, 20, 2);
+  ctx.fillStyle = THEATRE.velvetDark;
+  ctx.fillRect(px - 10, py - 7, 20, 2);
+  // a seam down the cushion
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+  ctx.fillRect(px - 1, py - 15, 2, 8);
+
+  // arm rests, front and back
+  ctx.fillStyle = THEATRE.velvetDark;
+  ctx.fillRect(px - 11, py - 21, 22, 4);
+  ctx.fillRect(px - 11, py - 8, 22, 3);
+
+  // the back, on the side away from whatever it faces
+  const bx = px + flip * 8;
+  ctx.fillStyle = THEATRE.velvetDark;
+  ctx.fillRect(bx - 4, py - 30, 8, 22);
+  ctx.fillStyle = THEATRE.velvet;
+  ctx.fillRect(bx - 4, py - 30, 4, 22);
+  ctx.fillStyle = THEATRE.velvetHi;
+  ctx.fillRect(bx - 4, py - 30, 8, 1);
+
+  // brass stud on the seat back
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(bx - 1, py - 25, 2, 2);
+}
+
+/** A gathered velvet drape hanging down a wall. (px, py) is the top-centre. */
+export function drawDrape(ctx, px, py, w, h) {
+  const x = px - Math.floor(w / 2);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x - 2, py, w + 4, 2);
+
+  ctx.fillStyle = THEATRE.velvet;
+  ctx.fillRect(x, py + 2, w, h);
+  ctx.fillStyle = THEATRE.velvetDark;
+  for (let i = 1; i < w; i += 5) ctx.fillRect(x + i, py + 2, 2, h);
+  ctx.fillStyle = THEATRE.velvetHi;
+  ctx.fillRect(x, py + 2, w, 1);
+
+  // scalloped hem
+  for (let i = 0; i < w; i += 5) {
+    ctx.fillStyle = THEATRE.velvetDark;
+    ctx.fillRect(x + i, py + 2 + h, 4, 2);
+  }
+}
+
+/** A standing person. Blinks on their own clock so a room of them isn't synced. */
+export function drawPerson(ctx, px, py, t, seed = 0) {
+  const sprite = ((t + seed * 900) % 4200) < 130
+    ? SPRITES.person.blink : SPRITES.person.idle;
+  const bob = Math.round(Math.sin((t + seed * 500) / 1300) * 0.5);
+
+  ctx.fillStyle = 'rgba(20, 8, 10, 0.32)';
+  ctx.fillRect(px - 6, py - 2, 12, 2);
+  ctx.drawImage(sprite, px - 8, py - 17 + bob);
 }
 
 /** The contact shadow under the hovering droid. */

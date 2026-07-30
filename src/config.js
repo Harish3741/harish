@@ -57,6 +57,26 @@ export const COL = {
   shadow: 'rgba(59, 42, 34, 0.25)',
 };
 
+// The About Me wing is fitted out as a small screening room. Black and red,
+// but warm blacks and a brick-toned red rather than pure #000 and #F00, so it
+// sits inside the museum rather than fighting it. The brass stays: it is what
+// ties the room to the rest of the building.
+export const THEATRE = {
+  wallFace: '#2A1B1C',
+  wallFaceHi: '#3B2528',
+  baseboard: '#7A2A31',
+  panel: '#221518',
+  carpetA: '#3E181D',
+  carpetB: '#471D22',
+  carpetLine: '#2A1014',
+  velvet: '#8E2A32',
+  velvetDark: '#5E1A21',
+  velvetHi: '#A8404A',
+  screen: '#DCE4E8',
+  screenDim: '#46505C',
+  glow: 'rgba(190, 214, 232, 0.16)',
+};
+
 // The droid. Same grid the avatar sheet used.
 export const DROID_PAL = {
   '#': '#3B2A22',

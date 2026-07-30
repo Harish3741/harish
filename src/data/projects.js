@@ -179,6 +179,41 @@ export const PAINTINGS = {
   atrium: [null, null, null, null],
 };
 
+// ---------------------------------------------------------------------------
+// THE SCREENING ROOM
+//
+// The About Me wing is fitted out as a small cinema. Two things in it:
+//
+//   the person by the door  — press E and they give the summary below, which
+//                             is just the About Me wing's entries above.
+//   the chair               — sit in it and the camera pans to the screen and
+//                             plays `video`.
+//
+// `video` takes any URL a browser can play: a file next to the page
+// ('media/intro.mp4'), a data URI, or an absolute URL. Leave it null and the
+// screen stays dark with a note instead — nothing breaks.
+//
+// `palette` is the character. Swap the hex values to change hair, skin and
+// clothes; the sprite itself doesn't need touching.
+// ---------------------------------------------------------------------------
+
+export const ABOUT = {
+  name: 'Harish',
+  greeting: 'Oh — hello. Come in, sit down, the film is about to start.',
+  video: null,
+  videoPoster: null,
+  videoCaption: 'A short introduction, recorded badly and with feeling.',
+  palette: {
+    '#': '#2A1B1C',   // outline
+    K: '#241A16',     // hair
+    S: '#B87A4E',     // skin
+    E: '#160F0C',     // eyes
+    T: '#8E2A32',     // shirt
+    P: '#2E2A38',     // trousers
+    O: '#1E1A18',     // shoes
+  },
+};
+
 /** Look a wing up by the id used on its plinth. */
 export function wingById(id) {
   return WINGS.find((w) => w.id === id) || null;

@@ -657,3 +657,89 @@ body.is-handheld { overflow: auto; }
   * { transition-duration: 0.01ms !important; }
   .window { transform: none; }
 }
+
+/* ------------------------------------------------------- screening room --
+   The film the chair in the About Me wing plays. Black and red like the room
+   it belongs to, and letterboxed, because that is what a screen looks like.
+   ---------------------------------------------------------------------- */
+
+#screening { background: rgba(8, 4, 6, 0.94); }
+
+.reel {
+  width: min(940px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #170F11;
+  padding: 18px;
+  box-shadow: 0 0 0 3px #8E2A32, 0 0 0 6px #0E0709;
+  transform: translateY(8px);
+  transition: transform 200ms ease;
+}
+
+.is-open .reel { transform: none; }
+
+.reel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#screening-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 21px;
+  letter-spacing: 0.02em;
+  color: #F0DDD5;
+}
+
+.reel-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #0A0608;
+  border: 1px solid #3A2225;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.reel-stage video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* what the screen says before a film has been put in it */
+.reel-empty {
+  max-width: 46ch;
+  padding: 24px;
+  text-align: center;
+  color: #9A8288;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+}
+
+.reel-empty strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #C8535F;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+}
+
+.reel-empty code {
+  color: #E0C4A8;
+  font-size: 12px;
+}
+
+.reel-caption {
+  margin: 0;
+  color: #9A8288;
+  font-size: 13px;
+  font-style: italic;
+}

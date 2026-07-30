@@ -58,6 +58,28 @@ up to and read, and leaving it `null` keeps the frame as decoration.
 `image` is optional and takes any URL a browser can load. A data URI keeps the
 picture inside the file, which is what the standalone build needs.
 
+### The screening room
+
+The About Me wing is a small cinema rather than a gallery: black and red, a
+screen on the west wall, one armchair facing it, and a character standing by
+the door. `ABOUT` in the same file drives all of it.
+
+- Press <kbd>E</kbd> at the character and they give you the About Me entries.
+- Sit in the chair and the camera pans to the screen, which plays `ABOUT.video`.
+
+```js
+export const ABOUT = {
+  name: 'Harish',
+  video: 'media/intro.mp4',        // or a data URI, or null
+  videoCaption: 'A short introduction.',
+  palette: { K: '#241A16', S: '#B87A4E', T: '#8E2A32', /* … */ },
+};
+```
+
+`video` being `null` is fine — the screen stays dark and says so. `palette`
+recolours the character (hair, skin, shirt, trousers, shoes) without touching
+the sprite.
+
 ---
 
 ## Running it

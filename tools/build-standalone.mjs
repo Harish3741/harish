@@ -31,6 +31,7 @@ const MODULES = [
   'player',
   'menu',
   'listview',
+  'screening',
   'intro',
   'main',
 ];
@@ -38,14 +39,21 @@ const MODULES = [
 const IMPORT_RE = /^import\s[\s\S]*?from\s+'[^']+';\s*$/gm;
 const EXPORT_RE = /^export\s+(const|let|var|function|class|async)\b/gm;
 
-const DECL_RES = [
-  /^(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)/gm,
-  /^(?:export\s+)?function\s+([A-Za-z_$][\w$]*)/gm,
-];
+// A `let a, b, c;` declares three names, and an earlier version of this only
+// saw the first — which let two modules both declare `titleEl` and the bundle
+// died at runtime with "already been declared". So capture the whole declarator
+// list and pull every identifier out of it.
+const DECL_LIST_RE = /^(?:export\s+)?(?:const|let|var)\s+([^=;\n]+)/gm;
+const FN_RE = /^(?:export\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)/gm;
+const CLASS_RE = /^(?:export\s+)?class\s+([A-Za-z_$][\w$]*)/gm;
+const IDENT_RE = /[A-Za-z_$][\w$]*/g;
 
 function declarations(src) {
   const names = new Set();
-  for (const re of DECL_RES) {
+  for (const m of src.matchAll(DECL_LIST_RE)) {
+    for (const id of m[1].matchAll(IDENT_RE)) names.add(id[0]);
+  }
+  for (const re of [FN_RE, CLASS_RE]) {
     for (const m of src.matchAll(re)) names.add(m[1]);
   }
   return names;

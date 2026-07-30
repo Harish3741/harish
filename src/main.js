@@ -6,6 +6,7 @@
 
 import { view, COL } from './config.js';
 import { buildSprites } from './art.js';
+import { ABOUT } from './data/projects.js';
 import {
   buildMap, map, plinthNear, interactableNear, drawProp, drawSconces, START_PX,
 } from './map.js';
@@ -20,6 +21,9 @@ import {
 import { initMenu, openMenu, openArtwork, isMenuOpen, closeMenu } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
+  initScreening, openScreening, closeScreening, isScreeningOpen,
+} from './screening.js';
+import {
   startIntro, updateIntro, drawIntroOverlay, shouldSkipIntro, markVisited,
 } from './intro.js';
 import { drawTextCentered, textWidth } from './font.js';
@@ -28,6 +32,11 @@ let state = 'intro';
 let last = 0;
 let promptPulse = 0;
 let lastNear = null;
+
+// The screening: sitting in the theatre chair pans the camera to the screen,
+// holds, opens the film, and reverses all of that on the way out.
+const SCREEN_PAN_SECONDS = 1.1;
+let screening = null;   // { phase, t, from: {x,y} }
 
 /* ------------------------------------------------------------------ */
 
@@ -50,13 +59,14 @@ function boot() {
     return;
   }
 
-  buildSprites();
+  buildSprites(ABOUT && ABOUT.palette);
   buildMap();
   initRenderer(canvas);
   initInput();
   watchPointer(canvas);
   initMenu();
   initListView();
+  initScreening();
 
   document.body.classList.add('is-playing');
 
@@ -90,12 +100,17 @@ function loop(ts) {
 
 function update(dt, ts) {
   // the overlays own the keyboard while they're up
-  if (isMenuOpen() || isListOpen()) {
+  if (isMenuOpen() || isListOpen() || isScreeningOpen()) {
     updatePlayer(dt, false);
     return;
   }
 
-  updatePlayer(dt, state === 'explore');
+  updatePlayer(dt, state === 'explore' && !screening);
+
+  if (screening) {
+    updateScreening(dt);
+    return;
+  }
 
   if (state === 'intro') {
     if (updateIntro(dt) === 'done') state = 'explore';
@@ -127,13 +142,77 @@ function update(dt, ts) {
       clearHeldKeys();
       // drop any keys held while the menu was up, or the droid bolts on close
       openMenu(near.id, clearHeldKeys);
+    } else if (near.wing) {
+      // the person by the door: their summary is the wing's own entries
+      clearHeldKeys();
+      openMenu(near.wing, clearHeldKeys);
     } else if (near.caption !== undefined) {
       clearHeldKeys();
       openArtwork(near, clearHeldKeys);
+    } else if (near.theatre) {
+      toggleSeat(near);
+      startScreening();
     } else {
       toggleSeat(near);
     }
   }
+}
+
+/* ------------------------------------------------------------------ */
+
+/** Ease in and out, so the camera doesn't jerk at either end of the pan. */
+function easeInOut(k) {
+  return k < 0.5 ? 2 * k * k : 1 - ((-2 * k + 2) ** 2) / 2;
+}
+
+function startScreening() {
+  if (!map.screen) return;
+  screening = { phase: 'in', t: 0, from: { x: player.x, y: focusY() } };
+  map.screen.playing = true;
+}
+
+function updateScreening(dt) {
+  const s = screening;
+  const scr = map.screen;
+  s.t += dt;
+
+  if (s.phase === 'in') {
+    const k = Math.min(1, s.t / SCREEN_PAN_SECONDS);
+    const e = easeInOut(k);
+    centreCamera(
+      s.from.x + (scr.cx - s.from.x) * e,
+      s.from.y + (scr.cy - s.from.y) * e
+    );
+    if (k >= 1) {
+      s.phase = 'showing';
+      clearHeldKeys();
+      openScreening(endScreening);
+    }
+    return;
+  }
+
+  if (s.phase === 'out') {
+    const k = Math.min(1, s.t / SCREEN_PAN_SECONDS);
+    const e = easeInOut(k);
+    centreCamera(
+      scr.cx + (s.from.x - scr.cx) * e,
+      scr.cy + (s.from.y - scr.cy) * e
+    );
+    if (k >= 1) {
+      screening = null;
+      clearHeldKeys();
+    }
+  }
+}
+
+/** Called when the film is dismissed: stand up and pan back. */
+function endScreening() {
+  if (!screening) return;
+  map.screen.playing = false;
+  if (player.seat) toggleSeat(player.seat);
+  screening.phase = 'out';
+  screening.t = 0;
+  screening.from = { x: player.x, y: focusY() };
 }
 
 /* ------------------------------------------------------------------ */
@@ -167,7 +246,7 @@ function draw(ts) {
 
   vignette();
 
-  if (state === 'explore') drawPrompt(ts, ox, oy);
+  if (state === 'explore' && !screening) drawPrompt(ts, ox, oy);
 
   if (state === 'intro') drawIntroOverlay(ctx, ts);
 }
@@ -189,8 +268,10 @@ function drawPrompt(ts, ox, oy) {
 
   const label = near.label.toUpperCase();
   const hint = near.id ? 'PRESS  E'
-    : near.caption !== undefined ? 'PRESS  E  TO  READ'
-      : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
+    : near.wing ? 'PRESS  E  TO  TALK'
+      : near.caption !== undefined ? 'PRESS  E  TO  READ'
+        : near.theatre ? 'PRESS  E  TO  WATCH'
+          : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
   const x = Math.round(near.x - ox);
   const bob = Math.round(Math.sin(ts / 400) * 1.5);

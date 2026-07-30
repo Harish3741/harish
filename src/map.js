@@ -21,17 +21,18 @@
 // There is no way in or out. The museum is the whole world, you begin in the
 // middle of it, and every room is a few seconds away.
 
-import { TILE, COL } from './config.js';
+import { TILE, COL, THEATRE } from './config.js';
 import {
-  drawMarble, drawWood,
+  drawMarble, drawWood, drawCarpet,
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner,
   drawColumn, drawVitrine, drawStatue, drawRug, drawSconce,
+  drawScreen, drawArmchair, drawDrape, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
-import { PAINTINGS } from './data/projects.js';
+import { PAINTINGS, ABOUT } from './data/projects.js';
 
 export const MAP_W = 40;
 export const MAP_H = 32;
@@ -47,7 +48,7 @@ const REGIONS = [
   { rect: [21, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
   { rect: [11, 14, 18, 3], floor: 'marble', indoor: true },
   { rect: [10, 20, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [21, 20, 9, 7], floor: 'wood', indoor: true, wing: 'about' },
+  { rect: [21, 20, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
   // is how thick the walls are. These replaced the old connecting corridors.
@@ -74,7 +75,10 @@ export const WING_ROOMS = {
   automations: { cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations', accent: '#2E4A52' },
   personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
   client: { cx: 14, cy: 23, entry: 'north', rail: 18, label: 'Client Work', accent: '#2F3A55' },
-  about: { cx: 25, cy: 23, entry: 'north', rail: 18, label: 'About Me', accent: '#4C2F49' },
+  about: {
+    cx: 25, cy: 23, entry: 'north', rail: 18, label: 'About Me',
+    accent: '#7A2A31', theatre: true,
+  },
 };
 
 // The row of each wall that carries pictures and sconces (the "picture field",
@@ -117,6 +121,7 @@ export const map = {
   floor: new Array(MAP_W * MAP_H).fill(null),
   indoor: new Uint8Array(MAP_W * MAP_H),
   wing: new Array(MAP_W * MAP_H).fill(null),
+  theme: new Array(MAP_W * MAP_H).fill(null),
   wall: new Uint8Array(MAP_W * MAP_H),
   canvas: null,
   plinths: [],
@@ -124,6 +129,8 @@ export const map = {
   colliders: [],
   artworks: [],   // framed pictures you can walk up to and read
   seats: [],      // benches you can sit on
+  people: [],     // characters you can talk to
+  screen: null,   // the cinema screen, if the theatre is built
 };
 
 const idx = (x, y) => y * MAP_W + x;
@@ -174,13 +181,19 @@ export function seatNear(px, py) {
   return nearest(map.seats, px, py, 26);
 }
 
+/** The person you're standing next to, or null. */
+export function personNear(px, py) {
+  return nearest(map.people, px, py, 30);
+}
+
 /**
  * Whatever pressing E would act on right here. Ordered by how deliberate the
  * approach has to be: a plinth is the point of the room, a picture needs you
  * standing at the wall, a bench is what is left.
  */
 export function interactableNear(px, py) {
-  return plinthNear(px, py) || artworkNear(px, py) || seatNear(px, py);
+  return plinthNear(px, py) || personNear(px, py)
+    || artworkNear(px, py) || seatNear(px, py);
 }
 
 /* ------------------------------------------------------------------ */
@@ -197,6 +210,7 @@ export function buildMap() {
         map.floor[idx(x, y)] = r.floor;
         map.indoor[idx(x, y)] = r.indoor ? 1 : 0;
         if (r.wing) map.wing[idx(x, y)] = r.wing;
+        if (r.theme) map.theme[idx(x, y)] = r.theme;
       }
     }
   }
@@ -228,8 +242,10 @@ export function buildMap() {
     }
   }
 
-  // 3. one plinth per wing, dead centre
+  // 3. A plinth in the middle of every wing except the screening room, where
+  //    the character and the chair do that job instead.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
+    if (w.theatre) continue;
     const px = w.cx * TILE + 8;
     const py = w.cy * TILE + TILE;
     map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
@@ -274,6 +290,7 @@ function renderBackground() {
       const px = x * TILE;
       const py = y * TILE;
       if (f === 'marble') drawMarble(c, px, py, x, y);
+      else if (f === 'carpet') drawCarpet(c, px, py, x, y);
       else drawWood(c, px, py, x, y);
     }
   }
@@ -300,6 +317,8 @@ function renderBackground() {
   // until they read as pools of water rather than textiles.
   drawLightPool(c, AXIS - 60, 14 * TILE, 120, 48, 0.55);
   for (const w of Object.values(WING_ROOMS)) {
+    // no skylight over a cinema — the screen is the only light in that room
+    if (w.theatre) continue;
     drawLightPool(c, (w.cx - 3) * TILE, (w.cy - 3) * TILE, 7 * TILE, 7 * TILE);
   }
   for (const [sx, ry] of SCONCES) {
@@ -322,8 +341,12 @@ function renderBackground() {
     for (let x = 0; x < MAP_W; x++) {
       if (!map.wall[idx(x, y)]) continue;
       const depth = wallFaceDepth(x, y);
-      if (depth >= 0) drawWallFace(c, x * TILE, y * TILE, depth);
-      else drawWallTop(c, x * TILE, y * TILE, x, y);
+      if (depth >= 0) {
+        // the wall belongs to whichever room it faces into
+        drawWallFace(c, x * TILE, y * TILE, depth, map.theme[idx(x, y + depth + 1)]);
+      } else {
+        drawWallTop(c, x * TILE, y * TILE, x, y);
+      }
     }
   }
 
@@ -412,6 +435,7 @@ function decorate(c) {
   }
 
   for (const w of Object.values(WING_ROOMS)) {
+    if (w.theatre) { dressTheatre(c, w); continue; }
     const front = w.entry === 'south' ? 1 : -1;   // toward the arch
 
     // flanking the plinth, clear of the arch's five-tile span
@@ -460,6 +484,54 @@ function decorate(c) {
   map.props.sort((a, b) => a.y - b.y);
 }
 
+/**
+ * The screening room. Screen on the west wall, a single armchair facing it, and
+ * whoever is standing by the door on the right. No plinth: the person is the
+ * "about me" and the chair is the film.
+ */
+function dressTheatre(c, w) {
+  const left = (w.cx - 3) * TILE + 8;      // against the west wall
+  const midY = w.cy * TILE + 8;
+
+  // a little extra gloom, so the screen has something to be brighter than
+  c.fillStyle = 'rgba(14, 6, 9, 0.12)';
+  c.fillRect((w.cx - 4) * TILE, (w.cy - 3) * TILE, 9 * TILE, 7 * TILE);
+
+  // drapes down the side walls
+  drawDrape(c, (w.cx - 4) * TILE + 8, (w.cy - 3) * TILE + 2, 12, 20);
+  drawDrape(c, (w.cx + 4) * TILE + 8, (w.cy - 3) * TILE + 2, 12, 20);
+  drawDrape(c, (w.cx - 4) * TILE + 8, (w.cy + 1) * TILE + 2, 12, 20);
+  drawDrape(c, (w.cx + 4) * TILE + 8, (w.cy + 1) * TILE + 2, 12, 20);
+
+  // the screen: tall, against the west wall, facing into the room
+  const screen = {
+    x: left, y: midY + 40, w: 18, h: 78,
+    cx: left + 30, cy: midY,          // where the camera looks when it plays
+  };
+  map.screen = screen;
+  addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
+  map.colliders.push({ x: screen.x - 14, y: screen.y - screen.h, w: 22, h: screen.h });
+
+  // one chair, facing the screen
+  const seatX = (w.cx + 1) * TILE + 8;
+  addProp({ kind: 'armchair', x: seatX, y: midY + 26, facing: 'left' });
+  map.seats.push({ x: seatX, y: midY + 20, label: 'Seat', theatre: true });
+
+  // whoever is standing by the door, on the right as you come in
+  const person = {
+    x: (w.cx + 3) * TILE + 8,
+    y: (w.cy - 2) * TILE + 16,
+    label: (ABOUT && ABOUT.name) || 'About Me',
+    wing: 'about',
+  };
+  map.people.push(person);
+  addProp({ kind: 'person', x: person.x, y: person.y, seed: 1 });
+  map.colliders.push({ x: person.x - 6, y: person.y - 10, w: 12, h: 10 });
+
+  // a rope run along the back, so the room still reads as part of the museum
+  addProp({ kind: 'rope', x: (w.cx - 1) * TILE, y: (w.cy + 3) * TILE + 10, span: 4 * TILE });
+}
+
 /** The wall sconces, drawn live each frame so their flames move. */
 export function drawSconces(c, ox, oy, t) {
   SCONCES.forEach(([sx, ry], i) => {
@@ -482,6 +554,9 @@ export function drawProp(c, p, ox, oy, t) {
       drawPlinthIcon(c, x, y, p.id, t);
       break;
     case 'plant': drawPlant(c, x, y); break;
+    case 'screen': drawScreen(c, x, y, p.w, p.h, t, !!map.screen.playing); break;
+    case 'armchair': drawArmchair(c, x, y, p.facing); break;
+    case 'person': drawPerson(c, x, y, t, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
     case 'column': drawColumn(c, x, y); break;

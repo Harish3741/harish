@@ -52,6 +52,18 @@
     </div>
   </div>
 
+  <!-- The screening room's film. Opens after the camera pans to the screen. -->
+  <div id="screening" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="screening-title">
+    <div class="reel">
+      <div class="reel-head">
+        <h2 id="screening-title">Now showing</h2>
+        <button id="screening-close" class="win-close" type="button" aria-label="Stop the film and get up">✕</button>
+      </div>
+      <div id="screening-stage" class="reel-stage"></div>
+      <p id="screening-caption" class="reel-caption"></p>
+    </div>
+  </div>
+
   <noscript>
     <div class="noscript">
       <h1>Harish</h1>

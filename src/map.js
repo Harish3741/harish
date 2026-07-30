@@ -29,7 +29,7 @@ import {
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner,
   drawColumn, drawVitrine, drawStatue, drawRug, drawSconce,
-  drawScreen, drawArmchair, drawDrape, drawPerson,
+  drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
 import { PAINTINGS, ABOUT } from './data/projects.js';
@@ -77,7 +77,7 @@ export const WING_ROOMS = {
   client: { cx: 14, cy: 23, entry: 'north', rail: 18, label: 'Client Work', accent: '#2F3A55' },
   about: {
     cx: 25, cy: 23, entry: 'north', rail: 18, label: 'About Me',
-    accent: '#7A2A31', theatre: true,
+    accent: '#33373C', theatre: true,
   },
 };
 
@@ -494,14 +494,8 @@ function dressTheatre(c, w) {
   const midY = w.cy * TILE + 8;
 
   // a little extra gloom, so the screen has something to be brighter than
-  c.fillStyle = 'rgba(14, 6, 9, 0.12)';
+  c.fillStyle = 'rgba(8, 10, 12, 0.14)';
   c.fillRect((w.cx - 4) * TILE, (w.cy - 3) * TILE, 9 * TILE, 7 * TILE);
-
-  // drapes down the side walls
-  drawDrape(c, (w.cx - 4) * TILE + 8, (w.cy - 3) * TILE + 2, 12, 20);
-  drawDrape(c, (w.cx + 4) * TILE + 8, (w.cy - 3) * TILE + 2, 12, 20);
-  drawDrape(c, (w.cx - 4) * TILE + 8, (w.cy + 1) * TILE + 2, 12, 20);
-  drawDrape(c, (w.cx + 4) * TILE + 8, (w.cy + 1) * TILE + 2, 12, 20);
 
   // the screen: tall, against the west wall, facing into the room
   const screen = {
@@ -512,10 +506,13 @@ function dressTheatre(c, w) {
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
   map.colliders.push({ x: screen.x - 14, y: screen.y - screen.h, w: 22, h: screen.h });
 
-  // one chair, facing the screen
-  const seatX = (w.cx + 1) * TILE + 8;
-  addProp({ kind: 'armchair', x: seatX, y: midY + 26, facing: 'left' });
-  map.seats.push({ x: seatX, y: midY + 20, label: 'Seat', theatre: true });
+  // One seat, centred on the rug and facing the screen. The rug is laid at the
+  // room's centre by the generic pass, so the seat takes its position from
+  // there rather than from a number of its own — move the rug and the seat
+  // follows.
+  const rug = { x: w.cx * TILE + 8, y: (w.cy + 1) * TILE - 4 };
+  addProp({ kind: 'cinemaseat', x: rug.x, y: rug.y + 14, facing: 'left' });
+  map.seats.push({ x: rug.x, y: rug.y + 8, label: 'Seat', theatre: true });
 
   // whoever is standing by the door, on the right as you come in
   const person = {
@@ -527,9 +524,6 @@ function dressTheatre(c, w) {
   map.people.push(person);
   addProp({ kind: 'person', x: person.x, y: person.y, seed: 1 });
   map.colliders.push({ x: person.x - 6, y: person.y - 10, w: 12, h: 10 });
-
-  // a rope run along the back, so the room still reads as part of the museum
-  addProp({ kind: 'rope', x: (w.cx - 1) * TILE, y: (w.cy + 3) * TILE + 10, span: 4 * TILE });
 }
 
 /** The wall sconces, drawn live each frame so their flames move. */
@@ -555,7 +549,7 @@ export function drawProp(c, p, ox, oy, t) {
       break;
     case 'plant': drawPlant(c, x, y); break;
     case 'screen': drawScreen(c, x, y, p.w, p.h, t, !!map.screen.playing); break;
-    case 'armchair': drawArmchair(c, x, y, p.facing); break;
+    case 'cinemaseat': drawCinemaSeat(c, x, y, p.facing); break;
     case 'person': drawPerson(c, x, y, t, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;

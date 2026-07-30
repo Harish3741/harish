@@ -57,23 +57,25 @@ export const COL = {
   shadow: 'rgba(59, 42, 34, 0.25)',
 };
 
-// The About Me wing is fitted out as a small screening room. Black and red,
-// but warm blacks and a brick-toned red rather than pure #000 and #F00, so it
-// sits inside the museum rather than fighting it. The brass stays: it is what
-// ties the room to the rest of the building.
+// The About Me wing is fitted out as a small screening room, in the black and
+// grey of a modern cinema rather than the red plush of an old one: acoustic
+// panelling, charcoal carpet, black masking round the screen. The greys carry a
+// slight warm bias so the room still belongs to a warm building, and the
+// fittings are steel rather than the museum's brass.
 export const THEATRE = {
-  wallFace: '#2A1B1C',
-  wallFaceHi: '#3B2528',
-  baseboard: '#7A2A31',
-  panel: '#221518',
-  carpetA: '#3E181D',
-  carpetB: '#471D22',
-  carpetLine: '#2A1014',
-  velvet: '#8E2A32',
-  velvetDark: '#5E1A21',
-  velvetHi: '#A8404A',
+  wallFace: '#2C2F33',
+  wallFaceHi: '#3A3E43',
+  baseboard: '#191B1E',
+  panel: '#212428',
+  carpetA: '#24272A',
+  carpetB: '#292C30',
+  carpetLine: '#191B1E',
+  seat: '#1C1E21',
+  seatHi: '#525A63',
+  seatLo: '#101214',
+  trim: '#4A5058',
   screen: '#DCE4E8',
-  screenDim: '#46505C',
+  screenDim: '#3C4248',
   glow: 'rgba(190, 214, 232, 0.16)',
 };
 

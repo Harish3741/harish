@@ -287,9 +287,9 @@ export function drawWallTop(ctx, px, py, tx, ty) {
 export function drawWallFace(ctx, px, py, depth, theme) {
   const T = theme === 'theatre' ? {
     face: THEATRE.wallFace, hi: THEATRE.wallFaceHi, base: THEATRE.baseboard,
-    panel: 'rgba(0, 0, 0, 0.30)', panelHi: 'rgba(168, 64, 74, 0.22)',
-    panelLo: 'rgba(0, 0, 0, 0.35)', rail: 'rgba(220, 166, 70, 0.55)',
-    light: 'rgba(255, 240, 230, 0.10)',
+    panel: 'rgba(0, 0, 0, 0.32)', panelHi: 'rgba(148, 158, 170, 0.16)',
+    panelLo: 'rgba(0, 0, 0, 0.38)', rail: 'rgba(120, 132, 146, 0.35)',
+    light: 'rgba(210, 224, 238, 0.07)',
   } : {
     face: COL.wallFace, hi: COL.wallFaceHi, base: COL.baseboard,
     panel: 'rgba(154, 124, 88, 0.24)', panelHi: 'rgba(255, 250, 238, 0.45)',
@@ -1159,10 +1159,10 @@ export function drawScreen(ctx, px, py, w, h, t, playing) {
     ctx.fillRect(x + w - 2, y + i * 3, i * 13, h - i * 6);
   }
 
-  // black surround
-  ctx.fillStyle = '#141013';
+  // black surround with a thin steel reveal
+  ctx.fillStyle = '#0E1012';
   ctx.fillRect(x - 3, y - 4, w + 6, h + 6);
-  ctx.fillStyle = COL.brassDim;
+  ctx.fillStyle = THEATRE.trim;
   ctx.fillRect(x - 3, y - 4, w + 6, 1);
   ctx.fillRect(x - 3, y + h + 1, w + 6, 1);
 
@@ -1190,76 +1190,55 @@ export function drawScreen(ctx, px, py, w, h, t, playing) {
   ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
   ctx.fillRect(x, y, 2, h);
 
-  // velvet drapes gathered at top and bottom
-  for (const dy of [y - 4, y + h - 5]) {
-    ctx.fillStyle = THEATRE.velvet;
-    ctx.fillRect(x - 4, dy, w + 8, 9);
-    ctx.fillStyle = THEATRE.velvetDark;
-    for (let i = 0; i < w + 8; i += 4) ctx.fillRect(x - 4 + i, dy, 2, 9);
-    ctx.fillStyle = THEATRE.velvetHi;
+  // black masking at each end, the way a modern screen is framed
+  for (const dy of [y - 4, y + h - 4]) {
+    ctx.fillStyle = '#0A0C0E';
+    ctx.fillRect(x - 4, dy, w + 8, 8);
+    ctx.fillStyle = 'rgba(148, 158, 170, 0.14)';
     ctx.fillRect(x - 4, dy, w + 8, 1);
   }
 }
 
-/** A velvet armchair. `facing` is 'left' or 'right'. (px, py) is bottom-centre. */
-export function drawArmchair(ctx, px, py, facing = 'left') {
+/**
+ * A plain black cinema seat. `facing` is 'left' or 'right'; the back goes on
+ * the far side from whatever it faces. (px, py) is the bottom-centre.
+ */
+export function drawCinemaSeat(ctx, px, py, facing = 'left') {
   const flip = facing === 'left' ? 1 : -1;
-  ctx.fillStyle = 'rgba(20, 8, 10, 0.40)';
+
+  ctx.fillStyle = 'rgba(6, 8, 10, 0.45)';
   ctx.fillRect(px - 10, py - 2, 20, 3);
 
-  // legs
-  ctx.fillStyle = COL.woodDark;
-  ctx.fillRect(px - 8, py - 5, 3, 4);
-  ctx.fillRect(px + 5, py - 5, 3, 4);
+  // pedestal
+  ctx.fillStyle = THEATRE.seatLo;
+  ctx.fillRect(px - 5, py - 6, 10, 5);
 
-  // seat cushion
-  ctx.fillStyle = THEATRE.velvet;
-  ctx.fillRect(px - 10, py - 17, 20, 12);
-  ctx.fillStyle = THEATRE.velvetHi;
-  ctx.fillRect(px - 10, py - 17, 20, 2);
-  ctx.fillStyle = THEATRE.velvetDark;
-  ctx.fillRect(px - 10, py - 7, 20, 2);
-  // a seam down the cushion
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-  ctx.fillRect(px - 1, py - 15, 2, 8);
+  // seat pad
+  ctx.fillStyle = THEATRE.seat;
+  ctx.fillRect(px - 9, py - 16, 18, 11);
+  ctx.fillStyle = THEATRE.seatHi;
+  ctx.fillRect(px - 9, py - 16, 18, 1);
+  ctx.fillStyle = THEATRE.seatLo;
+  ctx.fillRect(px - 9, py - 6, 18, 1);
 
-  // arm rests, front and back
-  ctx.fillStyle = THEATRE.velvetDark;
-  ctx.fillRect(px - 11, py - 21, 22, 4);
-  ctx.fillRect(px - 11, py - 8, 22, 3);
+  // arm rests
+  ctx.fillStyle = THEATRE.seatLo;
+  ctx.fillRect(px - 10, py - 19, 20, 3);
+  ctx.fillRect(px - 10, py - 8, 20, 2);
 
-  // the back, on the side away from whatever it faces
-  const bx = px + flip * 8;
-  ctx.fillStyle = THEATRE.velvetDark;
-  ctx.fillRect(bx - 4, py - 30, 8, 22);
-  ctx.fillStyle = THEATRE.velvet;
-  ctx.fillRect(bx - 4, py - 30, 4, 22);
-  ctx.fillStyle = THEATRE.velvetHi;
-  ctx.fillRect(bx - 4, py - 30, 8, 1);
+  // back
+  const bx = px + flip * 7;
+  ctx.fillStyle = THEATRE.seat;
+  ctx.fillRect(bx - 4, py - 28, 8, 20);
+  ctx.fillStyle = THEATRE.seatHi;
+  ctx.fillRect(bx - 4, py - 28, 8, 1);
+  ctx.fillStyle = THEATRE.seatLo;
+  ctx.fillRect(bx + flip * 2, py - 28, 2, 20);
 
-  // brass stud on the seat back
-  ctx.fillStyle = COL.brass;
-  ctx.fillRect(bx - 1, py - 25, 2, 2);
-}
-
-/** A gathered velvet drape hanging down a wall. (px, py) is the top-centre. */
-export function drawDrape(ctx, px, py, w, h) {
-  const x = px - Math.floor(w / 2);
-  ctx.fillStyle = COL.brassDim;
-  ctx.fillRect(x - 2, py, w + 4, 2);
-
-  ctx.fillStyle = THEATRE.velvet;
-  ctx.fillRect(x, py + 2, w, h);
-  ctx.fillStyle = THEATRE.velvetDark;
-  for (let i = 1; i < w; i += 5) ctx.fillRect(x + i, py + 2, 2, h);
-  ctx.fillStyle = THEATRE.velvetHi;
-  ctx.fillRect(x, py + 2, w, 1);
-
-  // scalloped hem
-  for (let i = 0; i < w; i += 5) {
-    ctx.fillStyle = THEATRE.velvetDark;
-    ctx.fillRect(x + i, py + 2 + h, 4, 2);
-  }
+  // rim light down the side the screen is on, which is the only light in here
+  ctx.fillStyle = 'rgba(196, 214, 232, 0.20)';
+  ctx.fillRect(px - flip * 10, py - 19, 1, 13);
+  ctx.fillRect(bx - flip * 4, py - 28, 1, 20);
 }
 
 /** A standing person. Blinks on their own clock so a room of them isn't synced. */

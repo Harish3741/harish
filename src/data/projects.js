@@ -96,12 +96,35 @@ export const WINGS = [
       {
         title: 'Placeholder — client one',
         year: '2025',
+        client: 'Placeholder — first client',
         tagline: 'What you were hired to solve.',
         description:
           'Placeholder. If any of this is under NDA, keep the entry and '
           + 'describe the shape of the problem without naming the client — '
           + '"a logistics company", "a mid-size retailer".',
         tech: ['React', 'Supabase'],
+        links: [],
+      },
+      {
+        title: 'Placeholder — client two',
+        year: '2025',
+        client: 'Placeholder — second client',
+        tagline: 'A second brief, for someone else.',
+        description:
+          'Placeholder. The `client` field is what puts an entry at one of '
+          + 'the three places round the boardroom table.',
+        tech: ['Python', 'Postgres'],
+        links: [],
+      },
+      {
+        title: 'Placeholder — client three',
+        year: '2024',
+        client: 'Placeholder — third client',
+        tagline: 'And a third.',
+        description:
+          'Placeholder. An entry with no `client` still shows up in the '
+          + 'skip-to-list; it just isn\'t standing at the table.',
+        tech: ['n8n'],
         links: [],
       },
     ],
@@ -167,10 +190,9 @@ export const PAINTINGS = {
     { title: 'Placeholder — picture three', caption: 'Another slot.' },
     null,
   ],
-  client: [
-    { title: 'Placeholder — picture one', caption: 'If the work is under NDA, a cropped detail with no client name still reads as a picture.' },
-    null, null, null,
-  ],
+  // The Client Work wing is a boardroom and hangs charts rather than pictures,
+  // so this key is unused. It stays so the four wings still read as a set.
+  client: [null, null, null, null],
   // The About Me wing is a cinema and hangs nothing, so this key is unused.
   // It stays here so the four wings still read as a set.
   about: [null, null, null, null],
@@ -178,6 +200,47 @@ export const PAINTINGS = {
   // then east. Nothing goes on its end wall — the résumé has that.
   atrium: [null, null, null, null, null, null],
 };
+
+// ---------------------------------------------------------------------------
+// THE BOARDROOM
+//
+// The Client Work wing is a boardroom rather than a gallery: three clients
+// standing round a table, and pressing E on one shows the work you did for
+// them. There is no plinth in that room — the people are the exhibit.
+//
+// `name` has to match the `client` field on the projects above; that is the
+// whole wiring. A client with nothing matching still stands there and says so.
+//
+// Three is the number the room is built for. Fewer and a place at the table
+// stands empty; more and they queue up along the wall.
+//
+// `hair` is 'short' or 'long', and `palette` recolours hair, skin, shirt and
+// trousers — between them, three people who don't look like triplets.
+// ---------------------------------------------------------------------------
+
+export const CLIENTS = [
+  {
+    name: 'Placeholder — first client',
+    role: 'What they do, in three words',
+    greeting: 'You built the thing that runs our mornings. Have a look.',
+    hair: 'short',
+    palette: { K: '#2E2018', S: '#C98F63', T: '#3A5A78', P: '#2A2E38' },
+  },
+  {
+    name: 'Placeholder — second client',
+    role: 'And what they do',
+    greeting: 'Six months of spreadsheets, gone. Here is what replaced them.',
+    hair: 'long',
+    palette: { K: '#4A2418', S: '#8A5A3A', T: '#6B4A2E', P: '#33302C' },
+  },
+  {
+    name: 'Placeholder — third client',
+    role: 'Likewise',
+    greeting: 'We had a deadline and no idea. Mostly the second part.',
+    hair: 'short',
+    palette: { K: '#1E1A18', S: '#E0B08A', T: '#4A5A46', P: '#2C2A30' },
+  },
+];
 
 // ---------------------------------------------------------------------------
 // THE RÉSUMÉ AND THE RULES

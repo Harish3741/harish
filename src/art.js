@@ -89,8 +89,25 @@ const PERSON = [
   '...#OOO##OOO#...',
 ];
 
+// Hair past the ears, so a room of people isn't a room of the same person in
+// different colours. Rows 6-8 are the face; the outer column either side of it
+// becomes hair, and it falls onto the shoulders at row 9.
+const PERSON_LONG = PERSON.map((row, i) => {
+  if (i === 6) return '...#KSSSSSSK#...';
+  if (i === 7) return '...#KESSSSEK#...';
+  if (i === 8) return '...#KSS##SSK#...';
+  if (i === 9) return '...#KK####KK#...';
+  return row;
+});
+
 // eyes closed, for the idle blink
 const PERSON_BLINK = PERSON.map((row, i) => (i === 7 ? '...#SS####SS#...' : row));
+const PERSON_LONG_BLINK = PERSON_LONG.map((row, i) => (i === 7 ? '...#KS####SK#...' : row));
+
+const PERSON_GRIDS = {
+  short: [PERSON, PERSON_BLINK],
+  long: [PERSON_LONG, PERSON_LONG_BLINK],
+};
 
 // Blink frame: the visor goes dark for a couple of frames.
 const DROID_DOWN_BLINK = DROID_DOWN.map((row, i) =>
@@ -126,15 +143,26 @@ function makeSprite(grid, pal, { mirror = false } = {}) {
 
 export const SPRITES = {};
 
-export function buildSprites(personPal) {
-  const pal = personPal || {
-    '#': '#2A1B1C', K: '#2E2018', S: '#C98F63', E: '#241A15',
-    T: '#7A2A31', P: '#2E2A38', O: '#1E1A18',
-  };
-  SPRITES.person = {
-    idle: makeSprite(PERSON, pal),
-    blink: makeSprite(PERSON_BLINK, pal),
-  };
+const PERSON_PAL = {
+  '#': '#2A1B1C', K: '#2E2018', S: '#C98F63', E: '#241A15',
+  T: '#7A2A31', P: '#2E2A38', O: '#1E1A18',
+};
+
+/**
+ * `cast` is { id: { hair, palette } } — everyone in the building who isn't the
+ * droid. Each one gets their own pair of frames baked at load, because a sprite
+ * recoloured per draw would mean a canvas operation per person per frame.
+ * A partial palette is fine: anything missing falls back to the default.
+ */
+export function buildSprites(cast) {
+  SPRITES.people = {};
+  const entries = Object.entries(cast || {});
+  if (!entries.length) entries.push(['default', {}]);
+  for (const [id, who] of entries) {
+    const pal = { ...PERSON_PAL, ...((who && who.palette) || {}) };
+    const [idle, blink] = PERSON_GRIDS[(who && who.hair) || 'short'] || PERSON_GRIDS.short;
+    SPRITES.people[id] = { idle: makeSprite(idle, pal), blink: makeSprite(blink, pal) };
+  }
 
   SPRITES.droid = {
     down: makeSprite(DROID_DOWN, DROID_PAL),
@@ -811,6 +839,113 @@ export function drawSideFrame(ctx, wallX, cy, side, seed) {
 }
 
 /**
+ * The boardroom table, seen from above: a long slab of wood with chairs tucked
+ * under both sides and the leavings of a meeting on it. (cx, cy) is its centre.
+ *
+ * Chairs are drawn as part of the table rather than as props of their own. They
+ * are pushed in, so they never need depth-sorting against anything, and one
+ * call keeps them evenly spaced whatever length the table is.
+ */
+export function drawBoardTable(ctx, cx, cy, w, h) {
+  const x = cx - Math.floor(w / 2);
+  const y = cy - Math.floor(h / 2);
+
+  // chairs, tucked under the long sides
+  const seats = Math.max(2, Math.floor(w / 20));
+  const gap = w / seats;
+  for (let i = 0; i < seats; i++) {
+    const sx = Math.round(x + gap * (i + 0.5));
+    for (const [sy, lip] of [[y - 7, -1], [y + h - 1, 1]]) {
+      ctx.fillStyle = COL.woodDark;
+      ctx.fillRect(sx - 7, sy, 14, 8);
+      ctx.fillStyle = COL.velvetDark;
+      ctx.fillRect(sx - 6, sy + 1, 12, 6);
+      ctx.fillStyle = COL.velvet;
+      ctx.fillRect(sx - 6, lip < 0 ? sy + 1 : sy + 6, 12, 1);
+    }
+  }
+
+  // the slab
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(x + 2, y + h - 1, w, 3);
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = COL.wood;
+  ctx.fillRect(x + 1, y + 1, w - 2, h - 3);
+  ctx.fillStyle = 'rgba(255, 236, 200, 0.14)';
+  ctx.fillRect(x + 1, y + 1, w - 2, 1);
+
+  // grain, running the length of it
+  ctx.fillStyle = 'rgba(107, 72, 48, 0.30)';
+  for (let j = 4; j < h - 4; j += 3) ctx.fillRect(x + 3, y + j, w - 6, 1);
+
+  // brass inlay down the centre line, and a lamp standing on it
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x + 4, cy - 1, w - 8, 1);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(cx - 5, cy - 4, 10, 6);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(cx - 5, cy + 1, 10, 1);
+  ctx.fillStyle = 'rgba(255, 240, 202, 0.35)';
+  ctx.fillRect(cx - 3, cy - 3, 6, 2);
+
+  // papers and a couple of mugs, so it looks like a meeting happened here
+  ctx.fillStyle = COL.paper;
+  ctx.fillRect(x + 9, cy - 6, 9, 7);
+  ctx.fillRect(x + w - 20, cy + 1, 9, 7);
+  ctx.fillStyle = 'rgba(122, 98, 70, 0.40)';
+  for (let j = 1; j < 6; j += 2) {
+    ctx.fillRect(x + 10, cy - 6 + j, 7, 1);
+    ctx.fillRect(x + w - 19, cy + 1 + j, 7, 1);
+  }
+  for (const [mx, my] of [[x + 24, cy + 3], [x + w - 27, cy - 5]]) {
+    ctx.fillStyle = COL.glass;
+    ctx.fillRect(mx, my, 5, 5);
+    ctx.fillStyle = '#6B4830';
+    ctx.fillRect(mx + 1, my + 1, 3, 3);
+  }
+}
+
+/**
+ * A chart pinned up on the wall — the boardroom's answer to a painting. Bars
+ * rather than a landscape, and the trend always goes up, because nobody pins up
+ * the other kind.
+ */
+export function drawWhiteboard(ctx, px, py, seed) {
+  const w = 18;
+  const ht = 16;
+  const x = px - Math.floor(w / 2);
+
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.22)';
+  ctx.fillRect(x + 2, py + 2, w, ht);
+
+  // board and its aluminium edge
+  ctx.fillStyle = '#8A8578';
+  ctx.fillRect(x, py, w, ht);
+  ctx.fillStyle = '#F3F1E8';
+  ctx.fillRect(x + 1, py + 1, w - 2, ht - 3);
+  ctx.fillStyle = '#C9C4B4';
+  ctx.fillRect(x + 1, py + ht - 3, w - 2, 2);
+
+  // axes and bars
+  ctx.fillStyle = 'rgba(60, 60, 60, 0.55)';
+  ctx.fillRect(x + 3, py + 3, 1, ht - 7);
+  ctx.fillRect(x + 3, py + ht - 5, w - 6, 1);
+  for (let i = 0; i < 3; i++) {
+    const bh = 3 + Math.floor(hash(seed + i, 7) * 3) + i * 2;
+    ctx.fillStyle = i === 2 ? COL.velvet : '#4F7A8C';
+    ctx.fillRect(x + 5 + i * 4, py + ht - 5 - bh, 3, bh);
+  }
+
+  // a pen on the tray, and the pins holding it up
+  ctx.fillStyle = hash(seed, 11) > 0.5 ? COL.velvet : '#3F5A7A';
+  ctx.fillRect(x + w - 7, py + ht - 3, 4, 1);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(x + 2, py - 1, 2, 2);
+  ctx.fillRect(x + w - 4, py - 1, 2, 2);
+}
+
+/**
  * A single sheet of paper on the wall, waiting to be read. Deliberately blank —
  * it's the résumé, and what's on it lives in the panel that opens, not in eight
  * pixels of pretend text.
@@ -1387,9 +1522,9 @@ export function drawCinemaSeat(ctx, px, py, facing = 'left') {
 }
 
 /** A standing person. Blinks on their own clock so a room of them isn't synced. */
-export function drawPerson(ctx, px, py, t, seed = 0) {
-  const sprite = ((t + seed * 900) % 4200) < 130
-    ? SPRITES.person.blink : SPRITES.person.idle;
+export function drawPerson(ctx, px, py, t, seed = 0, who = 'default') {
+  const set = SPRITES.people[who] || Object.values(SPRITES.people)[0];
+  const sprite = ((t + seed * 900) % 4200) < 130 ? set.blink : set.idle;
   const bob = Math.round(Math.sin((t + seed * 500) / 1300) * 0.5);
 
   ctx.fillStyle = 'rgba(20, 8, 10, 0.32)';

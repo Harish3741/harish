@@ -4,12 +4,14 @@ A portfolio you walk around in. It's a top-down pixel game: you play a small
 hovering droid arriving at a museum, and the work is hung in four wings off a
 central atrium.
 
-| Wing | What's in it |
-| --- | --- |
-| North-west | Automations |
-| North-east | Personal projects |
-| South-west | Client work |
-| South-east | About me |
+No two rooms are dressed the same way.
+
+| Wing | What's in it | Dressed as |
+| --- | --- | --- |
+| North-west | Automations | a gallery — plinth, pictures, benches |
+| North-east | Personal projects | a gallery |
+| South-west | Client work | a boardroom — a table and three clients |
+| South-east | About me | a cinema — one screen, one chair |
 
 You start in the middle of the atrium, standing on the compass. Walk to the
 plinth in the middle of a wing, press <kbd>E</kbd>, and the exhibit list opens.
@@ -64,7 +66,8 @@ up to and read, and leaving it `null` keeps the frame as decoration.
 picture inside the file, which is what the standalone build needs.
 
 The atrium hangs six, three down each side wall — `PAINTINGS.atrium` runs west
-top-to-bottom, then east. Its end wall carries the résumé instead.
+top-to-bottom, then east. Its end wall carries the résumé instead. The
+boardroom and the cinema hang nothing, so their keys go unused.
 
 ### The résumé and the rules
 
@@ -81,6 +84,35 @@ export const RESUME = {
   links: [{ label: 'Download PDF', url: 'resume.pdf' }],
 };
 ```
+
+### The boardroom
+
+The Client Work wing is a boardroom, not a gallery: a table down the middle
+and three clients standing round it. There's no plinth — press <kbd>E</kbd> on
+a client and you get the work you did for them.
+
+The wiring is one field. Tag a project with `client:` and it appears at that
+person's place at the table; `CLIENTS` gives the three of them a name, a line
+to greet you with, and a look.
+
+```js
+// in WINGS → client → projects
+{ title: 'Invoice reconciler', client: 'Acme Ltd', … }
+
+export const CLIENTS = [
+  { name: 'Acme Ltd',                       // must match the `client` field
+    role: 'Logistics, badly organised',
+    greeting: 'You built the thing that runs our mornings.',
+    hair: 'short',                          // or 'long'
+    palette: { K: '#2E2018', S: '#C98F63', T: '#3A5A78', P: '#2A2E38' } },
+  // …two more
+];
+```
+
+Three is what the room is built for — fewer leaves a place at the table empty.
+A project with no `client` still shows in the skip-to-list; it just isn't
+standing at the table. A client with nothing matching still turns up and says
+the shelf is bare.
 
 ### The screening room
 

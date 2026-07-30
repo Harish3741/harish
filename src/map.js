@@ -30,11 +30,13 @@ import {
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
-  drawVitrine, drawStatue, drawRug, drawSconce,
+  drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawWhiteboard,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
-import { PAINTINGS, ABOUT, RESUME, RULES } from './data/projects.js';
+import {
+  PAINTINGS, ABOUT, RESUME, RULES, CLIENTS, wingById,
+} from './data/projects.js';
 
 export const MAP_W = 40;
 export const MAP_H = 36;
@@ -81,7 +83,10 @@ const MASONRY = [0, 0, 40, 36];
 export const WING_ROOMS = {
   automations: { cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations', accent: '#2E4A52' },
   personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
-  client: { cx: 14, cy: 27, entry: 'north', rail: 22, label: 'Client Work', accent: '#2F3A55' },
+  client: {
+    cx: 14, cy: 27, entry: 'north', rail: 22, label: 'Client Work',
+    accent: '#2F3A55', boardroom: true,
+  },
   about: {
     cx: 25, cy: 27, entry: 'north', rail: 22, label: 'About Me',
     accent: '#33373C', theatre: true,
@@ -258,10 +263,11 @@ export function buildMap() {
     }
   }
 
-  // 3. A plinth in the middle of every wing except the screening room, where
-  //    the character and the chair do that job instead.
+  // 3. A plinth in the middle of every wing that is still a gallery. The
+  //    screening room and the boardroom have people in them instead, and a
+  //    plinth in either would be standing in the middle of the furniture.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
-    if (w.theatre) continue;
+    if (w.theatre || w.boardroom) continue;
     const px = w.cx * TILE + 8;
     const py = w.cy * TILE + TILE;
     map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
@@ -440,7 +446,8 @@ function decorate(c) {
   // South wings are entered through that same wall, so their pictures go either
   // side of the arch. Both sets are symmetric about the room's centre line.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
-    if (w.theatre) continue;   // a cinema doesn't hang pictures
+    // a cinema hangs nothing, and a boardroom hangs charts rather than pictures
+    if (w.theatre || w.boardroom) continue;
     const offsets = w.entry === 'south' ? [-3, -1, 1, 3] : [-4, -3, 3, 4];
     hangSymmetric(c, w.cx, w.rail, offsets, id);
   }
@@ -462,6 +469,7 @@ function decorate(c) {
 
   for (const w of Object.values(WING_ROOMS)) {
     if (w.theatre) { dressTheatre(c, w); continue; }
+    if (w.boardroom) { dressBoardroom(c, w); continue; }
     const front = w.entry === 'south' ? 1 : -1;   // toward the arch
 
     // flanking the plinth, clear of the arch's five-tile span
@@ -501,6 +509,70 @@ function decorate(c) {
 
   // draw order is fixed, so sort once rather than every frame
   map.props.sort((a, b) => a.y - b.y);
+}
+
+/** The projects tagged with one client's name, in the order they're written. */
+function clientProjects(name) {
+  const wing = wingById('client');
+  return ((wing && wing.projects) || []).filter((p) => p.client === name);
+}
+
+/**
+ * The boardroom. A table down the middle, three clients standing round it, and
+ * charts on the wall rather than pictures. No plinth: press E on a client and
+ * you get the work you did for them, which is what the plinth would have shown
+ * anyway, only split three ways and attached to a face.
+ *
+ * The table is deliberately short of the walls. Four tiles leaves fourteen
+ * pixels of floor past each client — enough for the droid, which is twelve
+ * wide — so you can walk right round rather than reversing back out.
+ */
+function dressBoardroom(c, w) {
+  const mid = roomCentre(w);
+
+  // charts either side of the arch, clear of the sconces at ±3 tiles
+  for (const d of [-4, 4]) {
+    drawWhiteboard(c, (w.cx + d) * TILE + 9, w.rail * TILE + 6, w.cx * d);
+  }
+
+  const table = { w: 4 * TILE, h: 2 * TILE };
+  addProp({ kind: 'table', x: mid.x, y: mid.y, w: table.w, h: table.h });
+  map.colliders.push({
+    x: mid.x - table.w / 2,
+    y: mid.y - table.h / 2 - 7,          // the tucked-in chairs, too
+    w: table.w,
+    h: table.h + 14,
+  });
+
+  // one client at each head of the table, one on the near side
+  const spots = [
+    { x: mid.x - table.w / 2 - 20, y: mid.y },
+    { x: mid.x + table.w / 2 + 20, y: mid.y },
+    { x: mid.x, y: mid.y + table.h / 2 + 22 },
+  ];
+  CLIENTS.slice(0, spots.length).forEach((client, i) => {
+    const at = spots[i];
+    const who = `client${i}`;
+    map.people.push({
+      x: at.x,
+      y: at.y,
+      label: client.name,
+      list: {
+        title: client.name,
+        blurb: client.greeting || client.role || '',
+        entries: clientProjects(client.name),
+      },
+    });
+    addProp({ kind: 'person', x: at.x, y: at.y, seed: i + 2, who });
+    map.colliders.push({ x: at.x - 6, y: at.y - 10, w: 12, h: 10 });
+  });
+
+  // planting in the four corners, as the galleries have
+  for (const sx of [-4, 4]) {
+    for (const sy of [-2, 2]) {
+      addProp({ kind: 'plant', x: (w.cx + sx) * TILE + 8, y: (w.cy + sy) * TILE + 14 });
+    }
+  }
 }
 
 /**
@@ -613,7 +685,7 @@ function dressTheatre(c, w) {
     wing: 'about',
   };
   map.people.push(person);
-  addProp({ kind: 'person', x: person.x, y: person.y, seed: 1 });
+  addProp({ kind: 'person', x: person.x, y: person.y, seed: 1, who: 'about' });
   map.colliders.push({ x: person.x - 6, y: person.y - 10, w: 12, h: 10 });
 }
 
@@ -641,7 +713,8 @@ export function drawProp(c, p, ox, oy, t) {
     case 'plant': drawPlant(c, x, y); break;
     case 'screen': drawScreen(c, x, y, p.w, p.h, t, !!map.screen.playing); break;
     case 'cinemaseat': drawCinemaSeat(c, x, y, p.facing); break;
-    case 'person': drawPerson(c, x, y, t, p.seed || 0); break;
+    case 'person': drawPerson(c, x, y, t, p.seed || 0, p.who || 'default'); break;
+    case 'table': drawBoardTable(c, x, y, p.w, p.h); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
     case 'lectern': drawLectern(c, x, y, t); break;

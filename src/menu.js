@@ -74,16 +74,14 @@ export function openDocument(entry, blurb, closedCallback) {
   openSingle(entry, blurb || '', closedCallback);
 }
 
-export function openMenu(wingId, closedCallback) {
-  const wing = wingById(wingId);
-  if (!wing) return;
-
-  entries = wing.projects || [];
+/** A named list of entries: a wing's exhibits, or one client's projects. */
+function openEntries(title, blurb, list, closedCallback) {
+  entries = list || [];
   index = 0;
   onClose = closedCallback || null;
 
-  titleEl.textContent = wing.title;
-  blurbEl.textContent = wing.blurb || '';
+  titleEl.textContent = title;
+  blurbEl.textContent = blurb || '';
   root.classList.remove('is-single');
 
   renderList();
@@ -94,6 +92,17 @@ export function openMenu(wingId, closedCallback) {
   // let the browser paint the element before starting the transition
   requestAnimationFrame(() => root.classList.add('is-open'));
   listEl.focus();
+}
+
+export function openMenu(wingId, closedCallback) {
+  const wing = wingById(wingId);
+  if (!wing) return;
+  openEntries(wing.title, wing.blurb, wing.projects, closedCallback);
+}
+
+/** What a client at the boardroom table hands you: { title, blurb, entries }. */
+export function openPersonList(list, closedCallback) {
+  openEntries(list.title, list.blurb, list.entries, closedCallback);
 }
 
 export function closeMenu() {

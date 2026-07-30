@@ -6,7 +6,7 @@
 
 import { view, COL } from './config.js';
 import { buildSprites } from './art.js';
-import { ABOUT } from './data/projects.js';
+import { ABOUT, CLIENTS } from './data/projects.js';
 import {
   buildMap, map, plinthNear, interactableNear, drawProp, drawSconces, START_PX,
 } from './map.js';
@@ -19,7 +19,7 @@ import {
   player, spawnAt, movePlayer, updatePlayer, drawPlayer, focusY, toggleSeat, rouse,
 } from './player.js';
 import {
-  initMenu, openMenu, openArtwork, openDocument, isMenuOpen, closeMenu,
+  initMenu, openMenu, openArtwork, openDocument, openPersonList, isMenuOpen, closeMenu,
 } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
@@ -51,6 +51,19 @@ function isHandheld() {
   return coarse || window.innerWidth < 620;
 }
 
+/**
+ * Everyone in the building who isn't the droid, keyed by the id the map uses.
+ * The ids are positional (`client0`…) rather than names, so a client can be
+ * renamed in the content file without the sprite going missing.
+ */
+function personCast() {
+  const cast = { default: {}, about: { palette: ABOUT && ABOUT.palette } };
+  (CLIENTS || []).forEach((c, i) => {
+    cast[`client${i}`] = { hair: c.hair, palette: c.palette };
+  });
+  return cast;
+}
+
 function boot() {
   const canvas = document.getElementById('game');
 
@@ -61,7 +74,7 @@ function boot() {
     return;
   }
 
-  buildSprites(ABOUT && ABOUT.palette);
+  buildSprites(personCast());
   buildMap();
   initRenderer(canvas);
   initInput();
@@ -144,6 +157,10 @@ function update(dt, ts) {
       clearHeldKeys();
       // drop any keys held while the menu was up, or the droid bolts on close
       openMenu(near.id, clearHeldKeys);
+    } else if (near.list) {
+      // a client at the boardroom table: the work you did for them
+      clearHeldKeys();
+      openPersonList(near.list, clearHeldKeys);
     } else if (near.wing) {
       // the person by the door: their summary is the wing's own entries
       clearHeldKeys();
@@ -274,7 +291,7 @@ function drawPrompt(ts, ox, oy) {
 
   const label = near.label.toUpperCase();
   const hint = near.id ? 'PRESS  E'
-    : near.wing ? 'PRESS  E  TO  TALK'
+    : near.wing || near.list ? 'PRESS  E  TO  TALK'
       : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
         : near.theatre ? 'PRESS  E  TO  WATCH'
           : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';

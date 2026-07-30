@@ -171,10 +171,9 @@ export const PAINTINGS = {
     { title: 'Placeholder — picture one', caption: 'If the work is under NDA, a cropped detail with no client name still reads as a picture.' },
     null, null, null,
   ],
-  about: [
-    { title: 'Placeholder — a photo of you', caption: 'The one wall in the building where a face belongs.' },
-    null, null, null,
-  ],
+  // The About Me wing is a cinema and hangs nothing, so this key is unused.
+  // It stays here so the four wings still read as a set.
+  about: [null, null, null, null],
   // the atrium's own wall, above the entrance to the north wings
   atrium: [null, null, null, null],
 };

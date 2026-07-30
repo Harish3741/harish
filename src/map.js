@@ -102,7 +102,8 @@ const BANNERS = [
 const SCONCES = [
   ...[12, 16, 23, 27].map((x) => [x, RAIL.northWings]),
   ...[11, 18, 21, 28].map((x) => [x, RAIL.atrium]),
-  ...[11, 17, 22, 28].map((x) => [x, RAIL.southWings]),
+  // x22 and x28 would land in the screening room, which has no torches
+  ...[11, 17].map((x) => [x, RAIL.southWings]),
 ];
 
 // Arch mouths, for the brass thresholds laid across them.
@@ -273,6 +274,19 @@ function wallFaceDepth(x, y) {
   return -1;
 }
 
+/**
+ * Where a wing's rug is laid. The screening room's sits a tile up and a tile
+ * back from the room's centre, which is where the seat on it lines up best
+ * with the screen; the seat is derived from this, so the two stay together.
+ */
+function rugCentre(w) {
+  const back = w.theatre ? TILE : 0;
+  return {
+    x: w.cx * TILE + 8 + back,
+    y: (w.cy + 1) * TILE - 4 - back,
+  };
+}
+
 function renderBackground() {
   const cv = document.createElement('canvas');
   cv.width = MAP_W * TILE;
@@ -328,7 +342,8 @@ function renderBackground() {
 
   drawInlay(c, AXIS, 15 * TILE + 8, 21);
   for (const w of Object.values(WING_ROOMS)) {
-    drawRug(c, w.cx * TILE + 8, (w.cy + 1) * TILE - 4, 5 * TILE, 3 * TILE, w.accent);
+    const rug = rugCentre(w);
+    drawRug(c, rug.x, rug.y, 5 * TILE, 3 * TILE, w.accent);
   }
 
   // brass thresholds across the doorways
@@ -414,6 +429,7 @@ function decorate(c) {
   // South wings are entered through that same wall, so their pictures go either
   // side of the arch. Both sets are symmetric about the room's centre line.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
+    if (w.theatre) continue;   // a cinema doesn't hang pictures
     const offsets = w.entry === 'south' ? [-3, -1, 1, 3] : [-4, -3, 3, 4];
     hangSymmetric(c, w.cx, w.rail, offsets, id);
   }
@@ -506,11 +522,10 @@ function dressTheatre(c, w) {
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
   map.colliders.push({ x: screen.x - 14, y: screen.y - screen.h, w: 22, h: screen.h });
 
-  // One seat, centred on the rug and facing the screen. The rug is laid at the
-  // room's centre by the generic pass, so the seat takes its position from
-  // there rather than from a number of its own — move the rug and the seat
-  // follows.
-  const rug = { x: w.cx * TILE + 8, y: (w.cy + 1) * TILE - 4 };
+  // One seat, centred on the rug and facing the screen. It takes its position
+  // from the rug rather than from a number of its own, so the two can't drift
+  // apart — move the rug and the seat follows.
+  const rug = rugCentre(w);
   addProp({ kind: 'cinemaseat', x: rug.x, y: rug.y + 14, facing: 'left' });
   map.seats.push({ x: rug.x, y: rug.y + 8, label: 'Seat', theatre: true });
 

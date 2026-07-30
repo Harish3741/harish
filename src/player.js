@@ -91,7 +91,7 @@ export function toggleSeat(seat) {
   player.seat = seat;
   player.x = seat.x;
   player.y = seat.y;
-  player.dir = 'down';
+  player.dir = seat.facing || 'down';
   player.moving = false;
   return true;
 }

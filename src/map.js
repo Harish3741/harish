@@ -511,28 +511,33 @@ function dressTheatre(c, w) {
   c.fillStyle = 'rgba(8, 10, 12, 0.14)';
   c.fillRect(westWall, roomTop, 9 * TILE, 7 * TILE);
 
-  // The screen sits against the west wall, with room above and below it for
-  // the house curtains that frame it.
+  // The screen is flush against the west wall and runs the full depth of the
+  // room, stopping at the floor's edge so the wall above and below it still
+  // reads as wall. The house curtains take the end tile at each end, drawn as
+  // part of the screen so they overlap it rather than standing beside it.
   const screen = {
-    x: mid.x - 3 * TILE,
-    y: mid.y + 40,
+    x: westWall + 12,            // surround flush to the inner wall face
+    y: roomBottom,
     w: 18,
-    h: 78,
-    cx: mid.x - 3 * TILE + 30,   // where the camera looks when it plays
+    h: roomBottom - roomTop,
+    cx: westWall + 46,           // where the camera looks when it plays
     cy: mid.y,
   };
   map.screen = screen;
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
-  // the curtains stand proud of the screen, so the block reaches past it
-  map.colliders.push({
-    x: screen.x - 14, y: screen.y - screen.h - 16, w: 22, h: screen.h + 32,
-  });
+  // one block for the lot: the screen, and the curtains hanging proud of it
+  map.colliders.push({ x: westWall, y: roomTop, w: 30, h: screen.h });
 
-  // One seat facing the screen, a tile up and a tile back from the room's
-  // centre. The rug stays put in the middle of the room.
-  const seat = { x: mid.x + TILE, y: mid.y - TILE };
+  // One seat facing the screen, sitting in the middle of its tile rather than
+  // across the join. The rug stays put in the middle of the room.
+  const seat = { x: (w.cx + 1) * TILE + 8, y: w.cy * TILE + 8 };
   addProp({ kind: 'cinemaseat', x: seat.x, y: seat.y + 14, facing: 'left' });
-  map.seats.push({ x: seat.x, y: seat.y + 8, label: 'Seat', theatre: true });
+  // You sit level with the chair rather than behind it, so the droid draws on
+  // top of the seat instead of vanishing into it, forward of the back and
+  // turned to face the screen.
+  map.seats.push({
+    x: seat.x - 3, y: seat.y + 14, label: 'Seat', theatre: true, facing: 'left',
+  });
 
   // whoever is standing by the door, on the right as you come in
   const person = {

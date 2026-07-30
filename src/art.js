@@ -1146,7 +1146,11 @@ export function drawBanner(ctx, px, py, w, accent) {
  * A cinema screen standing against the west wall, facing into the room. In a
  * top-down view a screen on a side wall would be edge-on and unreadable, so it
  * is drawn with a little cheated perspective — the same licence a top-down game
- * takes with every doorway. (px, py) is the bottom-centre of its frame.
+ * takes with every doorway.
+ *
+ * Everything is painted inside the footprint it is handed, curtains included,
+ * so the caller can run it right up to the walls without it bleeding into them.
+ * (px, py) is the bottom-centre.
  */
 export function drawScreen(ctx, px, py, w, h, t, playing) {
   const x = px - Math.floor(w / 2);
@@ -1156,81 +1160,81 @@ export function drawScreen(ctx, px, py, w, h, t, playing) {
   const pulse = playing ? 0.55 + Math.sin(t / 260) * 0.18 : 0.28;
   for (let i = 5; i >= 1; i--) {
     ctx.fillStyle = `rgba(190, 214, 232, ${(0.030 * pulse * i).toFixed(3)})`;
-    ctx.fillRect(x + w - 2, y + i * 3, i * 13, h - i * 6);
+    ctx.fillRect(x + w + 1, y + i * 4, i * 13, h - i * 8);
   }
 
-  // black surround with a thin steel reveal
+  // black surround, filling the whole footprint
   ctx.fillStyle = '#0E1012';
-  ctx.fillRect(x - 3, y - 4, w + 6, h + 6);
+  ctx.fillRect(x - 3, y, w + 6, h);
   ctx.fillStyle = THEATRE.trim;
-  ctx.fillRect(x - 3, y - 4, w + 6, 1);
-  ctx.fillRect(x - 3, y + h + 1, w + 6, 1);
+  ctx.fillRect(x - 3, y, w + 6, 1);
+  ctx.fillRect(x - 3, y + h - 1, w + 6, 1);
 
-  // the surface: pale and scanning when playing, dark and matte when not
+  // the surface, inset inside the surround
+  const sy = y + 3;
+  const sh = h - 6;
   ctx.fillStyle = playing ? THEATRE.screen : THEATRE.screenDim;
-  ctx.fillRect(x, y, w, h);
+  ctx.fillRect(x, sy, w, sh);
 
   if (playing) {
     ctx.fillStyle = 'rgba(120, 150, 178, 0.20)';
-    for (let j = (Math.floor(t / 55) % 6); j < h; j += 6) {
-      ctx.fillRect(x, y + j, w, 1);
+    for (let j = (Math.floor(t / 55) % 6); j < sh; j += 6) {
+      ctx.fillRect(x, sy + j, w, 1);
     }
   } else {
-    // standby: a masked black surround and a single slow glint travelling down
-    // it, so it still reads as glass rather than as a slab of wall
-    ctx.fillStyle = 'rgba(10, 8, 12, 0.55)';
-    ctx.fillRect(x, y, w, 3);
-    ctx.fillRect(x, y + h - 3, w, 3);
-    const g = (t / 34) % (h + 40) - 20;
+    // standby: a slow glint travelling down it, so it still reads as glass
+    const g = (t / 34) % (sh + 40) - 20;
     ctx.fillStyle = 'rgba(200, 220, 236, 0.16)';
-    ctx.fillRect(x, y + Math.max(0, Math.min(h - 6, g)), w, 6);
+    ctx.fillRect(x, sy + Math.max(0, Math.min(sh - 6, g)), w, 6);
   }
 
   // sheen down the left edge, away from the room
   ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
-  ctx.fillRect(x, y, 2, h);
+  ctx.fillRect(x, sy, 2, sh);
 
-  // Red house curtains drawn back to either side of the screen. In this view
-  // the screen is rotated onto the west wall, so what an audience would see as
-  // the left and right curtains land at its top and bottom.
-  screenCurtain(ctx, px, y - 15, w + 20, 16, 1);
-  screenCurtain(ctx, px, y + h - 1, w + 20, 16, -1);
+  // Red house curtains, one tile deep, overlapping the screen at each end and
+  // hanging a little proud of it into the room, so they read as cloth in front
+  // of the screen rather than panels butted up against it.
+  screenCurtain(ctx, x - 3, y, w + 11, TILE, 1);
+  screenCurtain(ctx, x - 3, y + h - TILE, w + 11, TILE, -1);
 }
 
 /**
- * One gathered velvet curtain. `inner` says which side faces the screen, so the
- * fabric can fall darker into the opening and catch the light on the outside.
+ * One drawn-back velvet curtain, facing into the room. The screen is rotated
+ * onto the west wall here, so the pleats — which hang vertically in the real
+ * world — run across the curtain in this view. `inner` is which side faces the
+ * screen's opening, so the fabric can fall into shadow there. (x, y) is the
+ * top-left, matching the screen's own footprint.
  */
-function screenCurtain(ctx, cx, y, w, h, inner) {
-  const x = cx - Math.floor(w / 2);
-
+function screenCurtain(ctx, x, y, w, h, inner) {
   ctx.fillStyle = THEATRE.curtain;
   ctx.fillRect(x, y, w, h);
 
-  // pleats
-  for (let i = 0; i < w; i += 5) {
+  // pleats, running across the drop
+  for (let j = 0; j < h; j += 4) {
     ctx.fillStyle = THEATRE.curtainDark;
-    ctx.fillRect(x + i, y, 2, h);
+    ctx.fillRect(x, y + j, w, 2);
     ctx.fillStyle = THEATRE.curtainHi;
-    ctx.fillRect(x + i + 2, y, 1, h);
+    ctx.fillRect(x, y + j + 2, w, 1);
   }
 
-  // the fabric falls into shadow on the side nearest the opening
-  ctx.fillStyle = 'rgba(20, 6, 10, 0.38)';
-  ctx.fillRect(x, inner > 0 ? y + h - 4 : y, w, 4);
-  ctx.fillStyle = 'rgba(255, 190, 190, 0.10)';
-  ctx.fillRect(x, inner > 0 ? y : y + h - 1, w, 1);
+  // facing right: lit down the edge that looks into the room, dark against
+  // the wall behind it
+  ctx.fillStyle = 'rgba(255, 198, 198, 0.16)';
+  ctx.fillRect(x + w - 3, y, 3, h);
+  ctx.fillStyle = 'rgba(18, 6, 9, 0.42)';
+  ctx.fillRect(x, y, 3, h);
 
-  // a scalloped valance along the inner edge
-  const vy = inner > 0 ? y + h : y - 3;
+  // the fold nearest the opening falls into shadow
+  ctx.fillStyle = 'rgba(18, 6, 9, 0.34)';
+  ctx.fillRect(x, inner > 0 ? y + h - 3 : y, w, 3);
+
+  // scalloped valance along the inner edge
+  const vy = inner > 0 ? y + h - 2 : y;
   for (let i = 0; i < w; i += 6) {
     ctx.fillStyle = THEATRE.curtainDark;
-    ctx.fillRect(x + i + 1, vy, 4, 3);
+    ctx.fillRect(x + i + 1, vy, 4, 2);
   }
-
-  // pelmet cap on the outer edge
-  ctx.fillStyle = THEATRE.curtainDark;
-  ctx.fillRect(x - 1, inner > 0 ? y - 2 : y + h - 1, w + 2, 3);
 }
 
 /**

@@ -4,22 +4,18 @@
 // cinematic people come to resent.
 
 import { view, COL } from './config.js';
-import { player, walkToward } from './player.js';
+import { player } from './player.js';
 import { centreCamera, followCamera, overlay } from './renderer.js';
 import { drawTextCentered, textWidth } from './font.js';
 import { anyPressed } from './input.js';
 import { SITE } from './data/projects.js';
 
-// The arrival walk. Three legs: up the plaza past the fountain, across to the
-// doors, then into the atrium. The dogleg exists because the fountain sits on
-// the central axis, and walking around it frames the building better than
-// marching straight at it would.
-const LEGS = [
-  { x: 272, y: 676, speed: 92 },   // up the west side of the plaza
-  { x: 320, y: 652, speed: 92 },   // across onto the entrance axis
-  { x: 320, y: 336, speed: 128 },  // through the hall into the atrium
-];
-const START = { x: 272, y: 742 };
+// There is no outside any more, so there is no arrival walk. Instead the
+// camera opens high on the north arches — where the two banners are — and
+// drifts down to the droid standing on the medallion, then the title lands.
+const PAN_FROM = { x: 320, y: 176 };
+const PAN_TO = { x: 320, y: 272 };
+const PAN_SECONDS = 2.2;
 
 const VISIT_KEY = 'harish-museum-visited';
 
@@ -31,7 +27,6 @@ export const intro = {
   t: 0,
   cardAlpha: 0,
   fadeIn: 1,
-  leg: 0,
 };
 
 export function shouldSkipIntro() {
@@ -51,24 +46,17 @@ export function markVisited() {
 }
 
 export function startIntro() {
-  intro.phase = 'walk';
+  intro.phase = 'pan';
   intro.t = 0;
   intro.cardAlpha = 0;
   intro.fadeIn = 1;
-  intro.leg = 0;
-  player.x = START.x;
-  player.y = START.y;
-  player.dir = 'up';
-  centreCamera(player.x, player.y - 20);
-}
-
-/** Jump straight to the title card, leaving the droid in the atrium. */
-function cutToTitle() {
-  const last = LEGS[LEGS.length - 1];
-  player.x = last.x;
-  player.y = last.y;
   player.dir = 'up';
   player.moving = false;
+  centreCamera(PAN_FROM.x, PAN_FROM.y);
+}
+
+/** Jump straight to the title card. */
+function cutToTitle() {
   centreCamera(player.x, player.y - CARD_LIFT);
   intro.phase = 'title';
   intro.t = 0;
@@ -79,22 +67,19 @@ export function updateIntro(dt) {
   intro.t += dt;
   intro.fadeIn = Math.max(0, intro.fadeIn - dt * 1.6);
 
-  if (intro.phase === 'walk') {
+  if (intro.phase === 'pan') {
     if (anyPressed() && intro.fadeIn <= 0) {
       cutToTitle();
       return 'intro';
     }
-
-    const target = LEGS[intro.leg];
-    if (walkToward(target.x, target.y, dt, target.speed)) {
-      intro.leg += 1;
-      if (intro.leg >= LEGS.length) {
-        intro.phase = 'settle';
-        intro.t = 0;
-        player.moving = false;
-      }
+    // ease-out, so the camera arrives gently rather than stopping dead
+    const k = Math.min(1, intro.t / PAN_SECONDS);
+    const e = 1 - (1 - k) * (1 - k);
+    centreCamera(PAN_FROM.x, PAN_FROM.y + (PAN_TO.y - PAN_FROM.y) * e);
+    if (k >= 1) {
+      intro.phase = 'settle';
+      intro.t = 0;
     }
-    followCamera(player.x, player.y - 20, 0.07);
     return 'intro';
   }
 
@@ -139,7 +124,7 @@ export function updateIntro(dt) {
 export function drawIntroOverlay(ctx, now) {
   if (intro.fadeIn > 0) overlay('#1E1712', intro.fadeIn);
 
-  if (intro.phase === 'walk' || intro.phase === 'settle') {
+  if (intro.phase === 'pan' || intro.phase === 'settle') {
     // a quiet skip hint, once the fade is out of the way
     const a = Math.min(1, Math.max(0, (intro.t - 0.8) * 2));
     if (a > 0) {

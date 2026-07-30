@@ -8,110 +8,107 @@
 // wide arch. There are no connecting corridors: they were pure travel time, and
 // crossing the museum took fifteen seconds.
 //
-//     ┌─────────────┐        ┌─────────────┐
-//     │ AUTOMATIONS │        │  PERSONAL   │     north wings
-//     └──────┰──────┘        └──────┰──────┘
-//     ┌──────┸───────────────────────┸──────┐
-//     │              ATRIUM                 │
-//     └──┰──────────────┰───────────┰───────┘
-//     ┌──┸──────┐    ┌──┸──┐     ┌──┸──────┐
-//     │ CLIENT  │    │hall │     │ ABOUT   │    south wings
-//     └─────────┘    │     │     └─────────┘
-//                    └──┰──┘
-//                     doors / plaza
+//     ┌───────────┐          ┌───────────┐
+//     │AUTOMATIONS│          │ PERSONAL  │     north wings
+//     └─────┰─────┘          └─────┰─────┘
+//     ┌─────┸──────────────────────┸─────┐
+//     │             ATRIUM               │     you start here
+//     └─────┰──────────────────────┰─────┘
+//     ┌─────┸─────┐          ┌─────┸─────┐
+//     │  CLIENT   │          │ ABOUT ME  │     south wings
+//     └───────────┘          └───────────┘
+//
+// There is no way in or out. The museum is the whole world, you begin in the
+// middle of it, and every room is a few seconds away.
 
 import { TILE, COL } from './config.js';
 import {
-  drawMarble, drawWood, drawStone, drawGrass,
+  drawMarble, drawWood,
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
-  drawFrontDoors, drawSteps, drawLightPool, drawInlay,
+  drawLightPool, drawInlay, drawBanner,
   drawColumn, drawVitrine, drawStatue, drawRug, drawSconce,
-  drawFountain, drawHedge, drawLamppost, drawBillboard,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
-import { SITE } from './data/projects.js';
 
 export const MAP_W = 40;
-export const MAP_H = 48;
+export const MAP_H = 36;
 
+// Rooms are an odd number of tiles wide and arches an odd number too, so both
+// centre on a tile rather than a tile boundary. That is what lets every arch
+// line up exactly with the plinth behind it: you come through the opening and
+// the exhibit is straight ahead, with nothing to steer around.
+//
 // [x, y, w, h]
 const REGIONS = [
-  { rect: [5, 4, 13, 9], floor: 'wood', indoor: true, wing: 'automations' },
-  { rect: [22, 4, 13, 9], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [11, 16, 18, 9], floor: 'marble', indoor: true },
-  { rect: [3, 28, 13, 9], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [24, 28, 13, 9], floor: 'wood', indoor: true, wing: 'about' },
+  { rect: [9, 4, 9, 7], floor: 'wood', indoor: true, wing: 'automations' },
+  { rect: [22, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
+  { rect: [9, 14, 22, 7], floor: 'marble', indoor: true },
+  { rect: [9, 24, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [22, 24, 9, 7], floor: 'wood', indoor: true, wing: 'about' },
 
-  // Arches through the shared walls, three tiles deep because that is how
-  // thick the walls are. These replaced the old corridors.
-  { rect: [12, 13, 4, 3], floor: 'marble', indoor: true },
-  { rect: [24, 13, 4, 3], floor: 'marble', indoor: true },
-  { rect: [11, 25, 4, 3], floor: 'marble', indoor: true },
-  { rect: [25, 25, 4, 3], floor: 'marble', indoor: true },
-  { rect: [19, 25, 2, 3], floor: 'marble', indoor: true },
-
-  // entrance hall, reaching past the south wings to the facade
-  { rect: [17, 28, 6, 10], floor: 'marble', indoor: true },
-  { rect: [19, 38, 2, 3], floor: 'stone', indoor: true },
-
-  // outdoors — clear of the south wings, which reach down to y36
-  { rect: [8, 41, 24, 6], floor: 'grass', indoor: false },
-  { rect: [13, 41, 14, 6], floor: 'stone', indoor: false },
+  // Arches through the shared walls: five tiles wide, three deep because that
+  // is how thick the walls are. These replaced the old connecting corridors.
+  { rect: [11, 11, 5, 3], floor: 'marble', indoor: true },
+  { rect: [24, 11, 5, 3], floor: 'marble', indoor: true },
+  { rect: [11, 21, 5, 3], floor: 'marble', indoor: true },
+  { rect: [24, 21, 5, 3], floor: 'marble', indoor: true },
 ];
 
 // The building's footprint. Every tile inside it that isn't floor is solid
 // masonry, which is what fills the courtyards between the wings — a radius
 // around each room can't, because those courtyards open onto the map edge.
 // It reaches y=0 so the north wings get a full three-tile-tall wall above them.
-const MASONRY = [0, 0, 40, 41];
+const MASONRY = [0, 0, 40, 36];
 
 // Each wing gets its own accent, used on its rug, its vitrines and the icon
 // floating in its case, so the four rooms don't read as one room repeated.
 // Deep and desaturated on purpose: a large saturated rectangle on the floor
 // reads as a hole rather than a carpet.
-export const WINGS = {
-  automations: { cx: 11, cy: 8, label: 'Automations', accent: '#2E4A52' },
-  personal: { cx: 28, cy: 8, label: 'Personal Projects', accent: '#6B3F28' },
-  client: { cx: 9, cy: 32, label: 'Client Work', accent: '#2F3A55' },
-  about: { cx: 30, cy: 32, label: 'About Me', accent: '#4C2F49' },
+//
+// `entry` is the side the arch is on. Furniture that would otherwise sit in
+// the doorway goes to the opposite side of the plinth.
+export const WING_ROOMS = {
+  automations: { cx: 13, cy: 7, entry: 'south', label: 'Automations', accent: '#2E4A52' },
+  personal: { cx: 26, cy: 7, entry: 'south', label: 'Personal Projects', accent: '#6B3F28' },
+  client: { cx: 13, cy: 27, entry: 'north', label: 'Client Work', accent: '#2F3A55' },
+  about: { cx: 26, cy: 27, entry: 'north', label: 'About Me', accent: '#4C2F49' },
 };
 
 // The row of each wall that carries pictures and sconces (the "picture field",
 // two tiles above the floor it stands on).
-const RAIL = { northWings: 2, atrium: 14, southWings: 26 };
+const RAIL = { northWings: 2, atrium: 12, southWings: 22 };
 
-// Wing names, inlaid into the atrium floor just inside each arch. Free-standing
-// placards were the first attempt: in an atrium this compact they bunched up in
-// the middle, read as one row of four, and stood in the way. An inscription
-// sits under the arch it names, blocks nothing, and is more museum anyway.
-// [centre x in px, baseline y in px, text, which way the chevron points]
-const INSCRIPTIONS = [
-  [224, 16 * TILE + 6, 'AUTOMATIONS', 'up'],
-  [416, 16 * TILE + 6, 'PERSONAL', 'up'],
-  [208, 24 * TILE + 3, 'CLIENT WORK', 'down'],
-  [432, 24 * TILE + 3, 'ABOUT ME', 'down'],
+// Wing names, on banners hung across each arch. The first attempt put them as
+// inscriptions on the atrium floor, but the south pair sat on the very last row
+// of marble and read as though they were outside the building. A banner is tied
+// to its opening, unmistakably indoors, and you walk under it.
+// [centre x px, y px of the arch mouth on the atrium side, text]
+const BANNERS = [
+  [216, 14 * TILE, 'AUTOMATIONS'],
+  [424, 14 * TILE, 'PERSONAL'],
+  [216, 21 * TILE, 'CLIENT WORK'],
+  [424, 21 * TILE, 'ABOUT ME'],
 ];
 
 // Wall sconces: [tile x, rail row]. Their pools are painted with the rest of
 // the lighting, before the walls go down, so the glow can't spill onto plaster.
 const SCONCES = [
-  ...[7, 11, 15, 24, 28, 32].map((x) => [x, 2]),
-  ...[11, 17, 22, 28].map((x) => [x, 14]),
-  ...[5, 9, 13, 18, 22, 27, 31, 35].map((x) => [x, 26]),
+  ...[11, 15, 24, 28].map((x) => [x, RAIL.northWings]),
+  ...[10, 17, 22, 29].map((x) => [x, RAIL.atrium]),
+  ...[11, 15, 24, 28].map((x) => [x, RAIL.southWings]),
 ];
 
 // Arch mouths, for the brass thresholds laid across them.
 const THRESHOLDS = [
-  [12, 15, 4], [24, 15, 4],   // atrium -> north wings
-  [11, 27, 4], [25, 27, 4],   // atrium -> south wings
-  [19, 27, 2],                // atrium -> entrance hall
-  [19, 40, 2],                // entrance hall -> outside
+  [11, 13, 5], [24, 13, 5],   // atrium -> north wings
+  [11, 21, 5], [24, 21, 5],   // atrium -> south wings
 ];
 
-// Everything on the entrance axis is laid out around x=320.
+// The building's centre line, and where you start.
 const AXIS = 320;
+export const START_TILE = { x: 20, y: 17 };
 
 /* ------------------------------------------------------------------ */
 
@@ -203,7 +200,7 @@ export function buildMap() {
   }
 
   // 3. one plinth per wing, dead centre
-  for (const [id, w] of Object.entries(WINGS)) {
+  for (const [id, w] of Object.entries(WING_ROOMS)) {
     const px = w.cx * TILE + 8;
     const py = w.cy * TILE + TILE;
     map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
@@ -248,9 +245,7 @@ function renderBackground() {
       const px = x * TILE;
       const py = y * TILE;
       if (f === 'marble') drawMarble(c, px, py, x, y);
-      else if (f === 'wood') drawWood(c, px, py, x, y);
-      else if (f === 'stone') drawStone(c, px, py, x, y);
-      else if (f === 'grass') drawGrass(c, px, py, x, y);
+      else drawWood(c, px, py, x, y);
     }
   }
 
@@ -258,7 +253,7 @@ function renderBackground() {
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       const f = map.floor[idx(x, y)];
-      if (!f || f === 'grass' || !map.indoor[idx(x, y)]) continue;
+      if (!f || !map.indoor[idx(x, y)]) continue;
       const sides = {
         n: tileFloor(x, y - 1) === null,
         s: tileFloor(x, y + 1) === null,
@@ -274,8 +269,8 @@ function renderBackground() {
   // --- skylight, then the things laid into the floor ---
   // Light goes down first. Painting it over the rugs instead bleaches them
   // until they read as pools of water rather than textiles.
-  drawLightPool(c, AXIS - 64, 17 * TILE, 128, 128, 0.5);
-  for (const w of Object.values(WINGS)) {
+  drawLightPool(c, AXIS - 60, 14 * TILE + 8, 120, 104, 0.5);
+  for (const w of Object.values(WING_ROOMS)) {
     drawLightPool(c, (w.cx - 3) * TILE, (w.cy - 3) * TILE, 7 * TILE, 7 * TILE);
   }
   for (const [sx, ry] of SCONCES) {
@@ -283,8 +278,8 @@ function renderBackground() {
     drawLightPool(c, sx * TILE - 20, (ry + 2) * TILE, 56, 40, 0.8);
   }
 
-  drawInlay(c, AXIS, 20 * TILE + 8, 28);
-  for (const w of Object.values(WINGS)) {
+  drawInlay(c, AXIS, 17 * TILE + 8, 26);
+  for (const w of Object.values(WING_ROOMS)) {
     drawRug(c, w.cx * TILE + 8, (w.cy + 1) * TILE, 7 * TILE, 4 * TILE, w.accent);
   }
 
@@ -337,24 +332,6 @@ function hangFrames(c, x0, x1, ty) {
   }
 }
 
-/** An engraved wing name, inlaid into the floor beneath its arch. */
-function inscribe(c, cx, cy, text, arrow) {
-  drawTextCentered(c, text, cx, cy + 1, { color: 'rgba(255, 250, 236, 0.55)' });
-  drawTextCentered(c, text, cx, cy, { color: COL.brassDim });
-
-  // a chevron on each side, pointing the way through
-  const half = textWidth(text) / 2 + 8;
-  const dir = arrow === 'up' ? -1 : 1;
-  c.fillStyle = COL.brassDim;
-  for (const side of [-1, 1]) {
-    const ax = Math.round(cx + side * half);
-    for (let i = 0; i < 3; i++) {
-      c.fillRect(ax - i, cy + 2 + dir * (2 - i) + (dir < 0 ? 2 : 0), 1, 1);
-      c.fillRect(ax + i, cy + 2 + dir * (2 - i) + (dir < 0 ? 2 : 0), 1, 1);
-    }
-  }
-}
-
 /** Anything standing on the floor is depth-sorted, so the droid can pass behind it. */
 function addProp(p) {
   map.props.push(p);
@@ -365,21 +342,15 @@ function decorate(c) {
 
   // hangFrames and hangSconces both skip any tile that isn't a picture field,
   // so ranges can be given generously and the arches simply come out blank.
-  hangFrames(c, 6, 16, RAIL.northWings);
-  hangFrames(c, 23, 33, RAIL.northWings);
-  hangFrames(c, 4, 14, RAIL.southWings);
-  hangFrames(c, 25, 35, RAIL.southWings);
-  hangFrames(c, 11, 28, RAIL.atrium);
+  hangFrames(c, 10, 16, RAIL.northWings);
+  hangFrames(c, 23, 29, RAIL.northWings);
+  hangFrames(c, 10, 16, RAIL.southWings);
+  hangFrames(c, 23, 29, RAIL.southWings);
+  hangFrames(c, 9, 30, RAIL.atrium);
 
   for (const [sx, ry] of SCONCES) {
     if (wallFaceDepth(sx, ry) === 1) drawSconce(c, sx * TILE + 8, ry * TILE + 4);
   }
-
-  for (const [ix, iy, text, arrow] of INSCRIPTIONS) inscribe(c, ix, iy, text, arrow);
-
-  // the open front doors, then the steps down to the plaza
-  drawFrontDoors(c, AXIS - 32, 38 * TILE - 9);
-  drawSteps(c, AXIS - 32, 41 * TILE - 10, 4 * TILE);
 
   // ---- depth-sorted props ----
 
@@ -387,72 +358,50 @@ function decorate(c) {
     addProp({ kind: 'plinth', x: p.x, y: p.y, id: p.id });
   }
 
-  for (const w of Object.values(WINGS)) {
-    // flanking the plinth
-    addProp({ kind: 'statue', x: (w.cx - 4) * TILE + 8, y: w.cy * TILE + 10 });
-    addProp({ kind: 'statue', x: (w.cx + 4) * TILE + 8, y: w.cy * TILE + 10 });
-    addProp({ kind: 'rope', x: (w.cx - 3) * TILE, y: (w.cy + 1) * TILE + 12, span: 6 * TILE });
-    // benches face the plinth, leaving the middle of the room clear to walk
-    addProp({ kind: 'bench', x: (w.cx - 3) * TILE + 8, y: (w.cy + 3) * TILE + 10 });
-    addProp({ kind: 'bench', x: (w.cx + 3) * TILE + 8, y: (w.cy + 3) * TILE + 10 });
-
-    // vitrines down each side, and planting in the corners
-    addProp({ kind: 'vitrine', x: (w.cx - 5) * TILE + 8, y: (w.cy - 1) * TILE + 8, accent: w.accent });
-    addProp({ kind: 'vitrine', x: (w.cx + 5) * TILE + 8, y: (w.cy - 1) * TILE + 8, accent: w.accent });
-    addProp({ kind: 'plant', x: (w.cx - 6) * TILE + 8, y: (w.cy - 3) * TILE + 14 });
-    addProp({ kind: 'plant', x: (w.cx + 6) * TILE + 8, y: (w.cy - 3) * TILE + 14 });
-    addProp({ kind: 'plant', x: (w.cx - 6) * TILE + 8, y: (w.cy + 3) * TILE + 14 });
-    addProp({ kind: 'plant', x: (w.cx + 6) * TILE + 8, y: (w.cy + 3) * TILE + 14 });
+  // Banners hang at the atrium mouth of each arch, so the droid passes under
+  // them on the way through.
+  for (const [bx, by, text] of BANNERS) {
+    const wing = Object.values(WING_ROOMS).find((w) => w.cx * TILE + 8 === bx
+      && (w.entry === 'south' ? by < 16 * TILE : by > 16 * TILE));
+    addProp({ kind: 'banner', x: bx, y: by, text, accent: wing ? wing.accent : COL.velvet });
   }
 
-  // atrium colonnade, set wide of the arches so it never gets in the way
-  for (const cx of [16, 23]) {
-    addProp({ kind: 'column', x: cx * TILE + 8, y: 20 * TILE + 12 });
-    map.colliders.push({ x: cx * TILE + 1, y: 20 * TILE + 2, w: 14, h: 10 });
+  for (const w of Object.values(WING_ROOMS)) {
+    const back = w.entry === 'south' ? -1 : 1;   // away from the arch
+
+    // flanking the plinth, clear of the arch's five-tile span
+    addProp({ kind: 'statue', x: (w.cx - 3) * TILE + 8, y: w.cy * TILE + 10 });
+    addProp({ kind: 'statue', x: (w.cx + 3) * TILE + 8, y: w.cy * TILE + 10 });
+    addProp({ kind: 'rope', x: (w.cx - 2) * TILE, y: (w.cy + 1) * TILE + 10, span: 4 * TILE });
+
+    // one bench, on the far side of the plinth from the doorway. Two benches
+    // either side of the entry line is how the droid used to get wedged.
+    addProp({ kind: 'bench', x: w.cx * TILE + 8, y: (w.cy + back * 2) * TILE + 12 });
+
+    // vitrines and planting hug the side walls
+    addProp({ kind: 'vitrine', x: (w.cx - 3) * TILE + 8, y: (w.cy + back * 2) * TILE + 12, accent: w.accent });
+    addProp({ kind: 'vitrine', x: (w.cx + 3) * TILE + 8, y: (w.cy + back * 2) * TILE + 12, accent: w.accent });
+    addProp({ kind: 'plant', x: (w.cx - 4) * TILE + 8, y: (w.cy - 2) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx + 4) * TILE + 8, y: (w.cy - 2) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx - 4) * TILE + 8, y: (w.cy + 2) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx + 4) * TILE + 8, y: (w.cy + 2) * TILE + 14 });
   }
 
-  // Seating and planting down the short ends of the atrium, kept off rows 16
-  // and 24 so nothing sits on top of the floor inscriptions.
-  for (const px of [11, 28]) {
-    addProp({ kind: 'plant', x: px * TILE + 8, y: 18 * TILE + 14 });
-    addProp({ kind: 'bench', x: px * TILE + 8, y: 21 * TILE + 12 });
-    addProp({ kind: 'plant', x: px * TILE + 8, y: 23 * TILE + 14 });
-  }
-
-  // entrance hall: a colonnade down both sides, planters at the door
-  for (const cy of [31, 35]) {
-    for (const cx of [17, 22]) {
+  // Atrium colonnade. Kept between the arches and the medallion: any closer in
+  // and the columns straddle the medallion you start standing on.
+  for (const cx of [17, 22]) {
+    for (const cy of [15, 19]) {
       addProp({ kind: 'column', x: cx * TILE + 8, y: cy * TILE + 12 });
       map.colliders.push({ x: cx * TILE + 1, y: cy * TILE + 2, w: 14, h: 10 });
     }
   }
-  addProp({ kind: 'plant', x: 17 * TILE + 8, y: 37 * TILE + 14 });
-  addProp({ kind: 'plant', x: 22 * TILE + 8, y: 37 * TILE + 14 });
 
-  // ---- outside ----
-
-  addProp({ kind: 'fountain', x: AXIS, y: 44 * TILE + 8, r: 22 });
-  map.colliders.push({ x: AXIS - 24, y: 44 * TILE - 14, w: 48, h: 26 });
-
-  addProp({ kind: 'billboard', x: 23 * TILE, y: 45 * TILE + 12, text: SITE.name });
-  map.colliders.push({ x: 23 * TILE - 50, y: 45 * TILE + 4, w: 100, h: 8 });
-
-  for (const lx of [14, 25]) {
-    for (const ly of [41, 45]) {
-      addProp({ kind: 'lamp', x: lx * TILE + 8, y: ly * TILE + 12 });
-      map.colliders.push({ x: lx * TILE + 3, y: ly * TILE + 6, w: 10, h: 6 });
-    }
+  // seating and planting down the short ends of the atrium
+  for (const px of [9, 30]) {
+    addProp({ kind: 'plant', x: px * TILE + 8, y: 15 * TILE + 14 });
+    addProp({ kind: 'bench', x: px * TILE + 8, y: 17 * TILE + 12 });
+    addProp({ kind: 'plant', x: px * TILE + 8, y: 19 * TILE + 14 });
   }
-
-  for (const hy of [42, 46]) {
-    for (const hx of [10, 29]) {
-      addProp({ kind: 'hedge', x: hx * TILE, y: hy * TILE + 12, w: 5 * TILE });
-      map.colliders.push({ x: hx * TILE - 40, y: hy * TILE, w: 80, h: 12 });
-    }
-  }
-
-  // a bench out front, facing the fountain
-  addProp({ kind: 'bench', x: 17 * TILE, y: 46 * TILE + 4 });
 
   // things you bump into
   for (const p of map.props) {
@@ -482,13 +431,10 @@ export function drawProp(c, p, ox, oy, t) {
     case 'column': drawColumn(c, x, y); break;
     case 'statue': drawStatue(c, x, y); break;
     case 'vitrine': drawVitrine(c, x, y, p.accent); break;
-    case 'fountain': drawFountain(c, x, y, p.r); break;
-    case 'hedge': drawHedge(c, x, y, p.w); break;
-    case 'lamp': drawLamppost(c, x, y); break;
-    case 'billboard': {
-      const w = textWidth(p.text) * 2 + 24;
-      drawBillboard(c, x, y, w);
-      drawTextCentered(c, p.text, x, y - 21, { color: COL.ink, scale: 2 });
+    case 'banner': {
+      const w = Math.max(5 * TILE - 8, textWidth(p.text) + 14);
+      drawBanner(c, x, y, w, p.accent);
+      drawTextCentered(c, p.text, x, y + 8, { color: COL.paper, shadow: 'rgba(0,0,0,0.4)' });
       break;
     }
     default: break;

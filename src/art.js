@@ -986,6 +986,44 @@ export function drawBillboard(ctx, px, py, w) {
   ctx.fillRect(x + 3, py - 11, w - 6, 1);
 }
 
+/**
+ * A cloth banner hung across an archway, naming the wing beyond it. Drawn as a
+ * depth-sorted prop so you walk underneath it. (px, py) is the centre of the
+ * arch mouth; the banner hangs down from there. Lettering is the caller's job.
+ */
+export function drawBanner(ctx, px, py, w, accent) {
+  const x = px - Math.floor(w / 2);
+
+  // brass rail across the opening, with a finial at each end
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x - 3, py, w + 6, 3);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(x - 3, py, w + 6, 1);
+  ctx.fillRect(x - 4, py - 1, 3, 5);
+  ctx.fillRect(x + w + 1, py - 1, 3, 5);
+
+  // cloth, darker down the right where it falls away from the light
+  ctx.fillStyle = accent;
+  ctx.fillRect(x, py + 3, w, 15);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+  ctx.fillRect(x + w - 6, py + 3, 6, 15);
+  ctx.fillStyle = 'rgba(255, 246, 226, 0.10)';
+  ctx.fillRect(x, py + 3, 5, 15);
+
+  // woven edging
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x, py + 4, w, 1);
+  ctx.fillRect(x, py + 16, w, 1);
+
+  // scalloped hem
+  for (let i = 0; i < w; i += 6) {
+    ctx.fillStyle = accent;
+    ctx.fillRect(x + i + 1, py + 18, 4, 2);
+    ctx.fillStyle = COL.brass;
+    ctx.fillRect(x + i + 2, py + 20, 2, 1);
+  }
+}
+
 /** The contact shadow under the hovering droid. */
 export function drawDroidShadow(ctx, cx, baseY, lift) {
   const w = Math.max(4, 9 - lift);

@@ -11,8 +11,9 @@ central atrium.
 | South-west | Client work |
 | South-east | About me |
 
-Walk to the plinth in the middle of a wing, press <kbd>E</kbd>, and the exhibit
-list opens.
+You start in the middle of the atrium. Walk to the plinth in the middle of a
+wing, press <kbd>E</kbd>, and the exhibit list opens. There is no way in or out
+— the museum is the whole world, and every wing is about two seconds away.
 
 ---
 
@@ -57,6 +58,17 @@ python3 -m http.server 8000
 
 Deploying is copying the directory somewhere. On GitHub Pages, point Pages at
 the branch root and it works as-is.
+
+For anywhere that wants a single file and no server — an email attachment, a
+host that won't serve modules, a strict content policy — there is a bundler:
+
+```sh
+node tools/build-standalone.mjs
+# dist/index.html   one file, ~105 KB, no requests to anything
+```
+
+It concatenates the modules into one scope, so it refuses to build if two
+modules declare the same top-level name.
 
 ---
 
@@ -113,9 +125,14 @@ A few decisions worth knowing about, if you come back to this later:
   retyping a grid.
 
 - **Every wing opens straight onto the atrium.** There are no connecting
-  corridors. An earlier version had them and crossing the museum took fifteen
-  seconds, which is fifteen seconds of holding an arrow key. The worst-case
-  trip is now about five.
+  corridors, and no entrance hall or exterior either. The first version had all
+  three and crossing the museum took fifteen seconds, which is fifteen seconds
+  of holding an arrow key. Every wing is now about two.
+
+- **Rooms and arches are an odd number of tiles across.** That puts both their
+  centres on a tile rather than a tile boundary, which is what lets each arch
+  line up exactly with the plinth behind it. Before they were aligned, a bench
+  sat in one doorway and the droid could wedge itself on it.
 
 - **The background is baked once.** Floors, walls and wall-mounted art render
   into an offscreen canvas at load, and each frame blits the visible slice of

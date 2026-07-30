@@ -8,12 +8,12 @@
 
 import { SITE, WINGS } from './data/projects.js';
 
-let root, bodyEl, openBtn, closeBtn;
-let open = false;
+let listRoot, bodyEl, openBtn, closeBtn;
+let isOpen = false;
 let lastFocus = null;
 
 export function initListView({ standalone = false } = {}) {
-  root = document.getElementById('listview');
+  listRoot = document.getElementById('listview');
   bodyEl = document.getElementById('list-body');
   openBtn = document.getElementById('skip-to-list');
   closeBtn = document.getElementById('list-close');
@@ -21,15 +21,15 @@ export function initListView({ standalone = false } = {}) {
   render(standalone);
 
   if (standalone) {
-    root.hidden = false;
-    root.classList.add('is-open', 'is-standalone');
-    open = true;
+    listRoot.hidden = false;
+    listRoot.classList.add('is-open', 'is-standalone');
+    isOpen = true;
     return;
   }
 
   openBtn.addEventListener('click', openList);
   closeBtn.addEventListener('click', closeList);
-  root.addEventListener('keydown', (e) => {
+  listRoot.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
@@ -39,23 +39,23 @@ export function initListView({ standalone = false } = {}) {
 }
 
 export function isListOpen() {
-  return open;
+  return isOpen;
 }
 
 export function openList() {
-  if (open) return;
-  open = true;
+  if (isOpen) return;
+  isOpen = true;
   lastFocus = document.activeElement;
-  root.hidden = false;
-  requestAnimationFrame(() => root.classList.add('is-open'));
+  listRoot.hidden = false;
+  requestAnimationFrame(() => listRoot.classList.add('is-open'));
   closeBtn.focus();
 }
 
 export function closeList() {
-  if (!open) return;
-  open = false;
-  root.classList.remove('is-open');
-  setTimeout(() => { root.hidden = true; }, 180);
+  if (!isOpen) return;
+  isOpen = false;
+  listRoot.classList.remove('is-open');
+  setTimeout(() => { listRoot.hidden = true; }, 180);
   if (lastFocus && lastFocus.focus) lastFocus.focus();
 }
 

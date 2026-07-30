@@ -6,7 +6,7 @@
 
 import { view, COL } from './config.js';
 import { buildSprites } from './art.js';
-import { buildMap, map, plinthNear, drawProp } from './map.js';
+import { buildMap, map, plinthNear, drawProp, START_TILE } from './map.js';
 import { initRenderer, ctx, camX, camY, centreCamera, followCamera, vignette } from './renderer.js';
 import {
   initInput, moveAxis, interactPressed, endFrame, watchPointer, clearHeldKeys,
@@ -26,9 +26,13 @@ let lastNear = null;
 
 /* ------------------------------------------------------------------ */
 
+// A coarse pointer with no hover is the honest signal for "phone or tablet".
+// Width alone is not: a desktop window docked to half a screen, or the page
+// running inside a panel, still has a keyboard and should still get the game.
+// The width check is only a floor, for windows too small to play in at all.
 function isHandheld() {
   const coarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-  return coarse || window.innerWidth < 760;
+  return coarse || window.innerWidth < 620;
 }
 
 function boot() {
@@ -51,9 +55,10 @@ function boot() {
 
   document.body.classList.add('is-playing');
 
+  // You always begin in the middle of the atrium, on the medallion.
+  spawn(START_TILE.x, START_TILE.y, 'up');
+
   if (shouldSkipIntro()) {
-    // returning visitor — start them just inside the atrium
-    spawn(19, 22, 'up');
     centreCamera(player.x, player.y - 16);
     state = 'explore';
     markVisited();

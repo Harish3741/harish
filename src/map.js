@@ -9,69 +9,94 @@
 //        └────┬─────┘              └─────┬────┘
 //             │                          │
 //        ┌────┴──────────────────────────┴────┐
-//        │              ATRIUM               │
-//        └────┬──────────┬────────┬──────────┘
+//        │              ATRIUM                │
+//        └────┬──────────┬────────┬───────────┘
 //             │          │        │
 //        ┌────┴─────┐  LOBBY   ┌──┴───────┐
 //        │  CLIENT  │    │     │ ABOUT ME │    south wings
 //        └──────────┘    │     └──────────┘
 //                      doors
+//                      plaza
 
 import { TILE, COL } from './config.js';
 import {
   drawMarble, drawWood, drawStone, drawGrass,
-  drawWallTop, drawWallFace,
+  drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
+  drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawSign, drawFrontDoors, drawSteps, drawLightPool, drawInlay,
+  drawColumn, drawVitrine, drawStatue, drawRug, drawSconce,
+  drawFountain, drawHedge, drawLamppost, drawBillboard,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
+import { SITE } from './data/projects.js';
 
-export const MAP_W = 48;
-export const MAP_H = 47;
+export const MAP_W = 60;
+export const MAP_H = 56;
 
 // [x, y, w, h]
 const REGIONS = [
-  { rect: [2, 3, 16, 11], floor: 'wood', indoor: true, wing: 'automations' },
-  { rect: [30, 3, 16, 11], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [14, 17, 20, 10], floor: 'marble', indoor: true },
-  { rect: [2, 31, 16, 11], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [30, 31, 16, 11], floor: 'wood', indoor: true, wing: 'about' },
+  { rect: [3, 3, 20, 12], floor: 'wood', indoor: true, wing: 'automations' },
+  { rect: [37, 3, 20, 12], floor: 'wood', indoor: true, wing: 'personal' },
+  { rect: [16, 18, 28, 12], floor: 'marble', indoor: true },
+  { rect: [3, 33, 20, 12], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [37, 33, 20, 12], floor: 'wood', indoor: true, wing: 'about' },
 
   // corridors linking each wing to the atrium
-  { rect: [15, 14, 2, 3], floor: 'marble', indoor: true },
-  { rect: [31, 14, 2, 3], floor: 'marble', indoor: true },
-  { rect: [15, 27, 2, 4], floor: 'marble', indoor: true },
-  { rect: [31, 27, 2, 4], floor: 'marble', indoor: true },
+  { rect: [18, 15, 2, 3], floor: 'marble', indoor: true },
+  { rect: [40, 15, 2, 3], floor: 'marble', indoor: true },
+  { rect: [18, 30, 2, 3], floor: 'marble', indoor: true },
+  { rect: [40, 30, 2, 3], floor: 'marble', indoor: true },
 
   // The entrance hall runs the full depth of the south wings so the doorway
   // sits in the facade itself, rather than at the end of a long shaft.
-  { rect: [20, 27, 8, 14], floor: 'marble', indoor: true },
-  { rect: [23, 41, 2, 2], floor: 'stone', indoor: true },
+  { rect: [26, 30, 8, 15], floor: 'marble', indoor: true },
+  { rect: [29, 45, 2, 2], floor: 'stone', indoor: true },
 
-  // outdoors — kept clear of the south wings, which reach down to y41
-  { rect: [6, 43, 36, 4], floor: 'grass', indoor: false },
-  { rect: [14, 43, 20, 3], floor: 'stone', indoor: false },
+  // outdoors — kept clear of the south wings, which reach down to y44
+  { rect: [11, 47, 38, 9], floor: 'grass', indoor: false },
+  { rect: [18, 47, 24, 7], floor: 'stone', indoor: false },
 ];
 
 // The building's footprint. Every tile inside it that isn't floor is solid
 // masonry, which is what fills the courtyards between the wings — a radius
 // around each room can't, because those courtyards open onto the map edge.
-const MASONRY = [1, 1, 46, 42];
+// It reaches y=0 so the north wings get a full three-tile-tall wall above them.
+const MASONRY = [0, 0, 60, 47];
 
+// Each wing gets its own accent, used on its rug, its vitrines and the icon
+// floating in its case, so the four rooms don't read as one room repeated.
+// Deep and desaturated on purpose: a large saturated rectangle on the floor
+// reads as a hole rather than a carpet.
 export const WINGS = {
-  automations: { cx: 10, cy: 8, label: 'Automations' },
-  personal: { cx: 38, cy: 8, label: 'Personal Projects' },
-  client: { cx: 10, cy: 36, label: 'Client Work' },
-  about: { cx: 38, cy: 36, label: 'About Me' },
+  automations: { cx: 12, cy: 8, label: 'Automations', accent: '#2E4A52' },
+  personal: { cx: 46, cy: 8, label: 'Personal Projects', accent: '#6B3F28' },
+  client: { cx: 12, cy: 38, label: 'Client Work', accent: '#2F3A55' },
+  about: { cx: 46, cy: 38, label: 'About Me', accent: '#4C2F49' },
 };
 
-// Floor-standing placards in the atrium, pointing the way to each wing.
+// The row of each wall that carries pictures and sconces (the "picture field",
+// one tile above the floor it stands on).
+const RAIL = { northWings: 1, atrium: 16, southWings: 31 };
+
+// Floor-standing placards in the atrium, beside the corridor they point down.
 const SIGNS = [
-  { tx: 18, ty: 18, text: 'AUTOMATIONS', arrow: 'up' },
-  { tx: 29, ty: 18, text: 'PERSONAL', arrow: 'up' },
-  { tx: 18, ty: 25, text: 'CLIENT WORK', arrow: 'down' },
-  { tx: 29, ty: 25, text: 'ABOUT ME', arrow: 'down' },
+  { tx: 21, ty: 19, text: 'AUTOMATIONS', arrow: 'up' },
+  { tx: 38, ty: 19, text: 'PERSONAL', arrow: 'up' },
+  { tx: 21, ty: 28, text: 'CLIENT WORK', arrow: 'down' },
+  { tx: 38, ty: 28, text: 'ABOUT ME', arrow: 'down' },
 ];
+
+// Doorway mouths, for the brass thresholds laid across them.
+const THRESHOLDS = [
+  [18, 17, 2], [40, 17, 2],   // atrium -> north corridors
+  [18, 29, 2], [40, 29, 2],   // atrium -> south corridors
+  [26, 29, 8],                // atrium -> entrance hall
+  [29, 46, 2],                // entrance hall -> outside
+];
+
+// Everything out front is laid out around the building's centre line, x=480.
+const AXIS = 480;
 
 /* ------------------------------------------------------------------ */
 
@@ -166,16 +191,29 @@ export function buildMap() {
   for (const [id, w] of Object.entries(WINGS)) {
     const px = w.cx * TILE + 8;
     const py = w.cy * TILE + TILE;
-    map.plinths.push({ id, x: px, y: py, label: w.label });
+    map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
     map.colliders.push({ x: px - 11, y: py - 15, w: 22, h: 15 });
   }
 
   renderBackground();
 }
 
-/** Is this wall tile seen face-on? (i.e. is there floor directly below it) */
-function isWallFace(x, y) {
-  return map.wall[idx(x, y)] && tileFloor(x, y + 1) !== null && map.indoor[idx(x, y + 1)];
+/**
+ * How far up a face-on wall this tile sits: 0 stands on the floor, 2 meets the
+ * ceiling, -1 means the wall isn't seen face-on here (you're looking at its
+ * top instead). Walls stop at three tiles, which is as tall as a room can be
+ * before the geometry above it starts hiding the room behind.
+ */
+function wallFaceDepth(x, y) {
+  if (!map.wall[idx(x, y)]) return -1;
+  for (let d = 0; d < 3; d++) {
+    const by = y + 1 + d;
+    if (by >= MAP_H) return -1;
+    const bi = idx(x, by);
+    if (map.floor[bi] !== null) return map.indoor[bi] ? d : -1;
+    if (!map.wall[bi]) return -1;
+  }
+  return -1;
 }
 
 function renderBackground() {
@@ -184,11 +222,10 @@ function renderBackground() {
   cv.height = MAP_H * TILE;
   const c = cv.getContext('2d');
 
-  // night sky behind everything, so voids read as "outside the frame"
   c.fillStyle = COL.sky;
   c.fillRect(0, 0, cv.width, cv.height);
 
-  // floors
+  // --- floors ---
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       const f = map.floor[idx(x, y)];
@@ -202,22 +239,58 @@ function renderBackground() {
     }
   }
 
-  // the atrium's inlaid medallion, then the skylight pools over it and over
-  // each wing's plinth
-  drawInlay(c, 24 * TILE, 22 * TILE, 30);
-  drawLightPool(c, 20 * TILE, 18 * TILE, 8 * TILE, 8 * TILE, 0.55);
-  for (const w of Object.values(WINGS)) {
-    drawLightPool(c, (w.cx - 2) * TILE, (w.cy - 2) * TILE, 5 * TILE, 5 * TILE);
+  // --- inlaid margin wherever a floor meets a wall ---
+  for (let y = 0; y < MAP_H; y++) {
+    for (let x = 0; x < MAP_W; x++) {
+      const f = map.floor[idx(x, y)];
+      if (!f || f === 'grass' || !map.indoor[idx(x, y)]) continue;
+      const sides = {
+        n: tileFloor(x, y - 1) === null,
+        s: tileFloor(x, y + 1) === null,
+        w: tileFloor(x - 1, y) === null,
+        e: tileFloor(x + 1, y) === null,
+      };
+      if (sides.n || sides.s || sides.e || sides.w) {
+        drawFloorBorder(c, x * TILE, y * TILE, sides, f);
+      }
+    }
   }
 
-  // walls
+  // --- skylight, then the things laid into the floor ---
+  // Light goes down first. Painting it over the rugs instead bleaches them
+  // until they read as pools of water rather than textiles.
+  drawLightPool(c, AXIS - 72, 19 * TILE, 144, 144, 0.5);
+  for (const w of Object.values(WINGS)) {
+    drawLightPool(c, (w.cx - 3) * TILE, (w.cy - 3) * TILE, 7 * TILE, 7 * TILE);
+  }
+
+  drawInlay(c, AXIS, 23 * TILE + 8, 34);
+  for (const w of Object.values(WINGS)) {
+    drawRug(c, w.cx * TILE + 8, (w.cy + 1) * TILE, 8 * TILE, 5 * TILE, w.accent);
+  }
+
+  // brass thresholds across the doorways
+  for (const [tx, ty, tw] of THRESHOLDS) {
+    drawThreshold(c, tx * TILE, ty * TILE + TILE - 3, tw * TILE, 3);
+  }
+
+  // --- walls ---
   for (let y = 0; y < MAP_H; y++) {
     for (let x = 0; x < MAP_W; x++) {
       if (!map.wall[idx(x, y)]) continue;
-      const px = x * TILE;
-      const py = y * TILE;
-      if (isWallFace(x, y)) drawWallFace(c, px, py);
-      else drawWallTop(c, px, py, x, y);
+      const depth = wallFaceDepth(x, y);
+      if (depth >= 0) drawWallFace(c, x * TILE, y * TILE, depth);
+      else drawWallTop(c, x * TILE, y * TILE, x, y);
+    }
+  }
+
+  // --- the shadow walls cast onto the floor at their feet ---
+  for (let y = 0; y < MAP_H; y++) {
+    for (let x = 0; x < MAP_W; x++) {
+      if (map.floor[idx(x, y)] === null || !map.indoor[idx(x, y)]) continue;
+      if (y > 0 && map.wall[idx(x, y - 1)]) drawWallShadow(c, x * TILE, y * TILE);
+      if (map.wall[idx(x - 1, y)]) drawSideShadow(c, x * TILE, y * TILE, 'w');
+      if (map.wall[idx(x + 1, y)]) drawSideShadow(c, x * TILE, y * TILE, 'e');
     }
   }
 
@@ -226,40 +299,57 @@ function renderBackground() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Static dressing                                                     */
+/* Dressing                                                            */
 /* ------------------------------------------------------------------ */
 
-function hangFrames(c, x0, x1, ty, step = 3) {
-  for (let x = x0; x <= x1; x += step) {
-    if (!isWallFace(x, ty)) continue;
-    drawFrame(c, x * TILE + 1, ty * TILE + 4, x + ty);
+/**
+ * Hang pictures along a stretch of picture rail, at irregular spacing so the
+ * wall reads as a curated hang rather than a row of stamps.
+ */
+function hangFrames(c, x0, x1, ty) {
+  let x = x0;
+  let n = 0;
+  while (x <= x1) {
+    if (wallFaceDepth(x, ty) === 1) {
+      drawFrame(c, x * TILE + 8, ty * TILE + 6, x * 7 + ty);
+      n += 1;
+    }
+    x += n % 3 === 2 ? 4 : 3;
   }
 }
 
-/**
- * Anything that stands on the floor goes into map.props instead of being baked
- * into the background, so the droid can pass behind it. Flat things — pictures
- * on walls, the steps, the doorway — stay baked; nothing can get behind them.
- */
+/** Sconces along a stretch of wall, each throwing a pool onto the floor below. */
+function hangSconces(c, xs, ty) {
+  for (const x of xs) {
+    if (wallFaceDepth(x, ty) !== 1) continue;
+    drawSconce(c, x * TILE + 8, ty * TILE + 4);
+    drawLightPool(c, x * TILE - 20, (ty + 2) * TILE - 6, 56, 44, 0.75);
+  }
+}
+
+/** Anything standing on the floor is depth-sorted, so the droid can pass behind it. */
 function addProp(p) {
   map.props.push(p);
 }
 
 function decorate(c) {
-  // ---- baked: wall-mounted and ground-flat only ----
+  // ---- baked: wall-mounted, and flat on the ground ----
 
-  // paintings along the back wall of each wing
-  hangFrames(c, 3, 16, 2);
-  hangFrames(c, 31, 44, 2);
-  hangFrames(c, 3, 16, 30);
-  hangFrames(c, 31, 44, 30);
-  // and across the atrium's north wall, skipping the corridor mouths
-  hangFrames(c, 18, 29, 16, 4);
+  hangFrames(c, 4, 21, RAIL.northWings);
+  hangFrames(c, 38, 55, RAIL.northWings);
+  hangFrames(c, 4, 21, RAIL.southWings);
+  hangFrames(c, 38, 55, RAIL.southWings);
+  hangFrames(c, 22, 37, RAIL.atrium);
 
-  // the open front doors, then the steps down to the plaza. Both are centred
-  // on the doorway at x23-24, i.e. on pixel 384.
-  drawFrontDoors(c, 384 - 32, 41 * TILE - 9);
-  drawSteps(c, 384 - 32, 43 * TILE - 10, 4 * TILE);
+  hangSconces(c, [6, 12, 18], RAIL.northWings);
+  hangSconces(c, [40, 46, 52], RAIL.northWings);
+  hangSconces(c, [6, 12, 18], RAIL.southWings);
+  hangSconces(c, [40, 46, 52], RAIL.southWings);
+  hangSconces(c, [24, 30, 36], RAIL.atrium);
+
+  // the open front doors, then the steps down to the plaza
+  drawFrontDoors(c, AXIS - 32, 45 * TILE - 9);
+  drawSteps(c, AXIS - 32, 47 * TILE - 10, 4 * TILE);
 
   // ---- depth-sorted props ----
 
@@ -268,23 +358,47 @@ function decorate(c) {
   }
 
   for (const w of Object.values(WINGS)) {
-    addProp({ kind: 'bench', x: w.cx * TILE + 8, y: (w.cy + 3) * TILE + 12 });
-    addProp({ kind: 'plant', x: (w.cx - 6) * TILE + 8, y: (w.cy - 3) * TILE });
-    addProp({ kind: 'plant', x: (w.cx + 6) * TILE + 8, y: (w.cy - 3) * TILE });
-    addProp({ kind: 'rope', x: (w.cx - 3) * TILE, y: (w.cy + 1) * TILE + 10, span: 6 * TILE });
+    // flanking the plinth
+    addProp({ kind: 'statue', x: (w.cx - 6) * TILE + 8, y: w.cy * TILE + 10 });
+    addProp({ kind: 'statue', x: (w.cx + 6) * TILE + 8, y: w.cy * TILE + 10 });
+    addProp({ kind: 'rope', x: (w.cx - 4) * TILE, y: (w.cy + 1) * TILE + 12, span: 8 * TILE });
+    // benches face the plinth, leaving the middle of the room clear to walk
+    addProp({ kind: 'bench', x: (w.cx - 4) * TILE + 8, y: (w.cy + 4) * TILE + 8 });
+    addProp({ kind: 'bench', x: (w.cx + 4) * TILE + 8, y: (w.cy + 4) * TILE + 8 });
+
+    // vitrines down each side, and planting in the far corners
+    for (const dy of [-1, 2]) {
+      addProp({ kind: 'vitrine', x: (w.cx - 8) * TILE + 8, y: (w.cy + dy) * TILE + 8, accent: w.accent });
+      addProp({ kind: 'vitrine', x: (w.cx + 8) * TILE + 8, y: (w.cy + dy) * TILE + 8, accent: w.accent });
+    }
+    addProp({ kind: 'plant', x: (w.cx - 9) * TILE + 8, y: (w.cy - 4) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx + 9) * TILE + 8, y: (w.cy - 4) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx - 9) * TILE + 8, y: (w.cy + 3) * TILE + 14 });
+    addProp({ kind: 'plant', x: (w.cx + 9) * TILE + 8, y: (w.cy + 3) * TILE + 14 });
   }
 
-  // atrium plants flanking the corridor mouths
-  addProp({ kind: 'plant', x: 14 * TILE + 8, y: 18 * TILE + 14 });
-  addProp({ kind: 'plant', x: 33 * TILE + 8, y: 18 * TILE + 14 });
-  addProp({ kind: 'plant', x: 14 * TILE + 8, y: 26 * TILE + 6 });
-  addProp({ kind: 'plant', x: 33 * TILE + 8, y: 26 * TILE + 6 });
+  // atrium colonnade, framing the medallion
+  for (const cx of [25, 35]) {
+    for (const cy of [20, 27]) {
+      addProp({ kind: 'column', x: cx * TILE + 8, y: cy * TILE + 12 });
+      map.colliders.push({ x: cx * TILE + 1, y: cy * TILE + 2, w: 14, h: 10 });
+    }
+  }
 
-  // entrance hall: seating up by the atrium, planters flanking the doors
-  addProp({ kind: 'bench', x: 21 * TILE, y: 30 * TILE + 12 });
-  addProp({ kind: 'bench', x: 27 * TILE, y: 30 * TILE + 12 });
-  addProp({ kind: 'plant', x: 20 * TILE + 8, y: 39 * TILE + 14 });
-  addProp({ kind: 'plant', x: 27 * TILE + 8, y: 39 * TILE + 14 });
+  // atrium planting, flanking the corridor mouths
+  for (const px of [16, 43]) {
+    addProp({ kind: 'plant', x: px * TILE + 8, y: 19 * TILE + 14 });
+    addProp({ kind: 'plant', x: px * TILE + 8, y: 28 * TILE + 14 });
+  }
+
+  // seating and a pair of cases down the long sides of the atrium, so the
+  // floor isn't one unbroken field of marble
+  for (const px of [18, 41]) {
+    addProp({ kind: 'bench', x: px * TILE + 8, y: 22 * TILE + 12 });
+    addProp({ kind: 'bench', x: px * TILE + 8, y: 26 * TILE + 12 });
+  }
+  addProp({ kind: 'vitrine', x: 24 * TILE + 8, y: 19 * TILE + 12, accent: '#5A4A6B' });
+  addProp({ kind: 'vitrine', x: 36 * TILE + 8, y: 19 * TILE + 12, accent: '#5A4A6B' });
 
   // wayfinding placards
   for (const s of SIGNS) {
@@ -297,11 +411,51 @@ function decorate(c) {
     });
   }
 
-  // plants and placards are things you bump into
+  // entrance hall: a colonnade down both sides, seating, planters at the door
+  for (const cy of [33, 39]) {
+    for (const cx of [26, 33]) {
+      addProp({ kind: 'column', x: cx * TILE + 8, y: cy * TILE + 12 });
+      map.colliders.push({ x: cx * TILE + 1, y: cy * TILE + 2, w: 14, h: 10 });
+    }
+  }
+  addProp({ kind: 'bench', x: 28 * TILE, y: 42 * TILE + 12 });
+  addProp({ kind: 'bench', x: 32 * TILE, y: 42 * TILE + 12 });
+  addProp({ kind: 'plant', x: 27 * TILE, y: 44 * TILE + 12 });
+  addProp({ kind: 'plant', x: 33 * TILE, y: 44 * TILE + 12 });
+
+  // ---- outside ----
+
+  addProp({ kind: 'fountain', x: AXIS, y: 50 * TILE + 12, r: 26 });
+  map.colliders.push({ x: AXIS - 28, y: 50 * TILE - 14, w: 56, h: 30 });
+
+  addProp({ kind: 'billboard', x: 21 * TILE, y: 49 * TILE + 12, text: SITE.name });
+  map.colliders.push({ x: 21 * TILE - 34, y: 49 * TILE + 4, w: 68, h: 8 });
+
+  for (const lx of [20, 40]) {
+    for (const ly of [47, 52]) {
+      addProp({ kind: 'lamp', x: lx * TILE + 8, y: ly * TILE + 12 });
+      map.colliders.push({ x: lx * TILE + 3, y: ly * TILE + 6, w: 10, h: 6 });
+    }
+  }
+
+  for (const hy of [48, 52]) {
+    for (const hx of [14, 45]) {
+      addProp({ kind: 'hedge', x: hx * TILE, y: hy * TILE + 12, w: 5 * TILE });
+      map.colliders.push({ x: hx * TILE - 40, y: hy * TILE, w: 80, h: 12 });
+    }
+  }
+
+  // benches out front, facing the fountain
+  addProp({ kind: 'bench', x: 24 * TILE, y: 52 * TILE + 4 });
+  addProp({ kind: 'bench', x: 36 * TILE, y: 52 * TILE + 4 });
+
+  // things you bump into
   for (const p of map.props) {
     if (p.kind === 'plant') map.colliders.push({ x: p.x - 6, y: p.y - 9, w: 12, h: 9 });
     if (p.kind === 'bench') map.colliders.push({ x: p.x - 11, y: p.y - 9, w: 22, h: 9 });
     if (p.kind === 'sign') map.colliders.push({ x: p.x - 8, y: p.y - 6, w: 16, h: 6 });
+    if (p.kind === 'statue') map.colliders.push({ x: p.x - 7, y: p.y - 15, w: 14, h: 15 });
+    if (p.kind === 'vitrine') map.colliders.push({ x: p.x - 16, y: p.y - 11, w: 32, h: 11 });
   }
 
   // draw order is fixed, so sort once rather than every frame
@@ -313,18 +467,32 @@ export function drawProp(c, p, ox, oy, t) {
   const x = Math.round(p.x - ox);
   const y = Math.round(p.y - oy);
 
-  if (p.kind === 'plinth') {
-    drawPlinth(c, x, y);
-    drawPlinthIcon(c, x, y, p.id, t);
-  } else if (p.kind === 'plant') {
-    drawPlant(c, x, y);
-  } else if (p.kind === 'bench') {
-    drawBench(c, x, y);
-  } else if (p.kind === 'rope') {
-    drawRopeLine(c, x, y, p.span);
-  } else if (p.kind === 'sign') {
-    const w = textWidth(p.text) + 20;
-    drawSign(c, x, y - 11, w, p.arrow);
-    drawTextCentered(c, p.text, x + 5, y - 8, { color: COL.brass });
+  switch (p.kind) {
+    case 'plinth':
+      drawPlinth(c, x, y);
+      drawPlinthIcon(c, x, y, p.id, t);
+      break;
+    case 'plant': drawPlant(c, x, y); break;
+    case 'bench': drawBench(c, x, y); break;
+    case 'rope': drawRopeLine(c, x, y, p.span); break;
+    case 'column': drawColumn(c, x, y); break;
+    case 'statue': drawStatue(c, x, y); break;
+    case 'vitrine': drawVitrine(c, x, y, p.accent); break;
+    case 'fountain': drawFountain(c, x, y, p.r); break;
+    case 'hedge': drawHedge(c, x, y, p.w); break;
+    case 'lamp': drawLamppost(c, x, y); break;
+    case 'billboard': {
+      const w = textWidth(p.text) * 2 + 24;
+      drawBillboard(c, x, y, w);
+      drawTextCentered(c, p.text, x, y - 21, { color: COL.ink, scale: 2 });
+      break;
+    }
+    case 'sign': {
+      const w = textWidth(p.text) + 20;
+      drawSign(c, x, y - 11, w, p.arrow);
+      drawTextCentered(c, p.text, x + 5, y - 8, { color: COL.brass });
+      break;
+    }
+    default: break;
   }
 }

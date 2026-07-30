@@ -202,25 +202,133 @@ export function drawGrass(ctx, px, py, tx, ty) {
 /* ------------------------------------------------------------------ */
 
 /**
- * The top of a wall, seen from above: coursed stone. Kept deliberately low
- * contrast — this is the largest surface on screen in some rooms, and loud
- * masonry pulls the eye away from the exhibits.
+ * The top of a wall, seen from above. This is the largest surface on screen in
+ * some rooms, so it is deliberately quiet: big ashlar blocks, low contrast, no
+ * fine detail to pull the eye off the exhibits.
  */
 export function drawWallTop(ctx, px, py, tx, ty) {
+  const h = hash(tx >> 1, ty >> 1);
   ctx.fillStyle = COL.wallTop;
   ctx.fillRect(px, py, TILE, TILE);
 
-  // two courses per tile, staggered so the joints break
-  const stagger = (ty % 2) * 8;
-  ctx.fillStyle = 'rgba(94, 74, 54, 0.45)';
-  ctx.fillRect(px, py, TILE, 1);
-  ctx.fillRect(px, py + 8, TILE, 1);
-  ctx.fillRect(px + stagger, py, 1, 8);
-  ctx.fillRect(px + ((stagger + 8) % TILE), py + 8, 1, 8);
+  // faint per-block tonal drift, so the mass isn't a flat field
+  ctx.fillStyle = h > 0.5
+    ? 'rgba(255, 246, 226, 0.045)'
+    : 'rgba(48, 34, 22, 0.05)';
+  ctx.fillRect(px, py, TILE, TILE);
 
-  ctx.fillStyle = 'rgba(163, 140, 107, 0.4)';
-  ctx.fillRect(px, py + 1, TILE, 1);
-  ctx.fillRect(px, py + 9, TILE, 1);
+  // joints every two tiles, staggered by row
+  const stagger = ((ty >> 1) % 2) * TILE;
+  ctx.fillStyle = 'rgba(74, 56, 38, 0.30)';
+  if (ty % 2 === 0) ctx.fillRect(px, py, TILE, 1);
+  if ((px + stagger) % (TILE * 2) === 0) ctx.fillRect(px, py, 1, TILE);
+
+  ctx.fillStyle = 'rgba(186, 162, 128, 0.16)';
+  if (ty % 2 === 0) ctx.fillRect(px, py + 1, TILE, 1);
+}
+
+/**
+ * The front of a wall, seen face-on. Walls are three tiles tall, and `depth`
+ * says which band this tile is: 0 sits on the floor, 2 meets the ceiling. That
+ * gives a real dado / picture field / cornice elevation instead of a single
+ * flat strip, which is most of what makes a room read as a room.
+ */
+export function drawWallFace(ctx, px, py, depth) {
+  if (depth === 2) {
+    // cornice: roof mass above, then crown moulding stepping out
+    ctx.fillStyle = COL.wallTop;
+    ctx.fillRect(px, py, TILE, 8);
+    ctx.fillStyle = 'rgba(48, 34, 22, 0.28)';
+    ctx.fillRect(px, py + 7, TILE, 1);
+
+    ctx.fillStyle = COL.wallFaceHi;
+    ctx.fillRect(px, py + 8, TILE, 3);
+    ctx.fillStyle = COL.wallFace;
+    ctx.fillRect(px, py + 11, TILE, 2);
+    ctx.fillStyle = COL.baseboard;
+    ctx.fillRect(px, py + 13, TILE, 1);
+    ctx.fillStyle = COL.wallFace;
+    ctx.fillRect(px, py + 14, TILE, 2);
+    return;
+  }
+
+  if (depth === 1) {
+    // the picture field: plaster, brighter at the top where light falls
+    ctx.fillStyle = COL.wallFace;
+    ctx.fillRect(px, py, TILE, TILE);
+    ctx.fillStyle = 'rgba(255, 250, 238, 0.35)';
+    ctx.fillRect(px, py, TILE, 5);
+    // picture rail
+    ctx.fillStyle = COL.baseboard;
+    ctx.fillRect(px, py + 2, TILE, 1);
+    ctx.fillStyle = COL.wallFaceHi;
+    ctx.fillRect(px, py + 3, TILE, 1);
+    return;
+  }
+
+  // depth 0 — dado rail, wainscot panelling, baseboard, contact shadow
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px, py, TILE, TILE);
+
+  ctx.fillStyle = COL.baseboard;
+  ctx.fillRect(px, py + 4, TILE, 1);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px, py + 5, TILE, 1);
+
+  // panelled wainscot: one recessed panel per tile
+  ctx.fillStyle = 'rgba(154, 124, 88, 0.24)';
+  ctx.fillRect(px + 2, py + 7, TILE - 4, 5);
+  ctx.fillStyle = 'rgba(255, 250, 238, 0.45)';
+  ctx.fillRect(px + 2, py + 7, TILE - 4, 1);
+  ctx.fillStyle = 'rgba(120, 94, 64, 0.30)';
+  ctx.fillRect(px + 2, py + 11, TILE - 4, 1);
+
+  ctx.fillStyle = COL.baseboard;
+  ctx.fillRect(px, py + 13, TILE, 3);
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.45)';
+  ctx.fillRect(px, py + 15, TILE, 1);
+}
+
+/** The band of shadow a wall casts onto the floor tile below it. */
+export function drawWallShadow(ctx, px, py) {
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.24)';
+  ctx.fillRect(px, py, TILE, 2);
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.15)';
+  ctx.fillRect(px, py + 2, TILE, 2);
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.07)';
+  ctx.fillRect(px, py + 4, TILE, 2);
+}
+
+/**
+ * An inlaid margin running around the edge of a room, mitred at the corners by
+ * simply drawing each side independently. `sides` is which edges meet a wall.
+ */
+export function drawFloorBorder(ctx, px, py, sides, kind) {
+  const band = kind === 'wood' ? '#8E5F38' : '#CBB894';
+  const line = kind === 'wood' ? '#6B4830' : COL.brassDim;
+  const W = 5;
+
+  const strip = (x, y, w, h, lx, ly, lw, lh) => {
+    ctx.fillStyle = band;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = line;
+    ctx.fillRect(lx, ly, lw, lh);
+  };
+
+  if (sides.n) strip(px, py, TILE, W, px, py + W - 1, TILE, 1);
+  if (sides.s) strip(px, py + TILE - W, TILE, W, px, py + TILE - W, TILE, 1);
+  if (sides.w) strip(px, py, W, TILE, px + W - 1, py, 1, TILE);
+  if (sides.e) strip(px + TILE - W, py, W, TILE, px + TILE - W, py, 1, TILE);
+}
+
+/** A brass threshold strip, laid across a doorway. */
+export function drawThreshold(ctx, px, py, w, h) {
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(px, py, w, h);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(px, py, w, 1);
+  ctx.fillStyle = 'rgba(255, 244, 214, 0.35)';
+  ctx.fillRect(px + 2, py + 1, w - 4, 1);
 }
 
 /**
@@ -262,28 +370,6 @@ export function drawInlay(ctx, cx, cy, r) {
     ctx.fillRect(cx, cy + i, 1, 1);
     ctx.fillRect(cx, cy - i, 1, 1);
   }
-}
-
-/** The front of a wall: plaster above, wainscot panelling below. */
-export function drawWallFace(ctx, px, py) {
-  ctx.fillStyle = COL.wallFace;
-  ctx.fillRect(px, py, TILE, TILE);
-
-  // cornice
-  ctx.fillStyle = COL.wallTop;
-  ctx.fillRect(px, py, TILE, 3);
-  ctx.fillStyle = COL.wallTopHi;
-  ctx.fillRect(px, py, TILE, 1);
-
-  // picture rail
-  ctx.fillStyle = COL.wallFaceHi;
-  ctx.fillRect(px, py + 4, TILE, 1);
-
-  // baseboard
-  ctx.fillStyle = COL.baseboard;
-  ctx.fillRect(px, py + TILE - 3, TILE, 3);
-  ctx.fillStyle = COL.wallLine;
-  ctx.fillRect(px, py + TILE - 1, TILE, 1);
 }
 
 /* ------------------------------------------------------------------ */
@@ -386,23 +472,49 @@ export function drawPlinthIcon(ctx, px, py, kind, t) {
   }
 }
 
-/** A framed picture hung on a wall face. */
+/**
+ * A framed picture, hung from the picture rail. (px, py) is the top-centre of
+ * the frame; the hanging wire runs up from there. Sizes vary so a wall of them
+ * reads as a hang rather than a row of stamps.
+ */
 export function drawFrame(ctx, px, py, seed) {
   const h = hash(seed, 3);
-  ctx.fillStyle = COL.brassDim;
-  ctx.fillRect(px, py, 14, 11);
-  ctx.fillStyle = COL.brass;
-  ctx.fillRect(px, py, 14, 1);
-  ctx.fillRect(px, py, 1, 11);
+  const SIZES = [[14, 11], [20, 15], [26, 18], [16, 20]];
+  const [w, ht] = SIZES[Math.floor(h * 977) % SIZES.length];
+  const x = px - Math.floor(w / 2);
 
-  // canvas inside
-  const inks = ['#8E6FA8', '#5D8FA8', '#A8785D', '#6B9A73', '#A85D6B'];
-  ctx.fillStyle = inks[Math.floor(h * inks.length) % inks.length];
-  ctx.fillRect(px + 2, py + 2, 10, 7);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-  ctx.fillRect(px + 3, py + 3, 8, 2);
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-  ctx.fillRect(px + 3, py + 7, 8, 1);
+  // hanging wire back up to the rail
+  ctx.fillStyle = 'rgba(90, 68, 46, 0.55)';
+  ctx.fillRect(px - 2, py - 3, 1, 3);
+  ctx.fillRect(px + 1, py - 3, 1, 3);
+
+  // frame, with a lit top-left edge
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x, py, w, ht);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(x, py, w, 1);
+  ctx.fillRect(x, py, 1, ht);
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.40)';
+  ctx.fillRect(x, py + ht - 1, w, 1);
+  ctx.fillRect(x + w - 1, py, 1, ht);
+
+  // the canvas: a horizon, a mass, a highlight — enough to read as a painting
+  const inks = ['#7C6494', '#4F8296', '#9A6B4E', '#5D8A64', '#96525F', '#3F5A7A'];
+  const base = inks[Math.floor(h * 613) % inks.length];
+  const iw = w - 4;
+  const ih = ht - 4;
+  ctx.fillStyle = base;
+  ctx.fillRect(x + 2, py + 2, iw, ih);
+  ctx.fillStyle = 'rgba(255, 245, 220, 0.22)';
+  ctx.fillRect(x + 2, py + 2, iw, Math.max(2, Math.floor(ih * 0.4)));
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.24)';
+  ctx.fillRect(x + 2, py + 2 + Math.floor(ih * 0.62), iw, ih - Math.floor(ih * 0.62) - 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+  ctx.fillRect(x + 3 + (Math.floor(h * 311) % Math.max(1, iw - 5)), py + 4, 2, 2);
+
+  // wall label underneath
+  ctx.fillStyle = 'rgba(251, 243, 228, 0.55)';
+  ctx.fillRect(px - 3, py + ht + 2, 6, 2);
 }
 
 /** A potted plant. (px, py) is the bottom-centre. */
@@ -565,6 +677,313 @@ export function drawLightPool(ctx, px, py, w, h, intensity = 1) {
     ctx.fillRect(px + inset, py + inset + cut, w - inset * 2, h - inset * 2 - cut * 2);
     ctx.fillRect(px + inset + cut, py + inset, w - inset * 2 - cut * 2, h - inset * 2);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Architecture and furniture                                          */
+/* ------------------------------------------------------------------ */
+
+/** A fluted column. (px, py) is the bottom-centre. */
+export function drawColumn(ctx, px, py) {
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(px - 10, py - 3, 20, 3);
+  ctx.fillStyle = 'rgba(59, 42, 34, 0.13)';
+  ctx.fillRect(px - 13, py - 2, 26, 2);
+
+  // base
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px - 8, py - 7, 16, 5);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 8, py - 7, 16, 1);
+  ctx.fillStyle = COL.baseboard;
+  ctx.fillRect(px - 8, py - 3, 16, 1);
+
+  // shaft, lit from the left
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px - 6, py - 38, 12, 31);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 6, py - 38, 4, 31);
+  ctx.fillStyle = 'rgba(138, 110, 76, 0.22)';
+  ctx.fillRect(px + 3, py - 38, 3, 31);
+
+  // flutes
+  ctx.fillStyle = 'rgba(138, 110, 76, 0.28)';
+  ctx.fillRect(px - 3, py - 36, 1, 28);
+  ctx.fillRect(px, py - 36, 1, 28);
+  ctx.fillRect(px + 3, py - 36, 1, 28);
+
+  // capital
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px - 8, py - 44, 16, 6);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 9, py - 45, 18, 2);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(px - 8, py - 39, 16, 1);
+}
+
+/** A low glass vitrine. (px, py) is the bottom-centre. */
+export function drawVitrine(ctx, px, py, accent) {
+  const x = px - 16;
+
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(x + 1, py - 3, 30, 3);
+
+  // cabinet
+  ctx.fillStyle = COL.wood;
+  ctx.fillRect(x + 2, py - 11, 28, 9);
+  ctx.fillStyle = COL.woodDark;
+  ctx.fillRect(x + 2, py - 3, 28, 2);
+  ctx.fillRect(x + 2, py - 11, 28, 1);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x + 6, py - 8, 20, 1);
+
+  // glass hood
+  ctx.fillStyle = 'rgba(191, 227, 232, 0.18)';
+  ctx.fillRect(x + 3, py - 22, 26, 11);
+  ctx.fillStyle = 'rgba(191, 227, 232, 0.5)';
+  ctx.fillRect(x + 2, py - 23, 28, 1);
+  ctx.fillRect(x + 2, py - 23, 1, 12);
+  ctx.fillRect(x + 29, py - 23, 1, 12);
+
+  // whatever is on show inside
+  ctx.fillStyle = accent || COL.brass;
+  ctx.fillRect(x + 11, py - 18, 4, 6);
+  ctx.fillRect(x + 17, py - 16, 4, 4);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.30)';
+  ctx.fillRect(x + 6, py - 21, 1, 8);
+  ctx.fillRect(x + 7, py - 21, 1, 4);
+}
+
+/** A stone bust on a pedestal. (px, py) is the bottom-centre. */
+export function drawStatue(ctx, px, py) {
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(px - 7, py - 2, 14, 3);
+
+  // pedestal
+  ctx.fillStyle = COL.stoneA;
+  ctx.fillRect(px - 6, py - 15, 12, 14);
+  ctx.fillStyle = COL.stoneB;
+  ctx.fillRect(px + 1, py - 15, 5, 14);
+  ctx.fillStyle = COL.stoneLine;
+  ctx.fillRect(px - 6, py - 1, 12, 1);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 7, py - 17, 14, 2);
+
+  // bust: shoulders, neck, head
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px - 5, py - 22, 10, 5);
+  ctx.fillRect(px - 2, py - 25, 4, 3);
+  ctx.fillRect(px - 4, py - 32, 8, 7);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 4, py - 32, 3, 7);
+  ctx.fillRect(px - 5, py - 22, 3, 5);
+  ctx.fillStyle = 'rgba(138, 110, 76, 0.30)';
+  ctx.fillRect(px + 2, py - 31, 2, 6);
+  ctx.fillRect(px - 1, py - 29, 1, 1);
+  ctx.fillRect(px + 1, py - 29, 1, 1);
+}
+
+/**
+ * A patterned rug: fringe, a dark guard band, a woven border and a centre
+ * medallion. Drawn into the floor, since you walk over it.
+ *
+ * The base tone wants to be a deep, desaturated one — a large flat saturated
+ * rectangle on the floor stops reading as a textile and starts reading as a
+ * hole in the ground.
+ */
+export function drawRug(ctx, px, py, w, h, base) {
+  const x = px - Math.floor(w / 2);
+  const y = py - Math.floor(h / 2);
+
+  // fringe along the short ends
+  ctx.fillStyle = 'rgba(226, 210, 180, 0.55)';
+  for (let i = 2; i < w - 2; i += 3) {
+    ctx.fillRect(x + i, y - 3, 1, 3);
+    ctx.fillRect(x + i, y + h, 1, 3);
+  }
+
+  ctx.fillStyle = base;
+  ctx.fillRect(x, y, w, h);
+
+  // guard bands
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.30)';
+  ctx.fillRect(x, y, w, 3);
+  ctx.fillRect(x, y + h - 3, w, 3);
+  ctx.fillRect(x, y, 3, h);
+  ctx.fillRect(x + w - 3, y, 3, h);
+
+  // woven border: alternating ticks just inside the guard
+  ctx.fillStyle = 'rgba(226, 200, 156, 0.34)';
+  ctx.fillRect(x + 5, y + 5, w - 10, 1);
+  ctx.fillRect(x + 5, y + h - 6, w - 10, 1);
+  ctx.fillRect(x + 5, y + 5, 1, h - 10);
+  ctx.fillRect(x + w - 6, y + 5, 1, h - 10);
+  for (let i = x + 8; i < x + w - 8; i += 6) {
+    ctx.fillRect(i, y + 7, 3, 1);
+    ctx.fillRect(i, y + h - 8, 3, 1);
+  }
+  for (let j = y + 8; j < y + h - 8; j += 6) {
+    ctx.fillRect(x + 7, j, 1, 3);
+    ctx.fillRect(x + w - 8, j, 1, 3);
+  }
+
+  // field: a faint diagonal weave, so the middle isn't a flat slab
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  for (let j = y + 10; j < y + h - 10; j += 4) {
+    for (let i = x + 10; i < x + w - 10; i += 4) {
+      if (((i + j) >> 2) % 2 === 0) ctx.fillRect(i, j, 2, 2);
+    }
+  }
+
+  // centre medallion
+  const cx = x + Math.floor(w / 2);
+  const cy = y + Math.floor(h / 2);
+  const rx = Math.floor(w * 0.20);
+  const ry = Math.floor(h * 0.26);
+  for (let dy = -ry; dy <= ry; dy++) {
+    for (let dx = -rx; dx <= rx; dx++) {
+      const d = (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry);
+      if (d > 1) continue;
+      ctx.fillStyle = d > 0.78
+        ? 'rgba(226, 200, 156, 0.32)'
+        : d > 0.62 ? 'rgba(0, 0, 0, 0.22)' : 'rgba(226, 200, 156, 0.13)';
+      ctx.fillRect(cx + dx, cy + dy, 1, 1);
+    }
+  }
+}
+
+/** Shadow along a wall that runs down the side of a room rather than across it. */
+export function drawSideShadow(ctx, px, py, side) {
+  const BANDS = [[0.20, 0], [0.11, 2], [0.05, 4]];
+  for (const [alpha, off] of BANDS) {
+    ctx.fillStyle = `rgba(58, 42, 30, ${alpha})`;
+    ctx.fillRect(side === 'w' ? px + off : px + TILE - off - 2, py, 2, TILE);
+  }
+}
+
+/** A wall sconce. Drawn onto the picture-field row of a wall. */
+export function drawSconce(ctx, px, py) {
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(px - 1, py + 4, 2, 5);
+  ctx.fillRect(px - 3, py + 8, 6, 1);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(px - 3, py + 1, 6, 3);
+  ctx.fillStyle = '#FFE9B0';
+  ctx.fillRect(px - 2, py, 4, 2);
+  ctx.fillStyle = 'rgba(255, 226, 168, 0.35)';
+  ctx.fillRect(px - 4, py - 1, 8, 5);
+}
+
+/** A fountain. (px, py) is the centre of the basin. */
+export function drawFountain(ctx, px, py, r) {
+  for (let dy = -r; dy <= r; dy++) {
+    for (let dx = -r; dx <= r; dx++) {
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d > r) continue;
+      let col;
+      if (d > r - 3) col = COL.stoneB;
+      else if (d > r - 5) col = COL.stoneA;
+      else if (d > r - 6) col = '#6E7F80';
+      else col = ((dx + dy + Math.round(d)) & 3) ? '#5A8C93' : '#6C9FA6';
+      ctx.fillStyle = col;
+      ctx.fillRect(px + dx, py + dy, 1, 1);
+    }
+  }
+
+  // plinth and jet at the centre
+  ctx.fillStyle = COL.stoneA;
+  ctx.fillRect(px - 4, py - 8, 8, 10);
+  ctx.fillStyle = COL.stoneB;
+  ctx.fillRect(px + 1, py - 8, 3, 10);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 5, py - 10, 10, 2);
+
+  ctx.fillStyle = 'rgba(190, 232, 240, 0.85)';
+  ctx.fillRect(px - 1, py - 20, 2, 10);
+  ctx.fillStyle = 'rgba(190, 232, 240, 0.5)';
+  ctx.fillRect(px - 4, py - 17, 2, 6);
+  ctx.fillRect(px + 3, py - 17, 2, 6);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.fillRect(px - 1, py - 22, 2, 2);
+}
+
+/** A clipped hedge. (px, py) is the bottom-centre. */
+export function drawHedge(ctx, px, py, w) {
+  const x = px - Math.floor(w / 2);
+  const h = 22;
+  const top = py - h;
+
+  ctx.fillStyle = 'rgba(34, 52, 26, 0.28)';
+  ctx.fillRect(x + 3, py - 3, w, 4);
+
+  // mass, with the corners knocked off so it isn't a slab
+  ctx.fillStyle = COL.plantB;
+  ctx.fillRect(x, top + 2, w, h - 2);
+  ctx.fillRect(x + 2, top, w - 4, h);
+
+  // sunlit crown
+  ctx.fillStyle = COL.plantA;
+  ctx.fillRect(x + 2, top, w - 4, 7);
+  ctx.fillRect(x, top + 3, w, 4);
+
+  // dappled foliage, deterministic so it never shimmers
+  for (let j = 0; j < h; j += 2) {
+    for (let i = 0; i < w; i += 2) {
+      const n = hash(x + i, top + j);
+      if (n > 0.74) {
+        ctx.fillStyle = j < 8 ? '#84B76B' : COL.plantA;
+        ctx.fillRect(x + i, top + j, 2, 2);
+      } else if (n < 0.20) {
+        ctx.fillStyle = '#3E6630';
+        ctx.fillRect(x + i, top + j, 2, 2);
+      }
+    }
+  }
+
+  // shaded underside
+  ctx.fillStyle = 'rgba(28, 44, 22, 0.42)';
+  ctx.fillRect(x + 1, py - 5, w - 2, 5);
+}
+
+/** A lamp post. (px, py) is the bottom-centre. */
+export function drawLamppost(ctx, px, py) {
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(px - 4, py - 2, 9, 2);
+  ctx.fillStyle = COL.ink;
+  ctx.fillRect(px - 3, py - 4, 6, 3);
+  ctx.fillRect(px - 1, py - 34, 2, 31);
+  ctx.fillStyle = '#5A4436';
+  ctx.fillRect(px - 1, py - 34, 1, 31);
+
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(px - 4, py - 44, 8, 10);
+  ctx.fillStyle = '#FFE9B0';
+  ctx.fillRect(px - 3, py - 43, 6, 8);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(px - 4, py - 46, 8, 2);
+  ctx.fillRect(px - 2, py - 48, 4, 2);
+  ctx.fillStyle = 'rgba(255, 226, 168, 0.20)';
+  ctx.fillRect(px - 8, py - 46, 16, 14);
+}
+
+/** The big board out front. Lettering is drawn by the caller. */
+export function drawBillboard(ctx, px, py, w) {
+  const x = px - Math.floor(w / 2);
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(x + 2, py - 2, w, 3);
+  ctx.fillStyle = COL.stoneB;
+  ctx.fillRect(x + 4, py - 8, 8, 7);
+  ctx.fillRect(x + w - 12, py - 8, 8, 7);
+
+  ctx.fillStyle = COL.stoneA;
+  ctx.fillRect(x, py - 28, w, 21);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(x, py - 30, w, 3);
+  ctx.fillStyle = COL.stoneLine;
+  ctx.fillRect(x, py - 8, w, 1);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x + 3, py - 25, w - 6, 1);
+  ctx.fillRect(x + 3, py - 11, w - 6, 1);
 }
 
 /** The contact shadow under the hovering droid. */

@@ -53,7 +53,7 @@ function boot() {
 
   if (shouldSkipIntro()) {
     // returning visitor — start them just inside the atrium
-    spawn(23, 24, 'up');
+    spawn(29, 26, 'up');
     centreCamera(player.x, player.y - 16);
     state = 'explore';
     markVisited();

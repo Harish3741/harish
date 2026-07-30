@@ -10,9 +10,16 @@ import { drawTextCentered, textWidth } from './font.js';
 import { anyPressed } from './input.js';
 import { SITE } from './data/projects.js';
 
-const START = { x: 384, y: 726 };   // out on the plaza
-const DOOR = { x: 384, y: 676 };    // the threshold
-const HALL = { x: 384, y: 400 };    // a few paces into the atrium
+// The arrival walk. Three legs: up the plaza past the fountain, across to the
+// doors, then into the atrium. The dogleg exists because the fountain sits on
+// the central axis, and walking around it frames the building better than
+// marching straight at it would.
+const LEGS = [
+  { x: 408, y: 788, speed: 88 },   // up the west side of the plaza
+  { x: 480, y: 760, speed: 88 },   // across to the doors
+  { x: 480, y: 400, speed: 118 },  // through the hall into the atrium
+];
+const START = { x: 408, y: 864 };
 
 const VISIT_KEY = 'harish-museum-visited';
 
@@ -57,8 +64,9 @@ export function startIntro() {
 
 /** Jump straight to the title card, leaving the droid in the atrium. */
 function cutToTitle() {
-  player.x = HALL.x;
-  player.y = HALL.y;
+  const last = LEGS[LEGS.length - 1];
+  player.x = last.x;
+  player.y = last.y;
   player.dir = 'up';
   player.moving = false;
   centreCamera(player.x, player.y - CARD_LIFT);
@@ -77,11 +85,10 @@ export function updateIntro(dt) {
       return 'intro';
     }
 
-    const target = intro.leg === 0 ? DOOR : HALL;
-    const speed = intro.leg === 0 ? 78 : 92;
-    if (walkToward(target.x, target.y, dt, speed)) {
+    const target = LEGS[intro.leg];
+    if (walkToward(target.x, target.y, dt, target.speed)) {
       intro.leg += 1;
-      if (intro.leg >= 2) {
+      if (intro.leg >= LEGS.length) {
         intro.phase = 'settle';
         intro.t = 0;
         player.moving = false;

@@ -1,16 +1,21 @@
-// The plain-text version of the whole museum.
+// The plain version of the whole museum, dressed as a Minecraft world select.
 //
 // Two jobs, one renderer:
 //   1. Desktop — behind the "Skip to list" button, for anyone who doesn't want
 //      to play, and as the accessible path through the same content.
 //   2. Mobile — shown instead of the game, since walking a top-down character
 //      with a thumb is nobody's idea of a good time.
+//
+// Two screens: the four wings as a menu, then that wing's projects as a list of
+// "worlds". It's a joke, but it's also a genuinely good pattern for this — a
+// title, a subtitle line of metadata, and one obvious button per row.
 
 import { SITE, WINGS } from './data/projects.js';
 
 let listRoot, bodyEl, openBtn, closeBtn;
 let isOpen = false;
 let lastFocus = null;
+let dirtUrl = null;
 
 export function initListView({ standalone = false } = {}) {
   listRoot = document.getElementById('listview');
@@ -18,7 +23,10 @@ export function initListView({ standalone = false } = {}) {
   openBtn = document.getElementById('skip-to-list');
   closeBtn = document.getElementById('list-close');
 
-  render(standalone);
+  dirtUrl = makeDirtTexture();
+  listRoot.style.setProperty('--dirt', `url(${dirtUrl})`);
+
+  renderMenu(standalone);
 
   if (standalone) {
     listRoot.hidden = false;
@@ -33,7 +41,9 @@ export function initListView({ standalone = false } = {}) {
     if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
-      closeList();
+      // Escape backs out one screen at a time, then leaves
+      if (bodyEl.dataset.screen === 'wing') renderMenu(listRoot.classList.contains('is-standalone'));
+      else closeList();
     }
   });
 }
@@ -61,131 +71,135 @@ export function closeList() {
 
 /* ------------------------------------------------------------------ */
 
-function render(standalone) {
-  bodyEl.innerHTML = '';
-
-  const head = document.createElement('header');
-  head.className = 'list-head';
-
-  const h1 = document.createElement('h1');
-  h1.textContent = SITE.name;
-  head.appendChild(h1);
-
-  const tag = document.createElement('p');
-  tag.className = 'list-tagline';
-  tag.textContent = SITE.tagline;
-  head.appendChild(tag);
-
-  if (standalone) {
-    const note = document.createElement('p');
-    note.className = 'list-note';
-    note.textContent =
-      'There is a version of this you can walk around in — a pixel museum with '
-      + 'four wings. It needs a keyboard, so it lives on desktop. Everything in '
-      + 'it is also below.';
-    head.appendChild(note);
-  }
-
-  bodyEl.appendChild(head);
-
-  WINGS.forEach((wing) => {
-    const section = document.createElement('section');
-    section.className = 'list-wing';
-    section.id = `wing-${wing.id}`;
-
-    const h2 = document.createElement('h2');
-    h2.textContent = wing.title;
-    section.appendChild(h2);
-
-    if (wing.blurb) {
-      const b = document.createElement('p');
-      b.className = 'list-blurb';
-      b.textContent = wing.blurb;
-      section.appendChild(b);
+/**
+ * The tiled dirt background, generated rather than shipped as an image so the
+ * page still has no external requests. 16x16 of warm browns with a bit of
+ * grit, scaled up with pixelated rendering.
+ */
+function makeDirtTexture() {
+  const cv = document.createElement('canvas');
+  cv.width = 16;
+  cv.height = 16;
+  const c = cv.getContext('2d');
+  const TONES = ['#6B4C2E', '#7A5734', '#5E4228', '#845E39', '#6F5030'];
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
+      // deterministic, so the texture is identical every load
+      const n = Math.abs(Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1;
+      c.fillStyle = TONES[Math.floor(n * TONES.length)];
+      c.fillRect(x, y, 1, 1);
     }
-
-    (wing.projects || []).forEach((entry) => {
-      section.appendChild(renderEntry(entry));
-    });
-
-    bodyEl.appendChild(section);
-  });
-
-  if (SITE.footer) {
-    const foot = document.createElement('p');
-    foot.className = 'list-footer';
-    foot.textContent = SITE.footer;
-    bodyEl.appendChild(foot);
   }
+  return cv.toDataURL();
 }
 
-function renderEntry(entry) {
-  const art = document.createElement('article');
-  art.className = 'list-entry';
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
 
-  const head = document.createElement('div');
-  head.className = 'list-entry-head';
+/** Screen one: the four wings, as a title-screen menu. */
+function renderMenu(standalone) {
+  bodyEl.dataset.screen = 'menu';
+  bodyEl.innerHTML = '';
 
-  const h3 = document.createElement('h3');
-  h3.textContent = entry.title;
-  head.appendChild(h3);
+  const head = el('div', 'mc-head');
+  head.appendChild(el('h1', 'mc-title', SITE.name));
+  head.appendChild(el('p', 'mc-splash', SITE.tagline));
+  bodyEl.appendChild(head);
 
-  if (entry.year) {
-    const y = document.createElement('span');
-    y.className = 'list-year';
-    y.textContent = entry.year;
-    head.appendChild(y);
-  }
-  art.appendChild(head);
+  const menu = el('div', 'mc-menu');
+  WINGS.forEach((wing) => {
+    const b = el('button', 'mc-btn');
+    b.type = 'button';
+    b.appendChild(el('span', 'mc-btn-label', wing.title));
+    const n = (wing.projects || []).length;
+    b.appendChild(el('span', 'mc-btn-sub', `${n} ${n === 1 ? 'entry' : 'entries'}`));
+    b.addEventListener('click', () => renderWing(wing));
+    menu.appendChild(b);
+  });
+  bodyEl.appendChild(menu);
 
-  if (entry.tagline) {
-    const t = document.createElement('p');
-    t.className = 'list-entry-tagline';
-    t.textContent = entry.tagline;
-    art.appendChild(t);
-  }
-
-  if (entry.description) {
-    const d = document.createElement('p');
-    d.textContent = entry.description;
-    art.appendChild(d);
-  }
-
-  if (entry.highlights && entry.highlights.length) {
-    const ul = document.createElement('ul');
-    entry.highlights.forEach((line) => {
-      const li = document.createElement('li');
-      li.textContent = line;
-      ul.appendChild(li);
-    });
-    art.appendChild(ul);
+  if (standalone) {
+    const note = el('p', 'mc-note',
+      'There is a version of this you can walk around in — a pixel museum with '
+      + 'four wings. It needs a keyboard, so it lives on desktop. Everything in '
+      + 'it is also here.');
+    bodyEl.appendChild(note);
   }
 
-  if (entry.tech && entry.tech.length) {
-    const wrap = document.createElement('p');
-    wrap.className = 'list-tech';
-    entry.tech.forEach((tag) => {
-      const s = document.createElement('span');
-      s.className = 'tag';
-      s.textContent = tag;
-      wrap.appendChild(s);
-    });
-    art.appendChild(wrap);
+  if (SITE.footer) bodyEl.appendChild(el('p', 'mc-footer', SITE.footer));
+
+  const first = menu.querySelector('.mc-btn');
+  if (first && isOpen) first.focus();
+}
+
+/** Screen two: that wing's projects, as a list of worlds. */
+function renderWing(wing) {
+  bodyEl.dataset.screen = 'wing';
+  bodyEl.innerHTML = '';
+
+  const head = el('div', 'mc-head');
+  head.appendChild(el('h1', 'mc-title', wing.title));
+  if (wing.blurb) head.appendChild(el('p', 'mc-splash', wing.blurb));
+  bodyEl.appendChild(head);
+
+  const list = el('div', 'mc-worlds');
+  const entries = wing.projects || [];
+
+  if (!entries.length) {
+    list.appendChild(el('p', 'mc-empty', 'This wing is still being hung.'));
   }
 
-  if (entry.links && entry.links.length) {
-    const wrap = document.createElement('p');
-    wrap.className = 'list-links';
-    entry.links.forEach((link) => {
-      const a = document.createElement('a');
-      a.href = link.url;
-      a.textContent = link.label;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      wrap.appendChild(a);
-    });
-    art.appendChild(wrap);
-  }
+  entries.forEach((entry) => {
+    const row = el('article', 'mc-world');
 
-  return art;
+    const icon = el('div', 'mc-world-icon');
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = (entry.title || '?').trim().charAt(0).toUpperCase();
+    row.appendChild(icon);
+
+    const text = el('div', 'mc-world-text');
+    text.appendChild(el('h2', 'mc-world-name', entry.title));
+
+    // the grey metadata line, the way a save file shows its date and mode
+    const bits = [];
+    if (entry.year) bits.push(entry.year);
+    if (entry.tech && entry.tech.length) bits.push(entry.tech.join(', '));
+    if (bits.length) text.appendChild(el('p', 'mc-world-meta', bits.join('  ·  ')));
+
+    if (entry.tagline) text.appendChild(el('p', 'mc-world-tagline', entry.tagline));
+    if (entry.description) text.appendChild(el('p', 'mc-world-desc', entry.description));
+
+    if (entry.highlights && entry.highlights.length) {
+      const ul = el('ul', 'mc-world-points');
+      entry.highlights.forEach((line) => ul.appendChild(el('li', null, line)));
+      text.appendChild(ul);
+    }
+
+    if (entry.links && entry.links.length) {
+      const wrap = el('p', 'mc-world-links');
+      entry.links.forEach((link) => {
+        const a = el('a', 'mc-btn mc-btn-small', link.label);
+        a.href = link.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        wrap.appendChild(a);
+      });
+      text.appendChild(wrap);
+    }
+
+    row.appendChild(text);
+    list.appendChild(row);
+  });
+
+  bodyEl.appendChild(list);
+
+  const back = el('button', 'mc-btn mc-back', 'Back');
+  back.type = 'button';
+  back.addEventListener('click', () => renderMenu(listRoot.classList.contains('is-standalone')));
+  bodyEl.appendChild(back);
+  back.focus();
 }

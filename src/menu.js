@@ -34,6 +34,33 @@ export function isMenuOpen() {
   return open;
 }
 
+/**
+ * A single framed picture, shown in the same window as the exhibit lists. It is
+ * a list of one: the left rail would be a column with a single row in it, so it
+ * is hidden and the detail pane gets the whole window.
+ */
+export function openArtwork(art, closedCallback) {
+  entries = [{
+    title: art.title,
+    tagline: art.caption,
+    image: art.image || null,
+  }];
+  index = 0;
+  onClose = closedCallback || null;
+
+  titleEl.textContent = art.title;
+  blurbEl.textContent = 'On the wall';
+  root.classList.add('is-single');
+
+  renderList();
+  renderDetail();
+
+  open = true;
+  root.hidden = false;
+  requestAnimationFrame(() => root.classList.add('is-open'));
+  listEl.focus();
+}
+
 export function openMenu(wingId, closedCallback) {
   const wing = wingById(wingId);
   if (!wing) return;
@@ -44,6 +71,7 @@ export function openMenu(wingId, closedCallback) {
 
   titleEl.textContent = wing.title;
   blurbEl.textContent = wing.blurb || '';
+  root.classList.remove('is-single');
 
   renderList();
   renderDetail();
@@ -140,6 +168,17 @@ function renderDetail() {
   plate.className = 'detail-plate';
   plate.setAttribute('aria-hidden', 'true');
   detailEl.appendChild(plate);
+
+  if (entry.image) {
+    const fig = document.createElement('figure');
+    fig.className = 'detail-figure';
+    const img = document.createElement('img');
+    img.src = entry.image;
+    img.alt = entry.title;
+    img.loading = 'lazy';
+    fig.appendChild(img);
+    detailEl.appendChild(fig);
+  }
 
   if (entry.description) {
     const d = document.createElement('p');

@@ -139,6 +139,46 @@ export const WINGS = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// PICTURES ON THE WALLS
+//
+// Each wing hangs four framed pictures. Give an entry here and that frame
+// becomes something you can walk up to and read; leave it out and the frame is
+// simply decoration. Order is left to right along the wall.
+//
+// `image` takes any URL a browser can load — most usefully a data URI, so the
+// picture travels with the file and needs no server:
+//
+//   image: 'data:image/png;base64,iVBORw0KGgo…'
+//
+// A plain path works too if you are hosting the folder: image: 'img/thing.png'.
+// ---------------------------------------------------------------------------
+
+export const PAINTINGS = {
+  automations: [
+    { title: 'Placeholder — picture one', caption: 'Swap this for a screenshot of something running. Anything with a chart in it looks good on a wall.' },
+    { title: 'Placeholder — picture two', caption: 'A second frame. Delete the entry and the frame stays up, just without a plaque.' },
+    null,
+    { title: 'Placeholder — picture four', caption: 'Frames read left to right along the wall, so the order here is the order you walk past them.' },
+  ],
+  personal: [
+    { title: 'Placeholder — picture one', caption: 'Personal work tends to photograph better than client work. Use the good screenshots here.' },
+    null,
+    { title: 'Placeholder — picture three', caption: 'Another slot.' },
+    null,
+  ],
+  client: [
+    { title: 'Placeholder — picture one', caption: 'If the work is under NDA, a cropped detail with no client name still reads as a picture.' },
+    null, null, null,
+  ],
+  about: [
+    { title: 'Placeholder — a photo of you', caption: 'The one wall in the building where a face belongs.' },
+    null, null, null,
+  ],
+  // the atrium's own wall, above the entrance to the north wings
+  atrium: [null, null, null, null],
+};
+
 /** Look a wing up by the id used on its plinth. */
 export function wingById(id) {
   return WINGS.find((w) => w.id === id) || null;

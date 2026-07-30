@@ -12,16 +12,36 @@ export const player = {
   moving: false,
   t: 0,
   blink: 0,
+  idle: 0,        // seconds since the last input
+  asleep: false,
+  seat: null,     // the bench being sat on, if any
+  wake: 0,        // counts down a little startle bounce on waking
 };
+
+// `y` is the droid's contact point on the floor, but the sprite sits 16px above
+// it. The camera wants the middle of the sprite, not its feet — without this
+// the droid renders low on screen, which at 4x scale is a very visible 50px.
+export const FOCUS_DY = 10;
+
+// How long you have to leave it alone before it powers down.
+const SLEEP_AFTER = 9;
 
 // Half-extents of the collision box at the droid's base.
 const HW = 6;
 const HH = 4;
 
-export function spawn(tx, ty, dir = 'up') {
-  player.x = tx * TILE + TILE / 2;
-  player.y = ty * TILE + TILE;
+export function spawnAt(px, py, dir = 'down') {
+  player.x = px;
+  player.y = py;
   player.dir = dir;
+  player.seat = null;
+  player.asleep = false;
+  player.idle = 0;
+}
+
+/** The point the camera should hold in the middle of the screen. */
+export function focusY() {
+  return player.y - FOCUS_DY;
 }
 
 function free(x, y) {
@@ -59,6 +79,32 @@ export function movePlayer(ax, ay, dt) {
   return moved;
 }
 
+/** Sit on, or get up from, a bench. */
+export function toggleSeat(seat) {
+  if (player.seat) {
+    // stand up just in front of the bench, so you aren't left inside it
+    player.y = player.seat.y + 14;
+    player.seat = null;
+    player.dir = 'down';
+    return false;
+  }
+  player.seat = seat;
+  player.x = seat.x;
+  player.y = seat.y;
+  player.dir = 'down';
+  player.moving = false;
+  return true;
+}
+
+/** Any input at all: wake up, and reset the idle clock. */
+export function rouse() {
+  player.idle = 0;
+  if (player.asleep) {
+    player.asleep = false;
+    player.wake = 0.45;
+  }
+}
+
 /** Walk toward a point. Used by the opening cinematic. Returns true on arrival. */
 export function walkToward(tx, ty, dt, speed = SPEED) {
   const dx = tx - player.x;
@@ -77,21 +123,37 @@ export function walkToward(tx, ty, dt, speed = SPEED) {
   return false;
 }
 
-export function updatePlayer(dt) {
+export function updatePlayer(dt, active = true) {
   player.t += dt * 1000;
   player.blink = (player.blink + dt * 1000) % 3600;
+  player.wake = Math.max(0, player.wake - dt);
+
+  // Sitting still counts as being awake — you chose to sit there.
+  if (!active || player.moving || player.seat) {
+    player.idle = 0;
+    return;
+  }
+  player.idle += dt;
+  if (player.idle > SLEEP_AFTER) player.asleep = true;
 }
 
 /** How far off the floor the droid is sitting right now, in pixels. */
 export function hoverLift() {
+  // Asleep: settled on the floor, breathing very slowly.
+  if (player.asleep) return Math.round(Math.sin(player.t / 1900) * 0.5);
+  // Sat on a bench: resting on it, not hovering.
+  if (player.seat) return 1 + Math.round(Math.sin(player.t / 1400) * 0.5);
+  // Just woken: a startled hop that settles back down.
+  const startle = player.wake > 0 ? Math.round(player.wake * 9) : 0;
   const period = player.moving ? 380 : 900;
   const amp = player.moving ? 2 : 1.4;
-  return 2 + Math.round(Math.sin(player.t / period) * amp);
+  return 2 + startle + Math.round(Math.sin(player.t / period) * amp);
 }
 
 export function drawPlayer(ctx, ox = 0, oy = 0) {
   const lift = hoverLift();
-  const blinking = player.blink < 110;
+  // asleep, the visor is simply off — the blink frame is already that sprite
+  const blinking = player.asleep || player.blink < 110;
 
   let sprite;
   if (player.dir === 'up') sprite = SPRITES.droid.up;
@@ -104,8 +166,15 @@ export function drawPlayer(ctx, ox = 0, oy = 0) {
 
   drawDroidShadow(ctx, px, py - 2, lift);
 
+  if (player.asleep) {
+    // a slow pulse from the antenna, the only sign it is still on
+    const glow = (Math.sin(player.t / 1100) + 1) / 2;
+    ctx.fillStyle = `rgba(232, 118, 58, ${0.25 + glow * 0.5})`;
+    ctx.fillRect(px - 1, py - 16 - lift - 14, 2, 1);
+  }
+
   // exhaust motes when moving
-  if (player.moving) {
+  if (player.moving && !player.asleep) {
     ctx.fillStyle = 'rgba(232, 118, 58, 0.5)';
     for (let i = 0; i < 3; i++) {
       const ph = ((player.t / 70) + i * 2.6) % 8;

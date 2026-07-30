@@ -4,7 +4,7 @@
 // cinematic people come to resent.
 
 import { view, COL } from './config.js';
-import { player } from './player.js';
+import { player, focusY } from './player.js';
 import { centreCamera, followCamera, overlay } from './renderer.js';
 import { drawTextCentered, textWidth } from './font.js';
 import { anyPressed } from './input.js';
@@ -13,8 +13,8 @@ import { SITE } from './data/projects.js';
 // There is no outside any more, so there is no arrival walk. Instead the
 // camera opens high on the north arches — where the two banners are — and
 // drifts down to the droid standing on the medallion, then the title lands.
-const PAN_FROM = { x: 320, y: 176 };
-const PAN_TO = { x: 320, y: 272 };
+const PAN_FROM = { x: 320, y: 128 };
+const PAN_TO = { x: 320, y: 242 };
 const PAN_SECONDS = 2.2;
 
 const VISIT_KEY = 'harish-museum-visited';
@@ -57,7 +57,7 @@ export function startIntro() {
 
 /** Jump straight to the title card. */
 function cutToTitle() {
-  centreCamera(player.x, player.y - CARD_LIFT);
+  centreCamera(player.x, focusY() - CARD_LIFT);
   intro.phase = 'title';
   intro.t = 0;
 }
@@ -84,7 +84,7 @@ export function updateIntro(dt) {
   }
 
   if (intro.phase === 'settle') {
-    followCamera(player.x, player.y - CARD_LIFT, 0.09);
+    followCamera(player.x, focusY() - CARD_LIFT, 0.09);
     if (anyPressed() || intro.t > 0.7) {
       intro.phase = 'title';
       intro.t = 0;
@@ -96,7 +96,7 @@ export function updateIntro(dt) {
     intro.cardAlpha = Math.min(1, intro.cardAlpha + dt * 2.4);
     // sit the camera high so the droid drops into the lower third, clear of
     // the title rather than behind it
-    followCamera(player.x, player.y - CARD_LIFT, 0.06);
+    followCamera(player.x, focusY() - CARD_LIFT, 0.06);
     // require the card to be readable before a keypress can dismiss it,
     // otherwise a held key from the skip blows straight through it
     if (intro.cardAlpha >= 1 && intro.t > 0.35 && anyPressed()) {
@@ -109,7 +109,7 @@ export function updateIntro(dt) {
 
   if (intro.phase === 'out') {
     intro.cardAlpha = Math.max(0, intro.cardAlpha - dt * 3.2);
-    followCamera(player.x, player.y - 16, 0.1);
+    followCamera(player.x, focusY(), 0.12);
     if (intro.cardAlpha <= 0) {
       intro.phase = 'done';
       return 'done';

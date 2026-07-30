@@ -6,13 +6,18 @@
 
 import { view, COL } from './config.js';
 import { buildSprites } from './art.js';
-import { buildMap, map, plinthNear, drawProp, START_TILE } from './map.js';
+import {
+  buildMap, map, plinthNear, interactableNear, drawProp, drawSconces, START_PX,
+} from './map.js';
 import { initRenderer, ctx, camX, camY, centreCamera, followCamera, vignette } from './renderer.js';
 import {
-  initInput, moveAxis, interactPressed, endFrame, watchPointer, clearHeldKeys,
+  initInput, moveAxis, interactPressed, anyPressed, endFrame, watchPointer,
+  clearHeldKeys,
 } from './input.js';
-import { player, spawn, movePlayer, updatePlayer, drawPlayer } from './player.js';
-import { initMenu, openMenu, isMenuOpen, closeMenu } from './menu.js';
+import {
+  player, spawnAt, movePlayer, updatePlayer, drawPlayer, focusY, toggleSeat, rouse,
+} from './player.js';
+import { initMenu, openMenu, openArtwork, isMenuOpen, closeMenu } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
   startIntro, updateIntro, drawIntroOverlay, shouldSkipIntro, markVisited,
@@ -56,10 +61,10 @@ function boot() {
   document.body.classList.add('is-playing');
 
   // You always begin in the middle of the atrium, on the medallion.
-  spawn(START_TILE.x, START_TILE.y, 'up');
+  spawnAt(START_PX.x, START_PX.y, 'down');
 
   if (shouldSkipIntro()) {
-    centreCamera(player.x, player.y - 16);
+    centreCamera(player.x, focusY());
     state = 'explore';
     markVisited();
   } else {
@@ -85,9 +90,12 @@ function loop(ts) {
 
 function update(dt, ts) {
   // the overlays own the keyboard while they're up
-  if (isMenuOpen() || isListOpen()) return;
+  if (isMenuOpen() || isListOpen()) {
+    updatePlayer(dt, false);
+    return;
+  }
 
-  updatePlayer(dt);
+  updatePlayer(dt, state === 'explore');
 
   if (state === 'intro') {
     if (updateIntro(dt) === 'done') state = 'explore';
@@ -95,18 +103,36 @@ function update(dt, ts) {
   }
 
   const axis = moveAxis();
-  movePlayer(axis.x, axis.y, dt);
-  followCamera(player.x, player.y - 12, 0.14);
+  const pressed = interactPressed();
+  // anyPressed, not the axis: a quick tap can go down and up inside one frame,
+  // and the held-key set would be empty again by the time we look at it.
+  if (anyPressed()) rouse();
 
-  const near = plinthNear(player.x, player.y);
+  // Getting up is the same key as sitting down, and moving stands you up too.
+  if (player.seat) {
+    if (axis.x || axis.y) toggleSeat(player.seat);
+    else player.moving = false;
+  } else {
+    movePlayer(axis.x, axis.y, dt);
+  }
+
+  followCamera(player.x, focusY(), 0.14);
+
+  const near = interactableNear(player.x, player.y);
   promptPulse = near ? Math.min(1, promptPulse + dt * 7) : Math.max(0, promptPulse - dt * 9);
+  if (near) lastNear = near;
 
-  if (near && interactPressed()) {
-    clearHeldKeys();
-    openMenu(near.id, () => {
-      // drop any keys held while the menu was up, or the droid bolts on close
+  if (near && pressed) {
+    if (near.id) {
       clearHeldKeys();
-    });
+      // drop any keys held while the menu was up, or the droid bolts on close
+      openMenu(near.id, clearHeldKeys);
+    } else if (near.caption !== undefined) {
+      clearHeldKeys();
+      openArtwork(near, clearHeldKeys);
+    } else {
+      toggleSeat(near);
+    }
   }
 }
 
@@ -121,6 +147,10 @@ function draw(ts) {
 
   // the world, blitted from the pre-rendered map canvas
   ctx.drawImage(map.canvas, ox, oy, view.w, view.h, 0, 0, view.w, view.h);
+
+  // torches are drawn live so their flames move, and always behind everything
+  // that stands on the floor — they are on the wall
+  drawSconces(ctx, ox, oy, ts);
 
   // props and the droid, interleaved by depth so you can walk behind things
   const props = map.props;
@@ -154,16 +184,17 @@ function visible(p, ox, oy) {
 /** The "press E" bubble that floats over a plinth when you're close enough. */
 function drawPrompt(ts, ox, oy) {
   if (promptPulse <= 0.01) return;
-  const near = plinthNear(player.x, player.y) || lastNear;
+  const near = interactableNear(player.x, player.y) || lastNear;
   if (!near) return;
-  lastNear = near;
 
   const label = near.label.toUpperCase();
-  const hint = 'PRESS  E';
+  const hint = near.id ? 'PRESS  E'
+    : near.caption !== undefined ? 'PRESS  E  TO  READ'
+      : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
   const x = Math.round(near.x - ox);
   const bob = Math.round(Math.sin(ts / 400) * 1.5);
-  const y = Math.round(near.y - oy) - 60 + bob;
+  const y = Math.round(near.y - oy) - (near.id ? 60 : 34) + bob;
 
   ctx.save();
   ctx.globalAlpha = promptPulse;

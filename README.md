@@ -43,6 +43,21 @@ A wing with no entries says so rather than breaking, and a wing with twelve
 scrolls. Renaming a wing is the `title` field on that wing; the id (used by the
 plinth) stays put.
 
+### Pictures on the walls
+
+Each wing hangs four frames. `PAINTINGS` in the same file gives them captions,
+left to right along the wall — an entry makes that frame something you can walk
+up to and read, and leaving it `null` keeps the frame as decoration.
+
+```js
+{ title: 'Invoice reconciler',
+  caption: 'The dashboard it writes to, every morning at six.',
+  image: 'data:image/png;base64,…' }   // or 'img/dashboard.png'
+```
+
+`image` is optional and takes any URL a browser can load. A data URI keeps the
+picture inside the file, which is what the standalone build needs.
+
 ---
 
 ## Running it
@@ -77,8 +92,10 @@ modules declare the same top-level name.
 | | |
 | --- | --- |
 | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> | walk |
-| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit |
+| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture, sit on a bench |
 | <kbd>Esc</kbd> | close whatever is open |
+
+Leave the droid alone for nine seconds and it powers down; any key wakes it.
 
 Any key skips the opening cinematic. It's skipped automatically on a return
 visit — the flag lives in `localStorage` under `harish-museum-visited`.
@@ -88,8 +105,10 @@ visit — the flag lives in `localStorage` under `harish-museum-visited`.
 ## Who gets what
 
 - **Desktop** gets the game, with a permanent *Skip to list* button in the
-  corner for anyone who doesn't want to play. That same list is the accessible
-  path through the content — real text, real links, real headings.
+  corner for anyone who doesn't want to play. The list is dressed as a
+  Minecraft world picker: the four wings as a menu, then that wing's projects
+  as a list of worlds. It is also the accessible path through the content —
+  real text, real links, real headings, reachable by keyboard.
 - **Phones** get the list only, plus a note that the full thing is on desktop.
   Walking a top-down character with a thumb is miserable, so it isn't offered.
 

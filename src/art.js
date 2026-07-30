@@ -477,10 +477,11 @@ export function drawPlinthIcon(ctx, px, py, kind, t) {
  * the frame; the hanging wire runs up from there. Sizes vary so a wall of them
  * reads as a hang rather than a row of stamps.
  */
-export function drawFrame(ctx, px, py, seed) {
+export function drawFrame(ctx, px, py, seed, size = null) {
   const h = hash(seed, 3);
   const SIZES = [[14, 11], [20, 15], [26, 18], [16, 20]];
-  const [w, ht] = SIZES[Math.floor(h * 977) % SIZES.length];
+  const [w, ht] = size !== null ? SIZES[size % SIZES.length]
+    : SIZES[Math.floor(h * 977) % SIZES.length];
   const x = px - Math.floor(w / 2);
 
   // hanging wire back up to the rail
@@ -536,17 +537,29 @@ export function drawPlant(ctx, px, py) {
   ctx.fillRect(px + 3, py - 14, 3, 3);
 }
 
-/** A gallery bench. (px, py) is the bottom-centre. */
+/**
+ * A gallery bench, cut from the same stone as the walls rather than wood, so it
+ * reads as part of the architecture. (px, py) is the bottom-centre.
+ */
 export function drawBench(ctx, px, py) {
   ctx.fillStyle = COL.shadow;
-  ctx.fillRect(px - 11, py - 2, 22, 2);
-  ctx.fillStyle = COL.woodDark;
-  ctx.fillRect(px - 9, py - 5, 3, 5);
-  ctx.fillRect(px + 6, py - 5, 3, 5);
-  ctx.fillStyle = COL.wood;
-  ctx.fillRect(px - 11, py - 9, 22, 4);
-  ctx.fillStyle = COL.woodDark;
-  ctx.fillRect(px - 11, py - 6, 22, 1);
+  ctx.fillRect(px - 12, py - 2, 24, 3);
+
+  // legs
+  ctx.fillStyle = COL.baseboard;
+  ctx.fillRect(px - 9, py - 6, 4, 6);
+  ctx.fillRect(px + 5, py - 6, 4, 6);
+
+  // slab, lit along the top edge
+  ctx.fillStyle = COL.wallFace;
+  ctx.fillRect(px - 12, py - 11, 24, 5);
+  ctx.fillStyle = COL.wallFaceHi;
+  ctx.fillRect(px - 12, py - 11, 24, 2);
+  ctx.fillStyle = COL.baseboard;
+  ctx.fillRect(px - 12, py - 7, 24, 1);
+  ctx.fillStyle = 'rgba(94, 74, 54, 0.35)';
+  ctx.fillRect(px - 12, py - 11, 1, 5);
+  ctx.fillRect(px + 11, py - 11, 1, 5);
 }
 
 function stanchionPost(ctx, px, py) {
@@ -861,17 +874,51 @@ export function drawSideShadow(ctx, px, py, side) {
   }
 }
 
-/** A wall sconce. Drawn onto the picture-field row of a wall. */
-export function drawSconce(ctx, px, py) {
+/**
+ * A wall sconce with a live flame. The flame is three stacked bands that jitter
+ * on their own cycles — offset by `seed` so no two torches in a room flicker in
+ * step, which is what would give the whole wall a strobe.
+ */
+export function drawSconce(ctx, px, py, t = 0, seed = 0) {
+  // bracket
   ctx.fillStyle = COL.brassDim;
-  ctx.fillRect(px - 1, py + 4, 2, 5);
-  ctx.fillRect(px - 3, py + 8, 6, 1);
+  ctx.fillRect(px - 1, py + 6, 2, 5);
+  ctx.fillRect(px - 3, py + 10, 6, 1);
   ctx.fillStyle = COL.brass;
-  ctx.fillRect(px - 3, py + 1, 6, 3);
+  ctx.fillRect(px - 3, py + 3, 6, 3);
+  ctx.fillStyle = '#5A4436';
+  ctx.fillRect(px - 2, py + 4, 4, 1);
+
+  const p1 = Math.sin(t / 90 + seed * 2.1);
+  const p2 = Math.sin(t / 57 + seed * 3.7);
+  const sway = Math.round(p2 * 0.9);
+  const tall = Math.round(p1 * 1.4);
+
+  // halo on the plaster behind
+  ctx.fillStyle = 'rgba(255, 198, 110, 0.13)';
+  ctx.fillRect(px - 6, py - 5 - tall, 12, 14 + tall);
+  ctx.fillStyle = 'rgba(255, 214, 140, 0.16)';
+  ctx.fillRect(px - 4, py - 3 - tall, 8, 11 + tall);
+
+  // outer flame
+  ctx.fillStyle = '#E8763A';
+  ctx.fillRect(px - 3, py - 1, 6, 5);
+  ctx.fillRect(px - 2 + sway, py - 3 - tall, 4, 4);
+  // middle
+  ctx.fillStyle = '#F5A63C';
+  ctx.fillRect(px - 2, py, 4, 4);
+  ctx.fillRect(px - 1 + sway, py - 2 - tall, 2, 3);
+  // hot core
   ctx.fillStyle = '#FFE9B0';
-  ctx.fillRect(px - 2, py, 4, 2);
-  ctx.fillStyle = 'rgba(255, 226, 168, 0.35)';
-  ctx.fillRect(px - 4, py - 1, 8, 5);
+  ctx.fillRect(px - 1, py + 1, 2, 3);
+  if (p1 > 0.2) ctx.fillRect(px + sway, py - 1 - tall, 1, 2);
+
+  // the odd ember lifting off
+  const eph = (t / 140 + seed) % 4;
+  if (eph < 2.2) {
+    ctx.fillStyle = 'rgba(255, 190, 110, 0.75)';
+    ctx.fillRect(px + sway + (seed % 2 ? 1 : -1), Math.round(py - 4 - eph * 2.4), 1, 1);
+  }
 }
 
 /** A fountain. (px, py) is the centre of the basin. */

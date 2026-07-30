@@ -511,20 +511,21 @@ function dressTheatre(c, w) {
   c.fillStyle = 'rgba(8, 10, 12, 0.14)';
   c.fillRect(westWall, roomTop, 9 * TILE, 7 * TILE);
 
-  // The screen runs the full height of the west wall and sits flush against
-  // it, so its masking bars die into the wall at each end.
+  // The screen sits against the west wall, with room above and below it for
+  // the house curtains that frame it.
   const screen = {
-    x: westWall + 12,
-    y: roomBottom - 4,
+    x: mid.x - 3 * TILE,
+    y: mid.y + 40,
     w: 18,
-    h: (roomBottom - 4) - (roomTop + 4),
-    cx: westWall + 46,        // where the camera looks when it plays
+    h: 78,
+    cx: mid.x - 3 * TILE + 30,   // where the camera looks when it plays
     cy: mid.y,
   };
   map.screen = screen;
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
+  // the curtains stand proud of the screen, so the block reaches past it
   map.colliders.push({
-    x: westWall, y: roomTop, w: 26, h: roomBottom - roomTop,
+    x: screen.x - 14, y: screen.y - screen.h - 16, w: 22, h: screen.h + 32,
   });
 
   // One seat facing the screen, a tile up and a tile back from the room's

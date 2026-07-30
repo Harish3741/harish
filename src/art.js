@@ -1190,13 +1190,47 @@ export function drawScreen(ctx, px, py, w, h, t, playing) {
   ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
   ctx.fillRect(x, y, 2, h);
 
-  // black masking at each end, the way a modern screen is framed
-  for (const dy of [y - 4, y + h - 4]) {
-    ctx.fillStyle = '#0A0C0E';
-    ctx.fillRect(x - 4, dy, w + 8, 8);
-    ctx.fillStyle = 'rgba(148, 158, 170, 0.14)';
-    ctx.fillRect(x - 4, dy, w + 8, 1);
+  // Red house curtains drawn back to either side of the screen. In this view
+  // the screen is rotated onto the west wall, so what an audience would see as
+  // the left and right curtains land at its top and bottom.
+  screenCurtain(ctx, px, y - 15, w + 20, 16, 1);
+  screenCurtain(ctx, px, y + h - 1, w + 20, 16, -1);
+}
+
+/**
+ * One gathered velvet curtain. `inner` says which side faces the screen, so the
+ * fabric can fall darker into the opening and catch the light on the outside.
+ */
+function screenCurtain(ctx, cx, y, w, h, inner) {
+  const x = cx - Math.floor(w / 2);
+
+  ctx.fillStyle = THEATRE.curtain;
+  ctx.fillRect(x, y, w, h);
+
+  // pleats
+  for (let i = 0; i < w; i += 5) {
+    ctx.fillStyle = THEATRE.curtainDark;
+    ctx.fillRect(x + i, y, 2, h);
+    ctx.fillStyle = THEATRE.curtainHi;
+    ctx.fillRect(x + i + 2, y, 1, h);
   }
+
+  // the fabric falls into shadow on the side nearest the opening
+  ctx.fillStyle = 'rgba(20, 6, 10, 0.38)';
+  ctx.fillRect(x, inner > 0 ? y + h - 4 : y, w, 4);
+  ctx.fillStyle = 'rgba(255, 190, 190, 0.10)';
+  ctx.fillRect(x, inner > 0 ? y : y + h - 1, w, 1);
+
+  // a scalloped valance along the inner edge
+  const vy = inner > 0 ? y + h : y - 3;
+  for (let i = 0; i < w; i += 6) {
+    ctx.fillStyle = THEATRE.curtainDark;
+    ctx.fillRect(x + i + 1, vy, 4, 3);
+  }
+
+  // pelmet cap on the outer edge
+  ctx.fillStyle = THEATRE.curtainDark;
+  ctx.fillRect(x - 1, inner > 0 ? y - 2 : y + h - 1, w + 2, 3);
 }
 
 /**

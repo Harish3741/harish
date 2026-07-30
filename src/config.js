@@ -11,8 +11,8 @@ export const view = { w: 480, h: 270 };
 
 // Bounds the renderer respects when picking that scale. The upper bound
 // matters: the logical view must never grow larger than the map itself.
-export const MAX_VIEW_W = 560;
-export const MAX_VIEW_H = 320;
+export const MAX_VIEW_W = 480;
+export const MAX_VIEW_H = 300;
 
 export const COL = {
   // architecture
@@ -67,4 +67,6 @@ export const DROID_PAL = {
   O: '#E8763A',
 };
 
-export const SPEED = 62; // logical px per second
+// Logical px per second. It's a hovering droid in a building you are meant to
+// get around, not a character with weight — brisk beats stately here.
+export const SPEED = 105;

@@ -108,8 +108,14 @@ src/
 A few decisions worth knowing about, if you come back to this later:
 
 - **The map is rectangles, not a tile map.** `REGIONS` in `map.js` lists rooms
-  and corridors; walls are generated around whatever is indoors. Moving a wing
-  is a one-line change instead of retyping a grid.
+  and the arches between them; every floorless tile inside the building's
+  footprint becomes masonry. Moving a wing is a one-line change instead of
+  retyping a grid.
+
+- **Every wing opens straight onto the atrium.** There are no connecting
+  corridors. An earlier version had them and crossing the museum took fifteen
+  seconds, which is fifteen seconds of holding an arrow key. The worst-case
+  trip is now about five.
 
 - **The background is baked once.** Floors, walls and wall-mounted art render
   into an offscreen canvas at load, and each frame blits the visible slice of

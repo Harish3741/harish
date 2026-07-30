@@ -15,11 +15,11 @@ import { SITE } from './data/projects.js';
 // the central axis, and walking around it frames the building better than
 // marching straight at it would.
 const LEGS = [
-  { x: 408, y: 788, speed: 88 },   // up the west side of the plaza
-  { x: 480, y: 760, speed: 88 },   // across to the doors
-  { x: 480, y: 400, speed: 118 },  // through the hall into the atrium
+  { x: 272, y: 676, speed: 92 },   // up the west side of the plaza
+  { x: 320, y: 652, speed: 92 },   // across onto the entrance axis
+  { x: 320, y: 336, speed: 128 },  // through the hall into the atrium
 ];
-const START = { x: 408, y: 864 };
+const START = { x: 272, y: 742 };
 
 const VISIT_KEY = 'harish-museum-visited';
 

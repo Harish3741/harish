@@ -275,16 +275,12 @@ function wallFaceDepth(x, y) {
 }
 
 /**
- * Where a wing's rug is laid. The screening room's sits a tile up and a tile
- * back from the room's centre, which is where the seat on it lines up best
- * with the screen; the seat is derived from this, so the two stay together.
+ * The centre of a wing, in pixels. `cx`/`cy` are the room's centre *tile*, so
+ * the centre in pixels is the middle of that tile — not the tile's corner, and
+ * not an eyeballed offset from it. Rugs and furniture are laid out from here.
  */
-function rugCentre(w) {
-  const back = w.theatre ? TILE : 0;
-  return {
-    x: w.cx * TILE + 8 + back,
-    y: (w.cy + 1) * TILE - 4 - back,
-  };
+function roomCentre(w) {
+  return { x: w.cx * TILE + 8, y: w.cy * TILE + 8 };
 }
 
 function renderBackground() {
@@ -342,8 +338,8 @@ function renderBackground() {
 
   drawInlay(c, AXIS, 15 * TILE + 8, 21);
   for (const w of Object.values(WING_ROOMS)) {
-    const rug = rugCentre(w);
-    drawRug(c, rug.x, rug.y, 5 * TILE, 3 * TILE, w.accent);
+    const mid = roomCentre(w);
+    drawRug(c, mid.x, mid.y, 5 * TILE, 3 * TILE, w.accent);
   }
 
   // brass thresholds across the doorways
@@ -506,28 +502,36 @@ function decorate(c) {
  * "about me" and the chair is the film.
  */
 function dressTheatre(c, w) {
-  const left = (w.cx - 3) * TILE + 8;      // against the west wall
-  const midY = w.cy * TILE + 8;
+  const mid = roomCentre(w);
+  const westWall = (w.cx - 4) * TILE;      // inner face of the west wall
+  const roomTop = (w.cy - 3) * TILE;
+  const roomBottom = (w.cy + 4) * TILE;
 
   // a little extra gloom, so the screen has something to be brighter than
   c.fillStyle = 'rgba(8, 10, 12, 0.14)';
-  c.fillRect((w.cx - 4) * TILE, (w.cy - 3) * TILE, 9 * TILE, 7 * TILE);
+  c.fillRect(westWall, roomTop, 9 * TILE, 7 * TILE);
 
-  // the screen: tall, against the west wall, facing into the room
+  // The screen runs the full height of the west wall and sits flush against
+  // it, so its masking bars die into the wall at each end.
   const screen = {
-    x: left, y: midY + 40, w: 18, h: 78,
-    cx: left + 30, cy: midY,          // where the camera looks when it plays
+    x: westWall + 12,
+    y: roomBottom - 4,
+    w: 18,
+    h: (roomBottom - 4) - (roomTop + 4),
+    cx: westWall + 46,        // where the camera looks when it plays
+    cy: mid.y,
   };
   map.screen = screen;
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
-  map.colliders.push({ x: screen.x - 14, y: screen.y - screen.h, w: 22, h: screen.h });
+  map.colliders.push({
+    x: westWall, y: roomTop, w: 26, h: roomBottom - roomTop,
+  });
 
-  // One seat, centred on the rug and facing the screen. It takes its position
-  // from the rug rather than from a number of its own, so the two can't drift
-  // apart — move the rug and the seat follows.
-  const rug = rugCentre(w);
-  addProp({ kind: 'cinemaseat', x: rug.x, y: rug.y + 14, facing: 'left' });
-  map.seats.push({ x: rug.x, y: rug.y + 8, label: 'Seat', theatre: true });
+  // One seat facing the screen, a tile up and a tile back from the room's
+  // centre. The rug stays put in the middle of the room.
+  const seat = { x: mid.x + TILE, y: mid.y - TILE };
+  addProp({ kind: 'cinemaseat', x: seat.x, y: seat.y + 14, facing: 'left' });
+  map.seats.push({ x: seat.x, y: seat.y + 8, label: 'Seat', theatre: true });
 
   // whoever is standing by the door, on the right as you come in
   const person = {

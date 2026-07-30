@@ -528,15 +528,16 @@ function dressTheatre(c, w) {
   // one block for the lot: the screen, and the curtains hanging proud of it
   map.colliders.push({ x: westWall, y: roomTop, w: 30, h: screen.h });
 
-  // One seat facing the screen, sitting in the middle of its tile rather than
-  // across the join. The rug stays put in the middle of the room.
-  const seat = { x: (w.cx + 1) * TILE + 8, y: w.cy * TILE + 8 };
-  addProp({ kind: 'cinemaseat', x: seat.x, y: seat.y + 14, facing: 'left' });
+  // One seat facing the screen, landing dead centre of the medallion woven
+  // into the middle of the rug. The chair's body runs 28px above its anchor
+  // and 1px below, so the anchor sits 14 below the point it has to centre on.
+  const seat = { x: mid.x, y: mid.y + 14 };
+  addProp({ kind: 'cinemaseat', x: seat.x, y: seat.y, facing: 'left' });
   // You sit level with the chair rather than behind it, so the droid draws on
   // top of the seat instead of vanishing into it, forward of the back and
   // turned to face the screen.
   map.seats.push({
-    x: seat.x - 3, y: seat.y + 14, label: 'Seat', theatre: true, facing: 'left',
+    x: seat.x - 3, y: seat.y, label: 'Seat', theatre: true, facing: 'left',
   });
 
   // whoever is standing by the door, on the right as you come in

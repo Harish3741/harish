@@ -462,21 +462,29 @@ function hangSymmetric(c, cx, ty, offsets, wingId) {
     const size = [0, 1, 2, 1][Math.min(3, Math.abs(d))];
     drawFrame(c, x * TILE + 8, ty * TILE + 6, x * 7 + ty, size);
 
-    const info = captions[slot];
-    if (info) {
-      map.artworks.push({
-        x: x * TILE + 8,
-        y: (ty + 2) * TILE + 14,     // the floor tile in front of the frame
-        title: info.title,
-        caption: info.caption,
-        image: info.image || null,
-        label: 'Painting',
-        top: ty * TILE + 4,
-      });
-    }
+    const info = captions[slot] || EMPTY_FRAME;
+    map.artworks.push({
+      x: x * TILE + 8,
+      y: (ty + 2) * TILE + 14,     // the floor tile in front of the frame
+      title: info.title,
+      caption: info.caption,
+      image: info.image || null,
+      label: 'Painting',
+      top: ty * TILE + 4,
+    });
     slot += 1;
   }
 }
+
+// Every frame on every wall can be walked up to and read, whether or not
+// there is a caption behind it yet. A frame that swallows the keypress teaches
+// you not to bother pressing E at the next one.
+const EMPTY_FRAME = {
+  title: 'Untitled',
+  caption: 'Nothing hung here yet. Give this frame a title and a caption in '
+    + 'PAINTINGS in src/data/projects.js — its slot is the position it hangs '
+    + 'in, left to right along the wall.',
+};
 
 /** Anything standing on the floor is depth-sorted, so the droid can pass behind it. */
 function addProp(p) {
@@ -739,18 +747,16 @@ function dressAtrium(c) {
     for (const row of [ATRIUM_MID - 1, ATRIUM_MID + 1]) {
       const y = row * TILE + 8;
       drawSideFrame(c, wallX, y, side, row * 7 + slot);
-      const info = captions[slot];
-      if (info) {
-        map.artworks.push({
-          x: wallX + (side === 'w' ? 22 : -22),
-          y,
-          title: info.title,
-          caption: info.caption,
-          image: info.image || null,
-          label: 'Painting',
-          top: y - 17,
-        });
-      }
+      const info = captions[slot] || EMPTY_FRAME;
+      map.artworks.push({
+        x: wallX + (side === 'w' ? 22 : -22),
+        y,
+        title: info.title,
+        caption: info.caption,
+        image: info.image || null,
+        label: 'Painting',
+        top: y - 17,
+      });
       slot += 1;
     }
   }

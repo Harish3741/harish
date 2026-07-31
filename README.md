@@ -60,10 +60,11 @@ plinth) stays put.
 
 ### Pictures on the walls
 
-The Personal Projects wing hangs four frames. `PAINTINGS` in the same file
-gives them captions, left to right along the wall — an entry makes that frame
-something you can walk up to and read, and leaving it `null` keeps the frame as
-decoration.
+The Personal Projects wing hangs four frames and the atrium four more.
+`PAINTINGS` in the same file gives them captions, left to right along the wall.
+Every frame can be walked up to and read whether or not it has an entry yet —
+a `null` slot says so and points at this file, because a frame that swallows
+the keypress teaches you not to bother pressing E at the next one.
 
 ```js
 { title: 'Invoice reconciler',
@@ -260,7 +261,9 @@ A few decisions worth knowing about, if you come back to this later:
   The plant room is painted blockwork over stone, the boardroom light
   commercial plaster over carpet tile, the cinema charcoal over charcoal. Only
   the inner ring of masonry takes the room's colour — that ring is the room's
-  own wall seen from above, and everything past it is the building.
+  own wall seen from above, and everything past it is the building. The inlaid
+  margin where a floor meets a wall is themed with it, off the floor's own
+  name.
 
 - **The prompt bubble sits above whatever it names, never on it.** Each
   interactable declares the top of its own art — a picture's frame, a plinth's

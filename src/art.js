@@ -419,13 +419,25 @@ export function drawWallShadow(ctx, px, py) {
   ctx.fillRect(px, py + 4, TILE, 2);
 }
 
+// The inlaid margin each floor gets where it meets a wall: [band, line].
+const BORDERS = {
+  marble: ['#CBB894', COL.brassDim],
+  wood: ['#8E5F38', '#6B4830'],
+  stone: ['#9A9384', '#6E695C'],
+  office: ['#7C8490', '#9AA3AE'],
+  carpet: ['#2A2D31', '#4A5058'],
+};
+
 /**
  * An inlaid margin running around the edge of a room, mitred at the corners by
  * simply drawing each side independently. `sides` is which edges meet a wall.
  */
 export function drawFloorBorder(ctx, px, py, sides, kind) {
-  const band = kind === 'wood' ? '#8E5F38' : '#CBB894';
-  const line = kind === 'wood' ? '#6B4830' : COL.brassDim;
+  // Every floor gets its own margin. It used to be brass over tan for anything
+  // that wasn't wood, which put a warm brown stripe round the boardroom's grey
+  // carpet and the cinema's black one — the one piece of a themed room that
+  // stayed the museum's colour.
+  const [band, line] = BORDERS[kind] || BORDERS.marble;
   const W = 5;
 
   const strip = (x, y, w, h, lx, ly, lw, lh) => {

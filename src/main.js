@@ -276,7 +276,13 @@ function draw(ts) {
 function visible(p, ox, oy) {
   const x = p.x - ox;
   const y = p.y - oy;
-  return x > -140 && x < view.w + 140 && y > -60 && y < view.h + 60;
+  // Props anchor differently — a cinema screen by its foot, a conveyor by its
+  // left end — so the margin has to allow for the prop's own size rather than
+  // treat it as a point. A fixed margin culled the screen while its top half
+  // was still on camera, which showed up as it blinking out as you walked away.
+  const mx = 160 + (p.w || 0);
+  const my = 80 + (p.h || 0);
+  return x > -mx && x < view.w + mx && y > -my && y < view.h + my;
 }
 
 /** The "press E" bubble that floats over a plinth when you're close enough. */

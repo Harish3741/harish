@@ -199,8 +199,10 @@ modules declare the same top-level name.
 
 Leave the droid alone for nine seconds and it powers down; any key wakes it.
 
-Any key skips the opening cinematic. It's skipped automatically on a return
-visit — the flag lives in `localStorage` under `harish-museum-visited`.
+Any key skips the opening cinematic. It plays once per visit and is skipped
+on a reload — the flag lives in `sessionStorage` under
+`harish-museum-visited`, so closing the tab resets it. It was `localStorage`
+at first, which meant the front door showed once per browser ever.
 
 ---
 

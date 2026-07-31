@@ -21,6 +21,11 @@ const PAN_FROM = { x: 320, y: 128 };
 const PAN_TO = { x: START_PX.x, y: START_PX.y - FOCUS_DY };
 const PAN_SECONDS = 2.2;
 
+// Session-scoped, not localStorage. Stored for good, the opening showed once
+// per browser ever and no visitor after the first saw the front door of the
+// place. Per session it plays once for each new arrival, a reload during a
+// visit skips it, and closing the tab resets it. Any key skips it regardless,
+// so nobody is ever held there.
 const VISIT_KEY = 'harish-museum-visited';
 
 // How far above the droid the camera sits while the title card is up.
@@ -35,7 +40,7 @@ export const intro = {
 
 export function shouldSkipIntro() {
   try {
-    return localStorage.getItem(VISIT_KEY) === '1';
+    return sessionStorage.getItem(VISIT_KEY) === '1';
   } catch {
     return false; // private browsing, embedded frames — just play the intro
   }
@@ -43,7 +48,7 @@ export function shouldSkipIntro() {
 
 export function markVisited() {
   try {
-    localStorage.setItem(VISIT_KEY, '1');
+    sessionStorage.setItem(VISIT_KEY, '1');
   } catch {
     /* nothing to do */
   }

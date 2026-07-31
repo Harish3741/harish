@@ -31,7 +31,7 @@ import {
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
   drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawWhiteboard,
-  drawMachine, drawBelt, drawPipeRun, drawHazardLine, drawCrates,
+  drawMachine, drawBelt, drawPipeRun, drawHazardLine,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
@@ -40,7 +40,7 @@ import {
 } from './data/projects.js';
 
 export const MAP_W = 40;
-export const MAP_H = 34;
+export const MAP_H = 33;
 
 // Rooms are an odd number of tiles wide and arches an odd number too, so both
 // centre on a tile rather than a tile boundary. That is what lets every arch
@@ -48,17 +48,19 @@ export const MAP_H = 34;
 // the exhibit is straight ahead, with nothing to steer around.
 //
 // [x, y, w, h]
-// The atrium is five deep rather than three: it has to hold the compass, the
-// résumé above it and the lectern below without any of the three crowding the
-// others. The extra two rows go on the south side and the south half of the
-// building moves down with them, which keeps the north wings' wall thickness —
-// and their picture rail — exactly as it was.
+// The atrium is five deep and sixteen across: deep enough for the compass with
+// the résumé above it and the lectern below, narrow enough that its two arches
+// sit at its corners rather than marooned in the middle of a long wall.
+//
+// The wings are six deep. When they lost a row the north pair gave theirs up
+// at the top and the south pair at the bottom, so both arches — and the wall
+// thicknesses either side of them — are exactly where they were.
 const REGIONS = [
-  { rect: [10, 4, 9, 7], floor: 'stone', indoor: true, wing: 'automations' },
-  { rect: [21, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [11, 14, 18, 5], floor: 'marble', indoor: true },
-  { rect: [10, 22, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [21, 22, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
+  { rect: [10, 5, 9, 6], floor: 'stone', indoor: true, wing: 'automations' },
+  { rect: [21, 5, 9, 6], floor: 'wood', indoor: true, wing: 'personal' },
+  { rect: [12, 14, 16, 5], floor: 'marble', indoor: true },
+  { rect: [10, 22, 9, 6], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [21, 22, 9, 6], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
   // is how thick the walls are. These replaced the old connecting corridors.
@@ -72,34 +74,41 @@ const REGIONS = [
 // masonry, which is what fills the courtyards between the wings — a radius
 // around each room can't, because those courtyards open onto the map edge.
 // It reaches y=0 so the north wings get a full three-tile-tall wall above them.
-const MASONRY = [0, 0, 40, 34];
+const MASONRY = [0, 0, 40, 33];
 
 // Each wing gets its own accent, used on its rug, its vitrines and the icon
 // floating in its case, so the four rooms don't read as one room repeated.
 // Deep and desaturated on purpose: a large saturated rectangle on the floor
 // reads as a hole rather than a carpet.
 //
+// `cx` is the room's centre tile across, which is all that has to be a whole
+// tile — that is what lines an arch up with what is behind it. Everything
+// vertical comes from roomBox(), off the rectangle in REGIONS, so a room can
+// change height without a dozen offsets going quietly stale.
+//
 // `entry` is the side the arch is on. Furniture that would otherwise sit in
 // the doorway goes to the opposite side of the plinth.
 export const WING_ROOMS = {
   automations: {
-    cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations',
+    cx: 14, entry: 'south', rail: 3, label: 'Automations',
     accent: '#2E4A52', machineHall: true,
   },
-  personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
+  personal: {
+    cx: 25, entry: 'south', rail: 3, label: 'Personal Projects', accent: '#6B3F28',
+  },
   client: {
-    cx: 14, cy: 25, entry: 'north', rail: 20, label: 'Client Work',
+    cx: 14, entry: 'north', rail: 20, label: 'Client Work',
     accent: '#2F3A55', boardroom: true,
   },
   about: {
-    cx: 25, cy: 25, entry: 'north', rail: 20, label: 'About Me',
+    cx: 25, entry: 'north', rail: 20, label: 'About Me',
     accent: '#33373C', theatre: true,
   },
 };
 
 // The row of each wall that carries pictures and sconces (the "picture field",
 // two tiles above the floor it stands on).
-const RAIL = { northWings: 2, atrium: 12, southWings: 20 };
+const RAIL = { northWings: 3, atrium: 12, southWings: 20 };
 
 // Wing names, on banners hung across each arch. The first attempt put them as
 // inscriptions on the atrium floor, but the south pair sat on the very last row
@@ -117,7 +126,9 @@ const BANNERS = [
 // the lighting, before the walls go down, so the glow can't spill onto plaster.
 const SCONCES = [
   ...[12, 16, 23, 27].map((x) => [x, RAIL.northWings]),
-  ...[11, 18, 21, 28].map((x) => [x, RAIL.atrium]),
+  // the atrium is sixteen wide, so its end wall only shows either side of
+  // the résumé — x11 and x28 are its side walls now, seen from above
+  ...[18, 21].map((x) => [x, RAIL.atrium]),
   // x22 and x28 would land in the screening room, which has no torches
   ...[11, 17].map((x) => [x, RAIL.southWings]),
 ];
@@ -272,8 +283,9 @@ export function buildMap() {
   //    plinth in either would be standing in the middle of the furniture.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
     if (w.theatre || w.boardroom || w.machineHall) continue;
-    const px = w.cx * TILE + 8;
-    const py = w.cy * TILE + TILE;
+    const box = roomBox(id);
+    const px = box.cx;
+    const py = box.cy + 8;
     map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
     map.colliders.push({ x: px - 11, y: py - 15, w: 22, h: 15 });
   }
@@ -300,12 +312,21 @@ function wallFaceDepth(x, y) {
 }
 
 /**
- * The centre of a wing, in pixels. `cx`/`cy` are the room's centre *tile*, so
- * the centre in pixels is the middle of that tile — not the tile's corner, and
- * not an eyeballed offset from it. Rugs and furniture are laid out from here.
+ * A wing's floor in pixels, read off the rectangle that defines it rather than
+ * from offsets typed next to the furniture. The rooms have been resized four
+ * times now and every hand-written offset went stale silently each time — this
+ * is the one place that knows where a room's edges and centre actually are.
  */
-function roomCentre(w) {
-  return { x: w.cx * TILE + 8, y: w.cy * TILE + 8 };
+function roomBox(id) {
+  const [rx, ry, rw, rh] = REGIONS.find((r) => r.wing === id).rect;
+  return {
+    x0: rx * TILE,
+    y0: ry * TILE,
+    x1: (rx + rw) * TILE,
+    y1: (ry + rh) * TILE,
+    cx: rx * TILE + (rw * TILE) / 2,
+    cy: ry * TILE + (rh * TILE) / 2,
+  };
 }
 
 function renderBackground() {
@@ -352,10 +373,11 @@ function renderBackground() {
   // Light goes down first. Painting it over the rugs instead bleaches them
   // until they read as pools of water rather than textiles.
   drawLightPool(c, AXIS - 80, ATRIUM_MID * TILE - 24, 160, 64, 0.55);
-  for (const w of Object.values(WING_ROOMS)) {
+  for (const [id, w] of Object.entries(WING_ROOMS)) {
     // no skylight over a cinema — the screen is the only light in that room
     if (w.theatre) continue;
-    drawLightPool(c, (w.cx - 3) * TILE, (w.cy - 3) * TILE, 7 * TILE, 7 * TILE);
+    const box = roomBox(id);
+    drawLightPool(c, box.cx - 56, box.cy - 40, 112, 80);
   }
   for (const [sx, ry] of SCONCES) {
     if (wallFaceDepth(sx, ry) !== 1) continue;
@@ -365,13 +387,13 @@ function renderBackground() {
   // The compass is sized to the room: at five rows deep it has to share the
   // floor with the lectern standing at the foot of it.
   drawInlay(c, AXIS, ATRIUM_MID * TILE + 8, 16);
-  for (const w of Object.values(WING_ROOMS)) {
-    const mid = roomCentre(w);
+  for (const [id, w] of Object.entries(WING_ROOMS)) {
     if (w.machineHall) continue;   // a plant room has a painted floor, not a rug
+    const box = roomBox(id);
     // the boardroom's rug turns with its table, so it frames it rather than
     // letting both ends of the table hang off the edge
-    const [rw, rh] = w.boardroom ? [3, 5] : [5, 3];
-    drawRug(c, mid.x, mid.y, rw * TILE, rh * TILE, w.accent);
+    const [rw, rh] = w.boardroom ? [3, 4] : [5, 3];
+    drawRug(c, box.cx, box.cy, rw * TILE, rh * TILE, w.accent);
   }
 
   // brass thresholds across the doorways
@@ -479,33 +501,32 @@ function decorate(c) {
     addProp({ kind: 'banner', x: bx, y: by, text, accent: wing ? wing.accent : COL.velvet });
   }
 
-  for (const w of Object.values(WING_ROOMS)) {
-    if (w.theatre) { dressTheatre(c, w); continue; }
-    if (w.boardroom) { dressBoardroom(c, w); continue; }
-    if (w.machineHall) { dressMachineHall(c, w); continue; }
+  for (const [id, w] of Object.entries(WING_ROOMS)) {
+    if (w.theatre) { dressTheatre(c, w, roomBox(id)); continue; }
+    if (w.boardroom) { dressBoardroom(c, w, roomBox(id)); continue; }
+    if (w.machineHall) { dressMachineHall(c, w, roomBox(id)); continue; }
+
+    const box = roomBox(id);
     const front = w.entry === 'south' ? 1 : -1;   // toward the arch
 
     // flanking the plinth, clear of the arch's five-tile span
-    addProp({ kind: 'statue', x: (w.cx - 3) * TILE + 8, y: w.cy * TILE + 10 });
-    addProp({ kind: 'statue', x: (w.cx + 3) * TILE + 8, y: w.cy * TILE + 10 });
-    addProp({ kind: 'rope', x: (w.cx - 2) * TILE, y: (w.cy + front) * TILE + 10, span: 4 * TILE });
+    addProp({ kind: 'statue', x: box.cx - 48, y: box.cy + 2 });
+    addProp({ kind: 'statue', x: box.cx + 48, y: box.cy + 2 });
+    addProp({ kind: 'rope', x: box.cx - 32, y: box.cy + front * 18, span: 4 * TILE });
 
-    // A pair of benches on the way in, set two tiles off the centre line. They
-    // have to sit outside the plinth's interact radius or pressing E on the
-    // bench opens the exhibit list instead of sitting you down.
+    // A pair of benches by the entry wall, pushed out past the arch's five-tile
+    // span so neither sits in the doorway. They also have to stay outside the
+    // plinth's interact radius, or pressing E at a bench opens the exhibit list
+    // instead of sitting you down.
+    const benchY = front > 0 ? box.y1 - 10 : box.y0 + 26;
     for (const side of [-1, 1]) {
-      addProp({
-        kind: 'bench',
-        x: (w.cx + side * 3) * TILE + 8,
-        y: (w.cy + front * 2) * TILE + 12,
-      });
+      addProp({ kind: 'bench', x: box.cx + side * 56, y: benchY });
     }
 
-    // planting in the four corners
-    for (const sx of [-4, 4]) {
-      for (const sy of [-2, 2]) {
-        addProp({ kind: 'plant', x: (w.cx + sx) * TILE + 8, y: (w.cy + sy) * TILE + 14 });
-      }
+    // Planting along the back wall only. At six rows deep the corners by the
+    // entry belong to the benches, and a plant there overlaps one.
+    for (const sx of [-64, 64]) {
+      addProp({ kind: 'plant', x: box.cx + sx, y: front > 0 ? box.y0 + 16 : box.y1 - 8 });
     }
   }
 
@@ -514,7 +535,6 @@ function decorate(c) {
     if (p.kind === 'plant') map.colliders.push({ x: p.x - 6, y: p.y - 9, w: 12, h: 9 });
     if (p.kind === 'statue') map.colliders.push({ x: p.x - 7, y: p.y - 15, w: 14, h: 15 });
     if (p.kind === 'vitrine') map.colliders.push({ x: p.x - 16, y: p.y - 11, w: 32, h: 11 });
-    if (p.kind === 'crates') map.colliders.push({ x: p.x - 11, y: p.y - 12, w: 22, h: 12 });
     if (p.kind === 'bench') {
       // No collider: you sit *on* a bench, so walking into it has to be allowed.
       map.seats.push({ x: p.x, y: p.y - 6, label: 'Bench' });
@@ -530,22 +550,24 @@ function decorate(c) {
  * a row of machines against the back wall, a conveyor running past their feet
  * with crates on it, pipework overhead and a safety line painted on the floor.
  *
- * One machine per automation. You stand at the line, on the near side of the
- * belt, and press E at whichever one you want — near enough to read the panel,
- * not near enough to lose a hand. The room draws at least three whatever the
- * content file says, so it never looks half-decommissioned, and caps at six,
- * which is as many as will fit across nine tiles without touching.
+ * Five machines, and all five respond: three in a row behind the belt, two more
+ * standing against the side walls where you come in. Five is the number the
+ * room is built for, so the content file ships five slots; a slot with nothing
+ * in it still opens, and says so, rather than being a machine you press E at
+ * and nothing happens.
+ *
+ * You read a machine from the near side of the belt — close enough to read the
+ * panel, not close enough to lose a hand.
  */
-function dressMachineHall(c, w) {
+function dressMachineHall(c, w, box) {
   const wing = wingById('automations');
   const projects = (wing && wing.projects) || [];
-  const n = Math.max(3, Math.min(6, projects.length));
 
-  const left = (w.cx - 4) * TILE + 8;      // inner face of the west wall, +8
-  const run = 9 * TILE - 16;               // wall to wall, less that margin
-  const beltY = (w.cy - 1) * TILE;         // top of the belt
+  const left = box.x0 + 8;
+  const run = box.x1 - box.x0 - 16;
   const beltH = 16;
-  const floorY = beltY - 4;                // where the machines stand
+  const beltY = box.cy - 12;               // top of the belt
+  const floorY = beltY - 4;                // where the back row stands
 
   // pipework along the wall, in place of pictures
   drawPipeRun(c, left, w.rail * TILE + 8, run, w.cx);
@@ -556,38 +578,53 @@ function dressMachineHall(c, w) {
   addProp({ kind: 'belt', x: left, y: beltY + beltH, w: run, h: beltH });
   map.colliders.push({ x: left, y: beltY, w: run, h: beltH });
 
-  const pitch = run / n;
-  const mw = Math.min(24, Math.floor(pitch) - 4);
-  for (let i = 0; i < n; i++) {
-    const mx = Math.round(left + pitch * (i + 0.5));
+  // Three behind the belt, then one against each side wall down by the door.
+  // The back three are read from the safety line, which is why their anchor is
+  // the belt's near edge and not the cabinet — measured from the cabinet, the
+  // belt pushes you out of range.
+  //
+  // The back row is bunched into the middle rather than spread across the run.
+  // Spread out, its outer two sat close enough to the pair by the door that
+  // standing in front of one selected the other: the interact radius picks the
+  // nearest thing, and 17px sideways beats 24px forwards.
+  const bays = [];
+  for (const dx of [-32, 0, 32]) {
+    bays.push({ x: box.cx + dx, y: floorY, anchor: beltY + beltH, lift: 74 });
+  }
+  for (const bx of [box.x0 + 12, box.x1 - 12]) {
+    bays.push({ x: bx, y: box.y1 - 6, anchor: box.y1 - 6, lift: 46 });
+  }
+
+  const mw = 24;
+  bays.forEach((bay, i) => {
+    const project = projects[i] || null;
     addProp({
-      kind: 'machine', x: mx, y: floorY, w: mw, seed: i + 1,
-      accent: w.accent, running: i < projects.length,
+      kind: 'machine', x: bay.x, y: bay.y, w: mw, seed: i + 1,
+      accent: w.accent, running: !!project,
     });
-    map.colliders.push({ x: mx - Math.floor(mw / 2), y: floorY - 10, w: mw, h: 10 });
-
-    const project = projects[i];
-    if (!project) continue;
-    // The anchor is the near edge of the belt, not the machine behind it. You
-    // read the machine from this side of the belt, and measuring from the
-    // cabinet itself leaves a window barely wider than the droid.
+    map.colliders.push({ x: bay.x - mw / 2, y: bay.y - 10, w: mw, h: 10 });
     map.documents.push({
-      x: mx,
-      y: beltY + beltH,
-      label: project.title,
-      blurb: 'Running',
+      x: bay.x,
+      y: bay.anchor,
+      label: project ? project.title : `Bay ${i + 1}`,
+      blurb: project ? 'Running' : 'Idle',
       hint: 'PRESS  E  TO  INSPECT',
-      lift: 74,          // clears the whole cabinet rather than sitting on it
-      doc: project,
+      lift: bay.lift,
+      doc: project || EMPTY_BAY,
     });
-  }
-
-  // What comes off the belt, stacked in the near corners. It also stops the
-  // half of the room you walk in through from being an empty stone floor.
-  for (const [i, cx] of [left + 4, left + run - 4].entries()) {
-    addProp({ kind: 'crates', x: cx, y: (w.cy + 3) * TILE + 6, seed: i + 3 });
-  }
+  });
 }
+
+// What a machine with nothing behind it says when you press E at it. Better
+// than a machine that swallows the keypress: the room has five bays and this
+// explains why one of them is dark.
+const EMPTY_BAY = {
+  title: 'Bay empty',
+  tagline: 'Nothing wired up here yet.',
+  description: 'This machine is idle because the Automations wing has fewer '
+    + 'entries than the room has bays. Add one to WINGS → automations → '
+    + 'projects in src/data/projects.js and it starts running.',
+};
 
 /** The projects tagged with one client's name, in the order they're written. */
 function clientProjects(name) {
@@ -605,19 +642,17 @@ function clientProjects(name) {
  * it leaves close to three tiles of clear floor down each side instead of two,
  * so getting to the client at the far end is a walk rather than a squeeze.
  */
-function dressBoardroom(c, w) {
-  const mid = roomCentre(w);
-
+function dressBoardroom(c, w, box) {
   // charts either side of the arch, clear of the sconces at ±3 tiles
   for (const d of [-4, 4]) {
     drawWhiteboard(c, (w.cx + d) * TILE + 9, w.rail * TILE + 6, w.cx * d);
   }
 
-  const table = { w: 2 * TILE, h: 4 * TILE };
-  addProp({ kind: 'table', x: mid.x, y: mid.y, w: table.w, h: table.h });
+  const table = { w: 2 * TILE, h: 3 * TILE };
+  addProp({ kind: 'table', x: box.cx, y: box.cy, w: table.w, h: table.h });
   map.colliders.push({
-    x: mid.x - table.w / 2 - 7,          // the tucked-in chairs, too
-    y: mid.y - table.h / 2,
+    x: box.cx - table.w / 2 - 7,          // the tucked-in chairs, too
+    y: box.cy - table.h / 2,
     w: table.w + 14,
     h: table.h,
   });
@@ -625,9 +660,9 @@ function dressBoardroom(c, w) {
   // One client down each side and one at the far head. The near head is left
   // open: it is where you come in, and where you end up standing.
   const spots = [
-    { x: mid.x - table.w / 2 - 20, y: mid.y },
-    { x: mid.x + table.w / 2 + 20, y: mid.y },
-    { x: mid.x, y: mid.y + table.h / 2 + 14 },
+    { x: box.cx - table.w / 2 - 20, y: box.cy },
+    { x: box.cx + table.w / 2 + 20, y: box.cy },
+    { x: box.cx, y: box.cy + table.h / 2 + 14 },
   ];
   CLIENTS.slice(0, spots.length).forEach((client, i) => {
     const at = spots[i];
@@ -687,7 +722,7 @@ function dressAtrium(c) {
   // third without them touching.
   const captions = (PAINTINGS && PAINTINGS.atrium) || [];
   let slot = 0;
-  for (const [side, wallX] of [['w', 11 * TILE], ['e', 29 * TILE]]) {
+  for (const [side, wallX] of [['w', 12 * TILE], ['e', 28 * TILE]]) {
     for (const row of [ATRIUM_MID - 1, ATRIUM_MID + 1]) {
       const y = row * TILE + 8;
       drawSideFrame(c, wallX, y, side, row * 7 + slot);
@@ -712,15 +747,14 @@ function dressAtrium(c) {
  * whoever is standing by the door on the right. No plinth: the person is the
  * "about me" and the chair is the film.
  */
-function dressTheatre(c, w) {
-  const mid = roomCentre(w);
-  const westWall = (w.cx - 4) * TILE;      // inner face of the west wall
-  const roomTop = (w.cy - 3) * TILE;
-  const roomBottom = (w.cy + 4) * TILE;
+function dressTheatre(c, w, box) {
+  const westWall = box.x0;
+  const roomTop = box.y0;
+  const roomBottom = box.y1;
 
   // a little extra gloom, so the screen has something to be brighter than
   c.fillStyle = 'rgba(8, 10, 12, 0.14)';
-  c.fillRect(westWall, roomTop, 9 * TILE, 7 * TILE);
+  c.fillRect(westWall, roomTop, box.x1 - box.x0, roomBottom - roomTop);
 
   // The screen is flush against the west wall and runs the full depth of the
   // room, stopping at the floor's edge so the wall above and below it still
@@ -732,17 +766,17 @@ function dressTheatre(c, w) {
     w: 18,
     h: roomBottom - roomTop,
     cx: westWall + 46,           // where the camera looks when it plays
-    cy: mid.y,
+    cy: box.cy,
   };
   map.screen = screen;
   addProp({ kind: 'screen', x: screen.x, y: screen.y, w: screen.w, h: screen.h });
   // one block for the lot: the screen, and the curtains hanging proud of it
   map.colliders.push({ x: westWall, y: roomTop, w: 30, h: screen.h });
 
-  // One seat facing the screen, landing dead centre of the medallion woven
-  // into the middle of the rug. The chair's body runs 28px above its anchor
-  // and 1px below, so the anchor sits 14 below the point it has to centre on.
-  const seat = { x: mid.x, y: mid.y + 14 };
+  // One seat facing the screen, a square above the middle of the rug. The
+  // chair's body runs 28px above its anchor and 1px below, so the anchor sits
+  // 14 below the point its silhouette has to centre on.
+  const seat = { x: box.cx, y: box.cy + 14 - TILE };
   addProp({ kind: 'cinemaseat', x: seat.x, y: seat.y, facing: 'left' });
   // You sit level with the chair rather than behind it, so the droid draws on
   // top of the seat instead of vanishing into it, forward of the back and
@@ -753,8 +787,8 @@ function dressTheatre(c, w) {
 
   // whoever is standing by the door, on the right as you come in
   const person = {
-    x: (w.cx + 3) * TILE + 8,
-    y: (w.cy - 2) * TILE + 16,
+    x: box.cx + 48,
+    y: box.y0 + 32,
     label: (ABOUT && ABOUT.name) || 'About Me',
     wing: 'about',
   };
@@ -791,7 +825,6 @@ export function drawProp(c, p, ox, oy, t) {
     case 'table': drawBoardTable(c, x, y, p.w, p.h); break;
     case 'machine': drawMachine(c, x, y, p.w, p.seed, t, p.accent, p.running); break;
     case 'belt': drawBelt(c, x, y - p.h, p.w, p.h, t); break;
-    case 'crates': drawCrates(c, x, y, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
     case 'lectern': drawLectern(c, x, y, t); break;

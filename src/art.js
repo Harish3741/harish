@@ -992,34 +992,6 @@ export function drawPipeRun(ctx, x, y, w, seed) {
   ctx.fillRect(x + w - 6, y + 8, 1, 3);
 }
 
-/** A stack of crates, waiting to go somewhere. (px, py) is the bottom-centre. */
-export function drawCrates(ctx, px, py, seed) {
-  const h = hash(seed, 19);
-  ctx.fillStyle = COL.shadow;
-  ctx.fillRect(px - 11, py - 3, 22, 3);
-
-  // two on the floor, one on top, offset so the stack isn't a column
-  const boxes = [
-    [px - 11, py - 12, 11, 12],
-    [px, py - 11, 11, 11],
-    [px - 6 + Math.round(h * 4), py - 21, 10, 10],
-  ];
-  for (const [x, y, w, ht] of boxes) {
-    ctx.fillStyle = COL.wood;
-    ctx.fillRect(x, y, w, ht);
-    ctx.fillStyle = 'rgba(255, 236, 200, 0.18)';
-    ctx.fillRect(x, y, w, 1);
-    ctx.fillStyle = COL.woodDark;
-    ctx.fillRect(x, y + ht - 1, w, 1);
-    ctx.fillRect(x + w - 1, y, 1, ht);
-    // slats
-    ctx.fillStyle = 'rgba(107, 72, 48, 0.45)';
-    ctx.fillRect(x + 1, y + Math.floor(ht / 2), w - 2, 1);
-    ctx.fillStyle = COL.brassDim;
-    ctx.fillRect(x + 2, y + 2, 3, 2);
-  }
-}
-
 /** A painted safety line on the floor: brass and dark, to stay in palette. */
 export function drawHazardLine(ctx, x, y, w) {
   ctx.fillStyle = 'rgba(58, 42, 30, 0.35)';

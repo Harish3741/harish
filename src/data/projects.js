@@ -34,6 +34,7 @@ export const WINGS = [
     projects: [
       {
         title: 'Placeholder — automation one',
+        image: null,
         year: '2025',
         tagline: 'Replace me with something that runs on a schedule.',
         description:
@@ -46,12 +47,45 @@ export const WINGS = [
       },
       {
         title: 'Placeholder — automation two',
+        image: null,
         year: '2024',
         tagline: 'A second slot, so the list has something to scroll.',
         description:
           'Same idea. Delete this entry entirely if you only have one — the '
           + 'menu adapts to however many are here.',
         tech: ['Apps Script'],
+        links: [],
+      },
+      {
+        title: 'Placeholder — automation three',
+        image: null,
+        year: '2024',
+        tagline: 'The machine hall has five bays.',
+        description:
+          'Five machines stand in that room and all five can be pressed. An '
+          + 'entry here lights one of them up; a bay with no entry behind it '
+          + 'stands there with its lamps out and says so when you inspect it.',
+        tech: ['n8n'],
+        links: [],
+      },
+      {
+        title: 'Placeholder — automation four',
+        image: null,
+        year: '2023',
+        tagline: 'Fourth bay.',
+        description: 'Replace or delete. Nothing breaks either way.',
+        tech: ['n8n', 'Postgres'],
+        links: [],
+      },
+      {
+        title: 'Placeholder — automation five',
+        image: null,
+        year: '2023',
+        tagline: 'Fifth and last bay.',
+        description:
+          'A sixth entry would still show in the skip-to-list; the room only '
+          + 'has five places to stand a machine.',
+        tech: ['Zapier'],
         links: [],
       },
     ],
@@ -64,6 +98,7 @@ export const WINGS = [
     projects: [
       {
         title: 'Placeholder — personal one',
+        image: null,
         year: '2025',
         tagline: 'The thing you made because you wanted it to exist.',
         description:
@@ -75,6 +110,7 @@ export const WINGS = [
       },
       {
         title: 'This museum',
+        image: null,
         year: '2026',
         tagline: 'The site you are standing in.',
         description:
@@ -95,6 +131,7 @@ export const WINGS = [
     projects: [
       {
         title: 'Placeholder — client one',
+        image: null,
         year: '2025',
         client: 'Placeholder — first client',
         tagline: 'What you were hired to solve.',
@@ -107,6 +144,7 @@ export const WINGS = [
       },
       {
         title: 'Placeholder — client two',
+        image: null,
         year: '2025',
         client: 'Placeholder — second client',
         tagline: 'A second brief, for someone else.',
@@ -118,6 +156,7 @@ export const WINGS = [
       },
       {
         title: 'Placeholder — client three',
+        image: null,
         year: '2024',
         client: 'Placeholder — third client',
         tagline: 'And a third.',
@@ -137,6 +176,7 @@ export const WINGS = [
     projects: [
       {
         title: 'Who I am',
+        image: null,
         tagline: 'The short version.',
         description:
           'Placeholder. A few sentences: what you do, what you are drawn to, '
@@ -145,6 +185,7 @@ export const WINGS = [
       },
       {
         title: 'What I work with',
+        image: null,
         tagline: 'Tools and languages I reach for.',
         description:
           'Placeholder. List the things you would be happy to be handed a '
@@ -154,6 +195,7 @@ export const WINGS = [
       },
       {
         title: 'Get in touch',
+        image: null,
         tagline: 'The fastest way to reach me.',
         description: 'Placeholder. Email, and wherever else you want to be found.',
         links: [],

@@ -602,6 +602,38 @@ body.is-handheld { overflow: auto; }
   .mc-world-icon { width: 44px; height: 44px; font-size: 20px; }
 }
 
+/* the picture slot on a world row, same idea as the exhibit panel's */
+.mc-world-figure {
+  margin: 12px 0 0;
+  padding: 6px;
+  max-width: 420px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 2px solid #16100A;
+}
+
+.mc-world-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.mc-world-figure.is-empty {
+  border-style: dashed;
+  border-color: #6B5A44;
+  background: transparent;
+}
+
+.mc-world-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  color: #9A8A70;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 /* --------------------------------------------------------- artwork -- */
 
 /* a single picture uses the whole window; the one-row rail would be silly */
@@ -621,6 +653,24 @@ body.is-handheld { overflow: auto; }
   width: 100%;
   height: auto;
   image-rendering: auto;
+}
+
+/* An entry with a picture slot but no picture in it yet. Dashed, so it reads
+   as somewhere to put something rather than as an image that failed to load. */
+.detail-figure.is-empty {
+  border-style: dashed;
+  background: transparent;
+}
+
+.detail-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 /* ---------------------------------------------------------- noscript -- */

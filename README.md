@@ -8,7 +8,7 @@ No two rooms are dressed the same way.
 
 | Wing | What's in it | Dressed as |
 | --- | --- | --- |
-| North-west | Automations | a machine hall — a belt, and one machine per flow |
+| North-west | Automations | a machine hall — a belt, and five machines |
 | North-east | Personal projects | a gallery — plinth, pictures, benches |
 | South-west | Client work | a boardroom — a table and three clients |
 | South-east | About me | a cinema — one screen, one chair |
@@ -37,6 +37,7 @@ you leave out simply doesn't render.
 {
   title:       'Invoice reconciler',
   year:        '2025',
+  image:       null,                 // ← a picture slot, empty for now
   tagline:     'One line. What it is, in plain words.',
   description: 'A paragraph. What problem it solved, what you decided, '
              + 'what happened after.',
@@ -46,15 +47,23 @@ you leave out simply doesn't render.
 }
 ```
 
+Every entry carries an `image`. Left `null` it draws a dashed frame saying
+*photo goes here*, in the exhibit panel and in the list — a slot waiting to be
+filled rather than a layout that jumps when the pictures arrive. Fill it with
+any URL a browser can load; a data URI keeps the picture inside the file, which
+is what the standalone build needs. Delete the key entirely and no slot shows
+at all.
+
 A wing with no entries says so rather than breaking, and a wing with twelve
 scrolls. Renaming a wing is the `title` field on that wing; the id (used by the
 plinth) stays put.
 
 ### Pictures on the walls
 
-Each wing hangs four frames. `PAINTINGS` in the same file gives them captions,
-left to right along the wall — an entry makes that frame something you can walk
-up to and read, and leaving it `null` keeps the frame as decoration.
+The Personal Projects wing hangs four frames. `PAINTINGS` in the same file
+gives them captions, left to right along the wall — an entry makes that frame
+something you can walk up to and read, and leaving it `null` keeps the frame as
+decoration.
 
 ```js
 { title: 'Invoice reconciler',
@@ -94,10 +103,11 @@ safety line painted on the floor. There's no plinth — you stand at the line an
 press <kbd>E</kbd> at whichever machine you want.
 
 There's no extra wiring. One machine per entry in `WINGS → automations →
-projects`, in order. The room draws at least three whatever the file says, so
-it never looks half-decommissioned; a machine with nothing behind it stands
-there with its lamps out. Six is the most that fit across nine tiles, and
-anything past that still shows in the skip-to-list.
+projects`, in order. The room has five bays — three behind the belt, one
+against each side wall by the door — and all five can be pressed. A bay with
+nothing behind it stands there with its lamps out and its needle at rest, and
+says so when you inspect it. A sixth entry still shows in the skip-to-list;
+there just isn't a sixth place to stand a machine.
 
 ### The boardroom
 

@@ -188,6 +188,22 @@ function renderWing(wing) {
     if (entry.tagline) text.appendChild(el('p', 'mc-world-tagline', entry.tagline));
     if (entry.description) text.appendChild(el('p', 'mc-world-desc', entry.description));
 
+    // the same picture slot the exhibit panel shows, filled or waiting
+    if ('image' in entry) {
+      const fig = el('figure', 'mc-world-figure');
+      if (entry.image) {
+        const img = el('img');
+        img.src = entry.image;
+        img.alt = entry.title;
+        img.loading = 'lazy';
+        fig.appendChild(img);
+      } else {
+        fig.classList.add('is-empty');
+        fig.appendChild(el('div', 'mc-world-slot', 'Photo goes here'));
+      }
+      text.appendChild(fig);
+    }
+
     if (entry.highlights && entry.highlights.length) {
       const ul = el('ul', 'mc-world-points');
       entry.highlights.forEach((line) => ul.appendChild(el('li', null, line)));

@@ -10,7 +10,7 @@
 // "worlds". It's a joke, but it's also a genuinely good pattern for this — a
 // title, a subtitle line of metadata, and one obvious button per row.
 
-import { SITE, WINGS } from './data/projects.js';
+import { SITE, WINGS, RESUME } from './data/projects.js';
 
 let listRoot, bodyEl, openBtn, closeBtn;
 let isOpen = false;
@@ -120,6 +120,21 @@ function renderMenu(standalone) {
     b.addEventListener('click', () => renderWing(wing));
     menu.appendChild(b);
   });
+
+  // The résumé hangs on the atrium wall, which means it is only reachable by
+  // walking there. It is also the one thing a stranger is most likely to want,
+  // so it gets its own button here rather than being playable-only.
+  if (RESUME) {
+    const b = el('button', 'mc-btn');
+    b.type = 'button';
+    b.appendChild(el('span', 'mc-btn-label', RESUME.title));
+    b.appendChild(el('span', 'mc-btn-sub', RESUME.tagline || 'One page'));
+    b.addEventListener('click', () => renderWing({
+      title: RESUME.title, blurb: RESUME.tagline, projects: [RESUME],
+    }));
+    menu.appendChild(b);
+  }
+
   bodyEl.appendChild(menu);
 
   if (standalone) {

@@ -199,9 +199,9 @@ visit — the flag lives in `localStorage` under `harish-museum-visited`.
 
 - **Desktop** gets the game, with a permanent *Skip to list* button in the
   corner for anyone who doesn't want to play. The list is dressed as a
-  Minecraft world picker: the four wings as a menu, then that wing's projects
-  as a list of worlds. It is also the accessible path through the content —
-  real text, real links, real headings, reachable by keyboard.
+  Minecraft world picker: the four wings and the résumé as a menu, then each
+  one's entries as a list of worlds. It is also the accessible path through the
+  content — real text, real links, real headings, reachable by keyboard.
 - **Phones** get the list only, plus a note that the full thing is on desktop.
   Walking a top-down character with a thumb is miserable, so it isn't offered.
 

@@ -8,8 +8,8 @@ No two rooms are dressed the same way.
 
 | Wing | What's in it | Dressed as |
 | --- | --- | --- |
-| North-west | Automations | a gallery — plinth, pictures, benches |
-| North-east | Personal projects | a gallery |
+| North-west | Automations | a machine hall — a belt, and one machine per flow |
+| North-east | Personal projects | a gallery — plinth, pictures, benches |
 | South-west | Client work | a boardroom — a table and three clients |
 | South-east | About me | a cinema — one screen, one chair |
 
@@ -66,8 +66,9 @@ up to and read, and leaving it `null` keeps the frame as decoration.
 picture inside the file, which is what the standalone build needs.
 
 The atrium hangs four, two down each side wall — `PAINTINGS.atrium` runs west
-top-to-bottom, then east. Its end wall carries the résumé instead. The
-boardroom and the cinema hang nothing, so their keys go unused.
+top-to-bottom, then east. Its end wall carries the résumé instead. Only the
+Personal Projects wing is still a gallery; the other three hang pipework,
+charts and nothing at all, so their `PAINTINGS` keys go unused.
 
 ### The résumé and the rules
 
@@ -84,6 +85,19 @@ export const RESUME = {
   links: [{ label: 'Download PDF', url: 'resume.pdf' }],
 };
 ```
+
+### The machine hall
+
+The Automations wing is a plant room: a row of machines against the back wall,
+a conveyor running past their feet with crates on it, pipework overhead and a
+safety line painted on the floor. There's no plinth — you stand at the line and
+press <kbd>E</kbd> at whichever machine you want.
+
+There's no extra wiring. One machine per entry in `WINGS → automations →
+projects`, in order. The room draws at least three whatever the file says, so
+it never looks half-decommissioned; a machine with nothing behind it stands
+there with its lamps out. Six is the most that fit across nine tiles, and
+anything past that still shows in the skip-to-list.
 
 ### The boardroom
 

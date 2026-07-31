@@ -178,12 +178,9 @@ export const WINGS = [
 // ---------------------------------------------------------------------------
 
 export const PAINTINGS = {
-  automations: [
-    { title: 'Placeholder — picture one', caption: 'Swap this for a screenshot of something running. Anything with a chart in it looks good on a wall.' },
-    { title: 'Placeholder — picture two', caption: 'A second frame. Delete the entry and the frame stays up, just without a plaque.' },
-    null,
-    { title: 'Placeholder — picture four', caption: 'Frames read left to right along the wall, so the order here is the order you walk past them.' },
-  ],
+  // The Automations wing is a machine hall and hangs pipework rather than
+  // pictures, so this key is unused. It stays so the four wings read as a set.
+  automations: [null, null, null, null],
   personal: [
     { title: 'Placeholder — picture one', caption: 'Personal work tends to photograph better than client work. Use the good screenshots here.' },
     null,

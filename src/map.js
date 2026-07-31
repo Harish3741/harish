@@ -25,12 +25,13 @@
 
 import { TILE, COL, THEATRE } from './config.js';
 import {
-  drawMarble, drawWood, drawCarpet,
+  drawMarble, drawWood, drawCarpet, drawStone,
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
   drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawWhiteboard,
+  drawMachine, drawBelt, drawPipeRun, drawHazardLine, drawCrates,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
@@ -53,7 +54,7 @@ export const MAP_H = 34;
 // building moves down with them, which keeps the north wings' wall thickness —
 // and their picture rail — exactly as it was.
 const REGIONS = [
-  { rect: [10, 4, 9, 7], floor: 'wood', indoor: true, wing: 'automations' },
+  { rect: [10, 4, 9, 7], floor: 'stone', indoor: true, wing: 'automations' },
   { rect: [21, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
   { rect: [11, 14, 18, 5], floor: 'marble', indoor: true },
   { rect: [10, 22, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
@@ -81,7 +82,10 @@ const MASONRY = [0, 0, 40, 34];
 // `entry` is the side the arch is on. Furniture that would otherwise sit in
 // the doorway goes to the opposite side of the plinth.
 export const WING_ROOMS = {
-  automations: { cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations', accent: '#2E4A52' },
+  automations: {
+    cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations',
+    accent: '#2E4A52', machineHall: true,
+  },
   personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
   client: {
     cx: 14, cy: 25, entry: 'north', rail: 20, label: 'Client Work',
@@ -267,7 +271,7 @@ export function buildMap() {
   //    screening room and the boardroom have people in them instead, and a
   //    plinth in either would be standing in the middle of the furniture.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
-    if (w.theatre || w.boardroom) continue;
+    if (w.theatre || w.boardroom || w.machineHall) continue;
     const px = w.cx * TILE + 8;
     const py = w.cy * TILE + TILE;
     map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
@@ -322,6 +326,7 @@ function renderBackground() {
       const py = y * TILE;
       if (f === 'marble') drawMarble(c, px, py, x, y);
       else if (f === 'carpet') drawCarpet(c, px, py, x, y);
+      else if (f === 'stone') drawStone(c, px, py, x, y);
       else drawWood(c, px, py, x, y);
     }
   }
@@ -362,6 +367,7 @@ function renderBackground() {
   drawInlay(c, AXIS, ATRIUM_MID * TILE + 8, 16);
   for (const w of Object.values(WING_ROOMS)) {
     const mid = roomCentre(w);
+    if (w.machineHall) continue;   // a plant room has a painted floor, not a rug
     // the boardroom's rug turns with its table, so it frames it rather than
     // letting both ends of the table hang off the edge
     const [rw, rh] = w.boardroom ? [3, 5] : [5, 3];
@@ -451,8 +457,9 @@ function decorate(c) {
   // South wings are entered through that same wall, so their pictures go either
   // side of the arch. Both sets are symmetric about the room's centre line.
   for (const [id, w] of Object.entries(WING_ROOMS)) {
-    // a cinema hangs nothing, and a boardroom hangs charts rather than pictures
-    if (w.theatre || w.boardroom) continue;
+    // the cinema hangs nothing; the boardroom hangs charts and the machine
+    // hall hangs pipework, both dressed by their own function below
+    if (w.theatre || w.boardroom || w.machineHall) continue;
     const offsets = w.entry === 'south' ? [-3, -1, 1, 3] : [-4, -3, 3, 4];
     hangSymmetric(c, w.cx, w.rail, offsets, id);
   }
@@ -475,6 +482,7 @@ function decorate(c) {
   for (const w of Object.values(WING_ROOMS)) {
     if (w.theatre) { dressTheatre(c, w); continue; }
     if (w.boardroom) { dressBoardroom(c, w); continue; }
+    if (w.machineHall) { dressMachineHall(c, w); continue; }
     const front = w.entry === 'south' ? 1 : -1;   // toward the arch
 
     // flanking the plinth, clear of the arch's five-tile span
@@ -506,6 +514,7 @@ function decorate(c) {
     if (p.kind === 'plant') map.colliders.push({ x: p.x - 6, y: p.y - 9, w: 12, h: 9 });
     if (p.kind === 'statue') map.colliders.push({ x: p.x - 7, y: p.y - 15, w: 14, h: 15 });
     if (p.kind === 'vitrine') map.colliders.push({ x: p.x - 16, y: p.y - 11, w: 32, h: 11 });
+    if (p.kind === 'crates') map.colliders.push({ x: p.x - 11, y: p.y - 12, w: 22, h: 12 });
     if (p.kind === 'bench') {
       // No collider: you sit *on* a bench, so walking into it has to be allowed.
       map.seats.push({ x: p.x, y: p.y - 6, label: 'Bench' });
@@ -514,6 +523,70 @@ function decorate(c) {
 
   // draw order is fixed, so sort once rather than every frame
   map.props.sort((a, b) => a.y - b.y);
+}
+
+/**
+ * The machine hall. The Automations wing is a plant room rather than a gallery:
+ * a row of machines against the back wall, a conveyor running past their feet
+ * with crates on it, pipework overhead and a safety line painted on the floor.
+ *
+ * One machine per automation. You stand at the line, on the near side of the
+ * belt, and press E at whichever one you want — near enough to read the panel,
+ * not near enough to lose a hand. The room draws at least three whatever the
+ * content file says, so it never looks half-decommissioned, and caps at six,
+ * which is as many as will fit across nine tiles without touching.
+ */
+function dressMachineHall(c, w) {
+  const wing = wingById('automations');
+  const projects = (wing && wing.projects) || [];
+  const n = Math.max(3, Math.min(6, projects.length));
+
+  const left = (w.cx - 4) * TILE + 8;      // inner face of the west wall, +8
+  const run = 9 * TILE - 16;               // wall to wall, less that margin
+  const beltY = (w.cy - 1) * TILE;         // top of the belt
+  const beltH = 16;
+  const floorY = beltY - 4;                // where the machines stand
+
+  // pipework along the wall, in place of pictures
+  drawPipeRun(c, left, w.rail * TILE + 8, run, w.cx);
+
+  // the safety line, painted on the near side of the belt
+  drawHazardLine(c, left, beltY + beltH + 6, run);
+
+  addProp({ kind: 'belt', x: left, y: beltY + beltH, w: run, h: beltH });
+  map.colliders.push({ x: left, y: beltY, w: run, h: beltH });
+
+  const pitch = run / n;
+  const mw = Math.min(24, Math.floor(pitch) - 4);
+  for (let i = 0; i < n; i++) {
+    const mx = Math.round(left + pitch * (i + 0.5));
+    addProp({
+      kind: 'machine', x: mx, y: floorY, w: mw, seed: i + 1,
+      accent: w.accent, running: i < projects.length,
+    });
+    map.colliders.push({ x: mx - Math.floor(mw / 2), y: floorY - 10, w: mw, h: 10 });
+
+    const project = projects[i];
+    if (!project) continue;
+    // The anchor is the near edge of the belt, not the machine behind it. You
+    // read the machine from this side of the belt, and measuring from the
+    // cabinet itself leaves a window barely wider than the droid.
+    map.documents.push({
+      x: mx,
+      y: beltY + beltH,
+      label: project.title,
+      blurb: 'Running',
+      hint: 'PRESS  E  TO  INSPECT',
+      lift: 74,          // clears the whole cabinet rather than sitting on it
+      doc: project,
+    });
+  }
+
+  // What comes off the belt, stacked in the near corners. It also stops the
+  // half of the room you walk in through from being an empty stone floor.
+  for (const [i, cx] of [left + 4, left + run - 4].entries()) {
+    addProp({ kind: 'crates', x: cx, y: (w.cy + 3) * TILE + 6, seed: i + 3 });
+  }
 }
 
 /** The projects tagged with one client's name, in the order they're written. */
@@ -716,6 +789,9 @@ export function drawProp(c, p, ox, oy, t) {
     case 'cinemaseat': drawCinemaSeat(c, x, y, p.facing); break;
     case 'person': drawPerson(c, x, y, t, p.seed || 0, p.who || 'default'); break;
     case 'table': drawBoardTable(c, x, y, p.w, p.h); break;
+    case 'machine': drawMachine(c, x, y, p.w, p.seed, t, p.accent, p.running); break;
+    case 'belt': drawBelt(c, x, y - p.h, p.w, p.h, t); break;
+    case 'crates': drawCrates(c, x, y, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
     case 'lectern': drawLectern(c, x, y, t); break;

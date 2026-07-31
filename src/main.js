@@ -290,11 +290,12 @@ function drawPrompt(ts, ox, oy) {
   if (!near) return;
 
   const label = near.label.toUpperCase();
-  const hint = near.id ? 'PRESS  E'
-    : near.wing || near.list ? 'PRESS  E  TO  TALK'
-      : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
-        : near.theatre ? 'PRESS  E  TO  WATCH'
-          : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
+  const hint = near.hint ? near.hint
+    : near.id ? 'PRESS  E'
+      : near.wing || near.list ? 'PRESS  E  TO  TALK'
+        : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
+          : near.theatre ? 'PRESS  E  TO  WATCH'
+            : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
   const x = Math.round(near.x - ox);
   const bob = Math.round(Math.sin(ts / 400) * 1.5);

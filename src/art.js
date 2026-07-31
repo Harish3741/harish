@@ -839,6 +839,200 @@ export function drawSideFrame(ctx, wallX, cy, side, seed) {
 }
 
 /**
+ * One machine in the machine hall: a cabinet with a panel of lights, a gauge
+ * whose needle never quite settles, and a vent. Each one is an automation, and
+ * the point of the room is that they are all visibly running while you stand
+ * there doing nothing. (px, py) is the bottom-centre.
+ */
+export function drawMachine(ctx, px, py, w, seed, t, accent, running = true) {
+  const h = hash(seed, 13);
+  const ht = 30;
+  const x = px - Math.floor(w / 2);
+  const y = py - ht;
+
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(x + 1, py - 3, w - 2, 3);
+
+  // the cabinet, lit down its left edge like everything else in the building
+  ctx.fillStyle = '#6E6A62';
+  ctx.fillRect(x, y, w, ht);
+  ctx.fillStyle = '#8A867C';
+  ctx.fillRect(x, y, 2, ht);
+  ctx.fillStyle = '#4E4A44';
+  ctx.fillRect(x + w - 2, y, 2, ht);
+  ctx.fillRect(x, py - 5, w, 5);           // plinth it stands on
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x, y, w, 1);
+
+  // the panel: a dark face with lamps that blink on their own clock
+  const pw = w - 6;
+  ctx.fillStyle = '#22262A';
+  ctx.fillRect(x + 3, y + 4, pw, 11);
+  for (let i = 0; i < 3 && 3 + i * 4 < pw; i++) {
+    const on = running && ((t / (240 + i * 130) + h * 9) % 2) < 1;
+    ctx.fillStyle = on ? (i === 2 ? accent || '#7FE0D4' : '#7FE0D4') : '#2E3A3A';
+    ctx.fillRect(x + 5 + i * 4, y + 6, 2, 2);
+  }
+  // a readout that scrolls, because a still panel reads as broken — which is
+  // exactly what a machine with no automation behind it should look like
+  if (running) {
+    ctx.fillStyle = 'rgba(127, 224, 212, 0.45)';
+    ctx.fillRect(x + 4, y + 10 + (Math.floor(t / 300 + h * 5) % 3), pw - 2, 1);
+  }
+
+  // gauge, needle twitching
+  const gx = x + Math.floor(w / 2);
+  const gy = y + 21;
+  ctx.fillStyle = '#D9D2C2';
+  ctx.fillRect(gx - 3, gy - 3, 7, 7);
+  ctx.fillStyle = '#4E4A44';
+  ctx.fillRect(gx - 3, gy - 3, 7, 1);
+  ctx.fillRect(gx - 3, gy + 3, 7, 1);
+  const swing = running ? Math.round(Math.sin(t / 700 + h * 6) * 2) : -2;
+  ctx.fillStyle = COL.velvet;
+  ctx.fillRect(gx + swing, gy - 2, 1, 3);
+
+  // vents down one side, and the brass nameplate
+  ctx.fillStyle = '#4E4A44';
+  for (let j = 0; j < 3; j++) ctx.fillRect(x + 2, y + 18 + j * 3, 3, 1);
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(x + 3, py - 8, w - 6, 2);
+
+  // Every third machine lets off steam. Two puffs on one cycle, rising and
+  // fading, so the room has something moving above head height.
+  if (running && seed % 3 === 0) {
+    for (let i = 0; i < 2; i++) {
+      const k = ((t / 1500 + i * 0.5 + h) % 1);
+      const a = (1 - k) * 0.35;
+      if (a <= 0.02) continue;
+      const s = 2 + Math.round(k * 3);
+      ctx.fillStyle = `rgba(233, 228, 214, ${a.toFixed(3)})`;
+      ctx.fillRect(x + w - 5, y - Math.round(k * 14) - 2, s, s);
+    }
+  }
+}
+
+/**
+ * The conveyor belt the machines feed. The slats and the crates on it are
+ * placed from the clock rather than stepped, so the belt is still moving at
+ * whatever frame rate the browser feels like giving us.
+ */
+export function drawBelt(ctx, x, y, w, ht, t) {
+  // rails
+  ctx.fillStyle = '#4E4A44';
+  ctx.fillRect(x, y, w, ht);
+  ctx.fillStyle = '#8A867C';
+  ctx.fillRect(x, y, w, 2);
+  ctx.fillStyle = '#3A3730';
+  ctx.fillRect(x, y + ht - 2, w, 2);
+
+  // the band, with slats travelling along it
+  ctx.fillStyle = '#2A2824';
+  ctx.fillRect(x, y + 3, w, ht - 6);
+  ctx.fillStyle = '#3E3B35';
+  const roll = Math.floor(t / 40) % 8;
+  for (let i = -8 + roll; i < w; i += 8) {
+    if (i < 0 || i > w - 2) continue;
+    ctx.fillRect(x + i, y + 3, 2, ht - 6);
+  }
+
+  // rollers at each end
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(x, y + 3, 2, ht - 6);
+  ctx.fillRect(x + w - 2, y + 3, 2, ht - 6);
+
+  // crates riding it, evenly spaced and wrapping round
+  const crate = ht - 9;
+  for (let i = 0; i < 3; i++) {
+    const cx = ((t / 24) + i * (w / 3)) % (w + 20) - 10;
+    if (cx < -crate || cx > w) continue;
+    const cw = Math.min(crate, w - Math.max(0, cx), cx + crate);
+    const px = x + Math.max(0, cx);
+    ctx.fillStyle = COL.wood;
+    ctx.fillRect(px, y + 5, cw, crate);
+    ctx.fillStyle = COL.woodDark;
+    ctx.fillRect(px, y + 5 + crate - 1, cw, 1);
+    ctx.fillStyle = 'rgba(255, 236, 200, 0.20)';
+    ctx.fillRect(px, y + 5, cw, 1);
+  }
+}
+
+/**
+ * Pipework along a wall face, with brackets, a valve wheel and a gauge. This is
+ * what the machine hall hangs instead of pictures.
+ */
+export function drawPipeRun(ctx, x, y, w, seed) {
+  // the pipe itself, lit along the top
+  ctx.fillStyle = '#7A6A52';
+  ctx.fillRect(x, y, w, 5);
+  ctx.fillStyle = '#9C8A6C';
+  ctx.fillRect(x, y, w, 1);
+  ctx.fillStyle = '#5A4C3A';
+  ctx.fillRect(x, y + 4, w, 1);
+
+  // brackets holding it to the wall, and joints between lengths
+  for (let i = 8; i < w - 8; i += 22) {
+    ctx.fillStyle = COL.brassDim;
+    ctx.fillRect(x + i, y - 1, 3, 7);
+  }
+  // a valve wheel a third of the way along
+  const vx = x + Math.floor(w * (0.3 + hash(seed, 17) * 0.4));
+  ctx.fillStyle = COL.brass;
+  ctx.fillRect(vx - 4, y - 4, 8, 3);
+  ctx.fillRect(vx - 1, y - 4, 2, 6);
+  ctx.fillStyle = COL.brassDim;
+  ctx.fillRect(vx - 4, y - 2, 8, 1);
+
+  // a small dial at the far end
+  ctx.fillStyle = '#D9D2C2';
+  ctx.fillRect(x + w - 9, y + 6, 7, 7);
+  ctx.fillStyle = '#4E4A44';
+  ctx.fillRect(x + w - 9, y + 6, 7, 1);
+  ctx.fillStyle = COL.velvet;
+  ctx.fillRect(x + w - 6, y + 8, 1, 3);
+}
+
+/** A stack of crates, waiting to go somewhere. (px, py) is the bottom-centre. */
+export function drawCrates(ctx, px, py, seed) {
+  const h = hash(seed, 19);
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(px - 11, py - 3, 22, 3);
+
+  // two on the floor, one on top, offset so the stack isn't a column
+  const boxes = [
+    [px - 11, py - 12, 11, 12],
+    [px, py - 11, 11, 11],
+    [px - 6 + Math.round(h * 4), py - 21, 10, 10],
+  ];
+  for (const [x, y, w, ht] of boxes) {
+    ctx.fillStyle = COL.wood;
+    ctx.fillRect(x, y, w, ht);
+    ctx.fillStyle = 'rgba(255, 236, 200, 0.18)';
+    ctx.fillRect(x, y, w, 1);
+    ctx.fillStyle = COL.woodDark;
+    ctx.fillRect(x, y + ht - 1, w, 1);
+    ctx.fillRect(x + w - 1, y, 1, ht);
+    // slats
+    ctx.fillStyle = 'rgba(107, 72, 48, 0.45)';
+    ctx.fillRect(x + 1, y + Math.floor(ht / 2), w - 2, 1);
+    ctx.fillStyle = COL.brassDim;
+    ctx.fillRect(x + 2, y + 2, 3, 2);
+  }
+}
+
+/** A painted safety line on the floor: brass and dark, to stay in palette. */
+export function drawHazardLine(ctx, x, y, w) {
+  ctx.fillStyle = 'rgba(58, 42, 30, 0.35)';
+  ctx.fillRect(x, y, w, 4);
+  for (let i = 0; i < w; i += 6) {
+    ctx.fillStyle = 'rgba(220, 166, 70, 0.55)';
+    ctx.fillRect(x + i, y, 3, 4);
+  }
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
+  ctx.fillRect(x, y, w, 1);
+}
+
+/**
  * The boardroom table, seen from above: a long slab of wood with chairs tucked
  * under both sides and the leavings of a meeting on it. (cx, cy) is its centre.
  *

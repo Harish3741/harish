@@ -91,16 +91,12 @@ export const WALLS = {
     panel: 'rgba(154, 124, 88, 0.24)', panelHi: 'rgba(255, 250, 238, 0.45)',
     panelLo: 'rgba(120, 94, 64, 0.30)', rail: null,
     light: 'rgba(255, 250, 238, 0.35)',
-     top: COL.wallTop, topHi: 'rgba(255, 246, 226, 0.045)',
-    topLo: 'rgba(48, 34, 22, 0.05)', topJoint: 'rgba(74, 56, 38, 0.30)',
   },
   theatre: {
     face: THEATRE.wallFace, hi: THEATRE.wallFaceHi, base: THEATRE.baseboard,
     panel: 'rgba(0, 0, 0, 0.32)', panelHi: 'rgba(148, 158, 170, 0.16)',
     panelLo: 'rgba(0, 0, 0, 0.38)', rail: 'rgba(120, 132, 146, 0.35)',
     light: 'rgba(210, 224, 238, 0.07)',
-     top: '#23262A', topHi: 'rgba(190, 208, 224, 0.045)',
-    topLo: 'rgba(0, 0, 0, 0.14)', topJoint: 'rgba(10, 12, 14, 0.42)',
   },
   // painted blockwork, over the machine hall's stone floor
   plant: {
@@ -108,8 +104,6 @@ export const WALLS = {
     panel: 'rgba(68, 64, 54, 0.22)', panelHi: 'rgba(226, 222, 208, 0.34)',
     panelLo: 'rgba(56, 52, 44, 0.30)', rail: 'rgba(118, 114, 102, 0.32)',
     light: 'rgba(240, 238, 226, 0.20)',
-     top: '#7E7A6E', topHi: 'rgba(238, 238, 226, 0.05)',
-    topLo: 'rgba(34, 32, 28, 0.08)', topJoint: 'rgba(48, 46, 40, 0.32)',
   },
   // light commercial plaster, over the boardroom's carpet tile
   office: {
@@ -117,8 +111,6 @@ export const WALLS = {
     panel: 'rgba(96, 102, 112, 0.18)', panelHi: 'rgba(248, 250, 252, 0.40)',
     panelLo: 'rgba(78, 84, 94, 0.26)', rail: 'rgba(140, 148, 158, 0.30)',
     light: 'rgba(248, 250, 252, 0.30)',
-     top: '#8C939D', topHi: 'rgba(240, 244, 250, 0.05)',
-    topLo: 'rgba(30, 36, 44, 0.09)', topJoint: 'rgba(52, 58, 68, 0.32)',
   },
 };
 

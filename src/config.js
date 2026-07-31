@@ -82,6 +82,38 @@ export const THEATRE = {
   glow: 'rgba(190, 214, 232, 0.16)',
 };
 
+// Wall faces are themed per room, so a room's walls belong to its floor. The
+// key comes from the region's `theme` in map.js; a room without one gets the
+// museum's own plaster, which is what the atrium and the gallery want anyway.
+export const WALLS = {
+  museum: {
+    face: COL.wallFace, hi: COL.wallFaceHi, base: COL.baseboard,
+    panel: 'rgba(154, 124, 88, 0.24)', panelHi: 'rgba(255, 250, 238, 0.45)',
+    panelLo: 'rgba(120, 94, 64, 0.30)', rail: null,
+    light: 'rgba(255, 250, 238, 0.35)',
+  },
+  theatre: {
+    face: THEATRE.wallFace, hi: THEATRE.wallFaceHi, base: THEATRE.baseboard,
+    panel: 'rgba(0, 0, 0, 0.32)', panelHi: 'rgba(148, 158, 170, 0.16)',
+    panelLo: 'rgba(0, 0, 0, 0.38)', rail: 'rgba(120, 132, 146, 0.35)',
+    light: 'rgba(210, 224, 238, 0.07)',
+  },
+  // painted blockwork, over the machine hall's stone floor
+  plant: {
+    face: '#ADA89C', hi: '#BEB9AC', base: '#736E5E',
+    panel: 'rgba(68, 64, 54, 0.22)', panelHi: 'rgba(226, 222, 208, 0.34)',
+    panelLo: 'rgba(56, 52, 44, 0.30)', rail: 'rgba(118, 114, 102, 0.32)',
+    light: 'rgba(240, 238, 226, 0.20)',
+  },
+  // light commercial plaster, over the boardroom's carpet tile
+  office: {
+    face: '#C1C4CA', hi: '#D2D5DA', base: '#788089',
+    panel: 'rgba(96, 102, 112, 0.18)', panelHi: 'rgba(248, 250, 252, 0.40)',
+    panelLo: 'rgba(78, 84, 94, 0.26)', rail: 'rgba(140, 148, 158, 0.30)',
+    light: 'rgba(248, 250, 252, 0.30)',
+  },
+};
+
 // The droid. Same grid the avatar sheet used.
 export const DROID_PAL = {
   '#': '#3B2A22',

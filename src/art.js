@@ -3,7 +3,7 @@
 // — architecture is mostly rectangles, and code is far easier to tweak than a
 // 28-line string array.
 
-import { COL, DROID_PAL, THEATRE, TILE } from './config.js';
+import { COL, DROID_PAL, THEATRE, TILE, WALLS } from './config.js';
 
 /* ------------------------------------------------------------------ */
 /* Sprite grids                                                        */
@@ -349,17 +349,7 @@ export function drawWallTop(ctx, px, py, tx, ty) {
  * flat strip, which is most of what makes a room read as a room.
  */
 export function drawWallFace(ctx, px, py, depth, theme) {
-  const T = theme === 'theatre' ? {
-    face: THEATRE.wallFace, hi: THEATRE.wallFaceHi, base: THEATRE.baseboard,
-    panel: 'rgba(0, 0, 0, 0.32)', panelHi: 'rgba(148, 158, 170, 0.16)',
-    panelLo: 'rgba(0, 0, 0, 0.38)', rail: 'rgba(120, 132, 146, 0.35)',
-    light: 'rgba(210, 224, 238, 0.07)',
-  } : {
-    face: COL.wallFace, hi: COL.wallFaceHi, base: COL.baseboard,
-    panel: 'rgba(154, 124, 88, 0.24)', panelHi: 'rgba(255, 250, 238, 0.45)',
-    panelLo: 'rgba(120, 94, 64, 0.30)', rail: null,
-    light: 'rgba(255, 250, 238, 0.35)',
-  };
+  const T = WALLS[theme] || WALLS.museum;
 
   if (depth === 2) {
     // cornice: roof mass above, then crown moulding stepping out

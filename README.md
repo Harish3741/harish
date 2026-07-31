@@ -254,6 +254,20 @@ A few decisions worth knowing about, if you come back to this later:
   line up exactly with the plinth behind it. Before they were aligned, a bench
   sat in one doorway and the droid could wedge itself on it.
 
+- **A room's walls are themed to its floor.** `WALLS` in `config.js` holds a
+  palette per theme and a region names one; a region without one gets the
+  museum's own plaster. The plant room is painted blockwork over stone, the
+  boardroom light commercial plaster over carpet tile, the cinema charcoal over
+  charcoal. It is one table rather than a two-way switch because there turned
+  out to be four kinds of room, not two.
+
+- **The prompt bubble sits above whatever it names, never on it.** Each
+  interactable declares the top of its own art — a picture's frame, a plinth's
+  case, a machine's cabinet — and the bubble places itself clear of that. The
+  hand-tuned lifts it replaced drifted out of true every time a prop was
+  redrawn. Things with several access points onto one list, like the three
+  machines, pin the bubble to one spot so walking the line doesn't make it hop.
+
 - **Walls that run away from the camera get cheated perspective.** A top-down
   view only gives you a face to hang things on where a wall runs left to right;
   the atrium's side walls and the cinema's screen wall are seen from above and

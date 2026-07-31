@@ -56,10 +56,10 @@ export const MAP_H = 33;
 // at the top and the south pair at the bottom, so both arches — and the wall
 // thicknesses either side of them — are exactly where they were.
 const REGIONS = [
-  { rect: [10, 5, 9, 6], floor: 'stone', indoor: true, wing: 'automations' },
+  { rect: [10, 5, 9, 6], floor: 'stone', indoor: true, wing: 'automations', theme: 'plant' },
   { rect: [21, 5, 9, 6], floor: 'wood', indoor: true, wing: 'personal' },
   { rect: [12, 14, 16, 5], floor: 'marble', indoor: true },
-  { rect: [10, 22, 9, 6], floor: 'office', indoor: true, wing: 'client' },
+  { rect: [10, 22, 9, 6], floor: 'office', indoor: true, wing: 'client', theme: 'office' },
   { rect: [21, 22, 9, 6], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
@@ -275,7 +275,7 @@ export function buildMap() {
     const box = roomBox(id);
     const px = box.cx;
     const py = box.cy + 8;
-    map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent });
+    map.plinths.push({ id, x: px, y: py, label: w.label, accent: w.accent, top: py - 30 });
     map.colliders.push({ x: px - 11, y: py - 15, w: 22, h: 15 });
   }
 
@@ -451,6 +451,7 @@ function hangSymmetric(c, cx, ty, offsets, wingId) {
         caption: info.caption,
         image: info.image || null,
         label: 'Painting',
+        top: ty * TILE + 4,
       });
     }
     slot += 1;
@@ -484,13 +485,22 @@ function decorate(c) {
     addProp({ kind: 'plinth', x: p.x, y: p.y, id: p.id });
   }
 
-  // A wing's name hangs just inside its own doorway rather than on the atrium
-  // wall opposite it, so the title belongs to the room it names and the atrium
-  // is left to the résumé. You still walk under it on the way in.
+  // A wing's name hangs in the walkway between the atrium and the room — the
+  // middle of the arch, which is three tiles deep — rather than on either room's
+  // floor. It belongs to the opening it spans, you walk under it going in and
+  // coming out, and neither the atrium's end wall nor the room itself has to
+  // give up space to it.
+  const ARCH = 3 * TILE;
   for (const [id, w] of Object.entries(WING_ROOMS)) {
     const box = roomBox(id);
-    const by = w.entry === 'south' ? box.y1 - 21 : box.y0;
-    addProp({ kind: 'banner', x: box.cx, y: by, text: w.banner, accent: w.accent });
+    const mouth = w.entry === 'south' ? box.y1 : box.y0 - ARCH;
+    addProp({
+      kind: 'banner',
+      x: box.cx,
+      y: mouth + Math.round((ARCH - 22) / 2),   // 22 is the rail plus the cloth
+      text: w.banner,
+      accent: w.accent,
+    });
   }
 
   for (const [id, w] of Object.entries(WING_ROOMS)) {
@@ -598,7 +608,8 @@ function dressMachineHall(c, w, box) {
       label: w.label,
       accent: w.accent,
       bare: true,            // the machine is the prop; no plinth stands here
-      lift: 74,              // the bubble clears the cabinet behind the belt
+      top: floorY - 30,      // the top of the cabinet behind the belt
+      promptX: box.cx,       // one bubble, over the middle of the line
     });
   }
 
@@ -643,7 +654,7 @@ function dressBoardroom(c, w, box) {
     label: w.label,
     accent: w.accent,
     bare: true,      // the table is the prop
-    lift: 46,
+    top: box.cy - table.h / 2 - 8,
   });
 
   // One client down each side and one at the far head, all three decoration.
@@ -679,6 +690,7 @@ function dressAtrium(c) {
     label: 'Resume',                      // the bitmap font has no accents
     blurb: 'On the wall',
     doc: RESUME,
+    top: RAIL.atrium * TILE + 2,
   });
 
   // The lectern below it, on the last row of floor. It has to go that low: the
@@ -692,7 +704,7 @@ function dressAtrium(c) {
   map.colliders.push({ x: lx - 9, y: ly - 10, w: 18, h: 10 });
   map.documents.push({
     x: lx, y: ly, label: 'The rules', blurb: 'Open on the lectern', doc: RULES,
-    lift: 52,   // the bubble clears the book rather than sitting on it
+    top: ly - 28,
   });
 
   // Two pictures down each side wall, each level with the one opposite. Two,
@@ -713,6 +725,7 @@ function dressAtrium(c) {
           caption: info.caption,
           image: info.image || null,
           label: 'Painting',
+          top: y - 17,
         });
       }
       slot += 1;
@@ -761,6 +774,7 @@ function dressTheatre(c, w, box) {
   // turned to face the screen.
   map.seats.push({
     x: seat.x - 3, y: seat.y, label: 'Seat', theatre: true, facing: 'left',
+    top: seat.y - 29,
   });
 
   // whoever is standing by the door, on the right as you come in
@@ -769,6 +783,7 @@ function dressTheatre(c, w, box) {
     y: box.y0 + 32,
     label: (ABOUT && ABOUT.name) || 'About Me',
     wing: 'about',
+    top: box.y0 + 32 - 18,
   };
   map.people.push(person);
   addProp({ kind: 'person', x: person.x, y: person.y, seed: 1, who: 'about' });

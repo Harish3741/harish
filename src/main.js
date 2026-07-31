@@ -293,9 +293,19 @@ function drawPrompt(ts, ox, oy) {
           : near.theatre ? 'PRESS  E  TO  WATCH'
             : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
-  const x = Math.round(near.x - ox);
+  // Something with several access points onto the same list — the three
+  // machines in the plant room — can pin the bubble to one spot, so walking
+  // along the line doesn't make it hop and read as three separate exhibits.
+  const x = Math.round((near.promptX !== undefined ? near.promptX : near.x) - ox);
   const bob = Math.round(Math.sin(ts / 400) * 1.5);
-  const y = Math.round(near.y - oy) - (near.lift || (near.id ? 60 : 34)) + bob;
+
+  // The bubble sits above whatever it names, never on top of it. Each
+  // interactable says where the top of its own art is — a picture's frame is
+  // 40px above the floor you read it from, a plinth's case is 26 above its
+  // base — and the bubble plus its tail is 26 tall, so that is the whole sum.
+  // Hand-tuned lifts drifted every time a prop was redrawn; this cannot.
+  const top = near.top !== undefined ? near.top : near.y - 18;
+  const y = Math.max(2, Math.round(top - oy) - 27) + bob;
 
   ctx.save();
   ctx.globalAlpha = promptPulse;

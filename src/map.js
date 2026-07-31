@@ -301,6 +301,26 @@ function wallFaceDepth(x, y) {
 }
 
 /**
+ * The theme of a wall tile you are looking down on. The inner skin of masonry
+ * around a room belongs to that room — it is the room's own wall, seen from
+ * above — and everything past it is the building, which stays the building's
+ * colour. A corner can touch two rooms; the first found wins, and it is a
+ * single tile you can never stand beside.
+ */
+function wallTopTheme(x, y) {
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= MAP_W || ny >= MAP_H) continue;
+      const i = idx(nx, ny);
+      if (map.floor[i] !== null && map.indoor[i] && map.theme[i]) return map.theme[i];
+    }
+  }
+  return null;
+}
+
+/**
  * A wing's floor in pixels, read off the rectangle that defines it rather than
  * from offsets typed next to the furniture. The rooms have been resized four
  * times now and every hand-written offset went stale silently each time — this
@@ -400,7 +420,7 @@ function renderBackground() {
         // the wall belongs to whichever room it faces into
         drawWallFace(c, x * TILE, y * TILE, depth, map.theme[idx(x, y + depth + 1)]);
       } else {
-        drawWallTop(c, x * TILE, y * TILE, x, y);
+        drawWallTop(c, x * TILE, y * TILE, x, y, wallTopTheme(x, y));
       }
     }
   }
@@ -494,10 +514,13 @@ function decorate(c) {
   for (const [id, w] of Object.entries(WING_ROOMS)) {
     const box = roomBox(id);
     const mouth = w.entry === 'south' ? box.y1 : box.y0 - ARCH;
+    const toward = w.entry === 'south' ? 1 : -1;   // which way the atrium lies
     addProp({
       kind: 'banner',
       x: box.cx,
-      y: mouth + Math.round((ARCH - 22) / 2),   // 22 is the rail plus the cloth
+      // centred in the walkway, then a tile toward the atrium: hung at the end
+      // you read it from. 22 is the rail plus the cloth.
+      y: mouth + Math.round((ARCH - 22) / 2) + toward * TILE,
       text: w.banner,
       accent: w.accent,
     });

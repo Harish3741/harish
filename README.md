@@ -254,12 +254,13 @@ A few decisions worth knowing about, if you come back to this later:
   line up exactly with the plinth behind it. Before they were aligned, a bench
   sat in one doorway and the droid could wedge itself on it.
 
-- **A room's walls are themed to its floor.** `WALLS` in `config.js` holds a
-  palette per theme and a region names one; a region without one gets the
-  museum's own plaster. The plant room is painted blockwork over stone, the
-  boardroom light commercial plaster over carpet tile, the cinema charcoal over
-  charcoal. It is one table rather than a two-way switch because there turned
-  out to be four kinds of room, not two.
+- **A room's walls are themed to its floor**, both the face you see head-on and
+  the mass you look down on. `WALLS` in `config.js` holds a palette per theme
+  and a region names one; a region without one gets the museum's own plaster.
+  The plant room is painted blockwork over stone, the boardroom light
+  commercial plaster over carpet tile, the cinema charcoal over charcoal. Only
+  the inner ring of masonry takes the room's colour — that ring is the room's
+  own wall seen from above, and everything past it is the building.
 
 - **The prompt bubble sits above whatever it names, never on it.** Each
   interactable declares the top of its own art — a picture's frame, a plinth's

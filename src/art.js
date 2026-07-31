@@ -321,24 +321,23 @@ export function drawCarpet(ctx, px, py, tx, ty) {
  * some rooms, so it is deliberately quiet: big ashlar blocks, low contrast, no
  * fine detail to pull the eye off the exhibits.
  */
-export function drawWallTop(ctx, px, py, tx, ty) {
+export function drawWallTop(ctx, px, py, tx, ty, theme) {
+  const T = WALLS[theme] || WALLS.museum;
   const h = hash(tx >> 1, ty >> 1);
-  ctx.fillStyle = COL.wallTop;
+  ctx.fillStyle = T.top;
   ctx.fillRect(px, py, TILE, TILE);
 
   // faint per-block tonal drift, so the mass isn't a flat field
-  ctx.fillStyle = h > 0.5
-    ? 'rgba(255, 246, 226, 0.045)'
-    : 'rgba(48, 34, 22, 0.05)';
+  ctx.fillStyle = h > 0.5 ? T.topHi : T.topLo;
   ctx.fillRect(px, py, TILE, TILE);
 
   // joints every two tiles, staggered by row
   const stagger = ((ty >> 1) % 2) * TILE;
-  ctx.fillStyle = 'rgba(74, 56, 38, 0.30)';
+  ctx.fillStyle = T.topJoint;
   if (ty % 2 === 0) ctx.fillRect(px, py, TILE, 1);
   if ((px + stagger) % (TILE * 2) === 0) ctx.fillRect(px, py, 1, TILE);
 
-  ctx.fillStyle = 'rgba(186, 162, 128, 0.16)';
+  ctx.fillStyle = T.topHi;
   if (ty % 2 === 0) ctx.fillRect(px, py + 1, TILE, 1);
 }
 

@@ -844,24 +844,33 @@ export function drawSideFrame(ctx, wallX, cy, side, seed) {
  *
  * Chairs are drawn as part of the table rather than as props of their own. They
  * are pushed in, so they never need depth-sorting against anything, and one
- * call keeps them evenly spaced whatever length the table is.
+ * call keeps them evenly spaced along whichever pair of sides is the long one.
  */
 export function drawBoardTable(ctx, cx, cy, w, h) {
   const x = cx - Math.floor(w / 2);
   const y = cy - Math.floor(h / 2);
+  const acrossTheRoom = w >= h;
 
   // chairs, tucked under the long sides
-  const seats = Math.max(2, Math.floor(w / 20));
-  const gap = w / seats;
+  const run = acrossTheRoom ? w : h;
+  const seats = Math.max(2, Math.floor(run / 20));
+  const gap = run / seats;
   for (let i = 0; i < seats; i++) {
-    const sx = Math.round(x + gap * (i + 0.5));
-    for (const [sy, lip] of [[y - 7, -1], [y + h - 1, 1]]) {
+    const at = Math.round((acrossTheRoom ? x : y) + gap * (i + 0.5));
+    for (const near of [-1, 1]) {
+      // (sx, sy) is the chair's top-left, on whichever side of the table it is
+      const sx = acrossTheRoom ? at - 7 : (near < 0 ? x - 7 : x + w - 1);
+      const sy = acrossTheRoom ? (near < 0 ? y - 7 : y + h - 1) : at - 7;
+      const cw = acrossTheRoom ? 14 : 8;
+      const ch = acrossTheRoom ? 8 : 14;
       ctx.fillStyle = COL.woodDark;
-      ctx.fillRect(sx - 7, sy, 14, 8);
+      ctx.fillRect(sx, sy, cw, ch);
       ctx.fillStyle = COL.velvetDark;
-      ctx.fillRect(sx - 6, sy + 1, 12, 6);
+      ctx.fillRect(sx + 1, sy + 1, cw - 2, ch - 2);
+      // the lit edge goes on the side away from the table
       ctx.fillStyle = COL.velvet;
-      ctx.fillRect(sx - 6, lip < 0 ? sy + 1 : sy + 6, 12, 1);
+      if (acrossTheRoom) ctx.fillRect(sx + 1, near < 0 ? sy + 1 : sy + ch - 2, cw - 2, 1);
+      else ctx.fillRect(near < 0 ? sx + 1 : sx + cw - 2, sy + 1, 1, ch - 2);
     }
   }
 
@@ -875,13 +884,22 @@ export function drawBoardTable(ctx, cx, cy, w, h) {
   ctx.fillStyle = 'rgba(255, 236, 200, 0.14)';
   ctx.fillRect(x + 1, y + 1, w - 2, 1);
 
+  // Everything on the top is placed along the table rather than across it:
+  // `u` runs from one end to the other, `v` is the offset from its centre line.
+  const at = (u, v) => (acrossTheRoom ? [x + u, cy + v] : [cx + v, y + u]);
+  const box = (u, v, along, across) => (acrossTheRoom
+    ? [x + u, cy + v, along, across] : [cx + v, y + u, across, along]);
+
   // grain, running the length of it
   ctx.fillStyle = 'rgba(107, 72, 48, 0.30)';
-  for (let j = 4; j < h - 4; j += 3) ctx.fillRect(x + 3, y + j, w - 6, 1);
+  const width = (acrossTheRoom ? h : w) - 8;
+  for (let j = 0; j < width; j += 3) {
+    ctx.fillRect(...box(3, j - Math.floor(width / 2), run - 6, 1));
+  }
 
   // brass inlay down the centre line, and a lamp standing on it
   ctx.fillStyle = COL.brassDim;
-  ctx.fillRect(x + 4, cy - 1, w - 8, 1);
+  ctx.fillRect(...box(4, -1, run - 8, 1));
   ctx.fillStyle = COL.brass;
   ctx.fillRect(cx - 5, cy - 4, 10, 6);
   ctx.fillStyle = COL.brassDim;
@@ -890,15 +908,15 @@ export function drawBoardTable(ctx, cx, cy, w, h) {
   ctx.fillRect(cx - 3, cy - 3, 6, 2);
 
   // papers and a couple of mugs, so it looks like a meeting happened here
-  ctx.fillStyle = COL.paper;
-  ctx.fillRect(x + 9, cy - 6, 9, 7);
-  ctx.fillRect(x + w - 20, cy + 1, 9, 7);
-  ctx.fillStyle = 'rgba(122, 98, 70, 0.40)';
-  for (let j = 1; j < 6; j += 2) {
-    ctx.fillRect(x + 10, cy - 6 + j, 7, 1);
-    ctx.fillRect(x + w - 19, cy + 1 + j, 7, 1);
+  const sheets = [[9, -7], [run - 18, 1]];
+  for (const [u, v] of sheets) {
+    ctx.fillStyle = COL.paper;
+    ctx.fillRect(...box(u, v, 9, 7));
+    ctx.fillStyle = 'rgba(122, 98, 70, 0.40)';
+    for (let j = 1; j < 6; j += 2) ctx.fillRect(...box(u + 1, v + j, 7, 1));
   }
-  for (const [mx, my] of [[x + 24, cy + 3], [x + w - 27, cy - 5]]) {
+  for (const [u, v] of [[24, 3], [run - 29, -6]]) {
+    const [mx, my] = at(u, v);
     ctx.fillStyle = COL.glass;
     ctx.fillRect(mx, my, 5, 5);
     ctx.fillStyle = '#6B4830';

@@ -65,7 +65,7 @@ up to and read, and leaving it `null` keeps the frame as decoration.
 `image` is optional and takes any URL a browser can load. A data URI keeps the
 picture inside the file, which is what the standalone build needs.
 
-The atrium hangs six, three down each side wall — `PAINTINGS.atrium` runs west
+The atrium hangs four, two down each side wall — `PAINTINGS.atrium` runs west
 top-to-bottom, then east. Its end wall carries the résumé instead. The
 boardroom and the cinema hang nothing, so their keys go unused.
 
@@ -87,9 +87,10 @@ export const RESUME = {
 
 ### The boardroom
 
-The Client Work wing is a boardroom, not a gallery: a table down the middle
-and three clients standing round it. There's no plinth — press <kbd>E</kbd> on
-a client and you get the work you did for them.
+The Client Work wing is a boardroom, not a gallery: a table standing end-on to
+the door and three clients round it — one down each side, one at the far head.
+There's no plinth. Press <kbd>E</kbd> on a client and you get the work you did
+for them.
 
 The wiring is one field. Tag a project with `client:` and it appears at that
 person's place at the table; `CLIENTS` gives the three of them a name, a line

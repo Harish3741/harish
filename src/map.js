@@ -39,7 +39,7 @@ import {
 } from './data/projects.js';
 
 export const MAP_W = 40;
-export const MAP_H = 36;
+export const MAP_H = 34;
 
 // Rooms are an odd number of tiles wide and arches an odd number too, so both
 // centre on a tile rather than a tile boundary. That is what lets every arch
@@ -47,31 +47,31 @@ export const MAP_H = 36;
 // the exhibit is straight ahead, with nothing to steer around.
 //
 // [x, y, w, h]
-// The atrium is seven deep rather than three: it has to hold the compass, the
+// The atrium is five deep rather than three: it has to hold the compass, the
 // résumé above it and the lectern below without any of the three crowding the
-// others. The extra four rows go on the south side and the south half of the
+// others. The extra two rows go on the south side and the south half of the
 // building moves down with them, which keeps the north wings' wall thickness —
 // and their picture rail — exactly as it was.
 const REGIONS = [
   { rect: [10, 4, 9, 7], floor: 'wood', indoor: true, wing: 'automations' },
   { rect: [21, 4, 9, 7], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [11, 14, 18, 7], floor: 'marble', indoor: true },
-  { rect: [10, 24, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
-  { rect: [21, 24, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
+  { rect: [11, 14, 18, 5], floor: 'marble', indoor: true },
+  { rect: [10, 22, 9, 7], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [21, 22, 9, 7], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
   // is how thick the walls are. These replaced the old connecting corridors.
   { rect: [12, 11, 5, 3], floor: 'marble', indoor: true },
   { rect: [23, 11, 5, 3], floor: 'marble', indoor: true },
-  { rect: [12, 21, 5, 3], floor: 'marble', indoor: true },
-  { rect: [23, 21, 5, 3], floor: 'marble', indoor: true },
+  { rect: [12, 19, 5, 3], floor: 'marble', indoor: true },
+  { rect: [23, 19, 5, 3], floor: 'marble', indoor: true },
 ];
 
 // The building's footprint. Every tile inside it that isn't floor is solid
 // masonry, which is what fills the courtyards between the wings — a radius
 // around each room can't, because those courtyards open onto the map edge.
 // It reaches y=0 so the north wings get a full three-tile-tall wall above them.
-const MASONRY = [0, 0, 40, 36];
+const MASONRY = [0, 0, 40, 34];
 
 // Each wing gets its own accent, used on its rug, its vitrines and the icon
 // floating in its case, so the four rooms don't read as one room repeated.
@@ -84,18 +84,18 @@ export const WING_ROOMS = {
   automations: { cx: 14, cy: 7, entry: 'south', rail: 2, label: 'Automations', accent: '#2E4A52' },
   personal: { cx: 25, cy: 7, entry: 'south', rail: 2, label: 'Personal Projects', accent: '#6B3F28' },
   client: {
-    cx: 14, cy: 27, entry: 'north', rail: 22, label: 'Client Work',
+    cx: 14, cy: 25, entry: 'north', rail: 20, label: 'Client Work',
     accent: '#2F3A55', boardroom: true,
   },
   about: {
-    cx: 25, cy: 27, entry: 'north', rail: 22, label: 'About Me',
+    cx: 25, cy: 25, entry: 'north', rail: 20, label: 'About Me',
     accent: '#33373C', theatre: true,
   },
 };
 
 // The row of each wall that carries pictures and sconces (the "picture field",
 // two tiles above the floor it stands on).
-const RAIL = { northWings: 2, atrium: 12, southWings: 22 };
+const RAIL = { northWings: 2, atrium: 12, southWings: 20 };
 
 // Wing names, on banners hung across each arch. The first attempt put them as
 // inscriptions on the atrium floor, but the south pair sat on the very last row
@@ -105,8 +105,8 @@ const RAIL = { northWings: 2, atrium: 12, southWings: 22 };
 const BANNERS = [
   [232, 14 * TILE, 'AUTOMATIONS'],
   [408, 14 * TILE, 'PERSONAL'],
-  [232, 21 * TILE, 'CLIENT WORK'],
-  [408, 21 * TILE, 'ABOUT ME'],
+  [232, 19 * TILE, 'CLIENT WORK'],
+  [408, 19 * TILE, 'ABOUT ME'],
 ];
 
 // Wall sconces: [tile x, rail row]. Their pools are painted with the rest of
@@ -121,13 +121,13 @@ const SCONCES = [
 // Arch mouths, for the brass thresholds laid across them.
 const THRESHOLDS = [
   [12, 13, 5], [23, 13, 5],   // atrium -> north wings
-  [12, 21, 5], [23, 21, 5],   // atrium -> south wings
+  [12, 19, 5], [23, 19, 5],   // atrium -> south wings
 ];
 
 // The building's centre line, and where you start. The atrium's middle row is
-// 17: everything laid out in it — compass, résumé, lectern — hangs off that.
+// 16: everything laid out in it — compass, résumé, lectern — hangs off that.
 const AXIS = 320;
-const ATRIUM_MID = 17;
+const ATRIUM_MID = 16;
 export const START_PX = { x: AXIS, y: ATRIUM_MID * TILE + 12 };
 
 /* ------------------------------------------------------------------ */
@@ -346,7 +346,7 @@ function renderBackground() {
   // --- skylight, then the things laid into the floor ---
   // Light goes down first. Painting it over the rugs instead bleaches them
   // until they read as pools of water rather than textiles.
-  drawLightPool(c, AXIS - 80, ATRIUM_MID * TILE - 32, 160, 80, 0.55);
+  drawLightPool(c, AXIS - 80, ATRIUM_MID * TILE - 24, 160, 64, 0.55);
   for (const w of Object.values(WING_ROOMS)) {
     // no skylight over a cinema — the screen is the only light in that room
     if (w.theatre) continue;
@@ -357,10 +357,15 @@ function renderBackground() {
     drawLightPool(c, sx * TILE - 20, (ry + 2) * TILE, 56, 40, 0.8);
   }
 
-  drawInlay(c, AXIS, ATRIUM_MID * TILE + 8, 21);
+  // The compass is sized to the room: at five rows deep it has to share the
+  // floor with the lectern standing at the foot of it.
+  drawInlay(c, AXIS, ATRIUM_MID * TILE + 8, 16);
   for (const w of Object.values(WING_ROOMS)) {
     const mid = roomCentre(w);
-    drawRug(c, mid.x, mid.y, 5 * TILE, 3 * TILE, w.accent);
+    // the boardroom's rug turns with its table, so it frames it rather than
+    // letting both ends of the table hang off the edge
+    const [rw, rh] = w.boardroom ? [3, 5] : [5, 3];
+    drawRug(c, mid.x, mid.y, rw * TILE, rh * TILE, w.accent);
   }
 
   // brass thresholds across the doorways
@@ -523,9 +528,9 @@ function clientProjects(name) {
  * you get the work you did for them, which is what the plinth would have shown
  * anyway, only split three ways and attached to a face.
  *
- * The table is deliberately short of the walls. Four tiles leaves fourteen
- * pixels of floor past each client — enough for the droid, which is twelve
- * wide — so you can walk right round rather than reversing back out.
+ * The table stands end-on to the door rather than across it. Turned that way
+ * it leaves close to three tiles of clear floor down each side instead of two,
+ * so getting to the client at the far end is a walk rather than a squeeze.
  */
 function dressBoardroom(c, w) {
   const mid = roomCentre(w);
@@ -535,20 +540,21 @@ function dressBoardroom(c, w) {
     drawWhiteboard(c, (w.cx + d) * TILE + 9, w.rail * TILE + 6, w.cx * d);
   }
 
-  const table = { w: 4 * TILE, h: 2 * TILE };
+  const table = { w: 2 * TILE, h: 4 * TILE };
   addProp({ kind: 'table', x: mid.x, y: mid.y, w: table.w, h: table.h });
   map.colliders.push({
-    x: mid.x - table.w / 2,
-    y: mid.y - table.h / 2 - 7,          // the tucked-in chairs, too
-    w: table.w,
-    h: table.h + 14,
+    x: mid.x - table.w / 2 - 7,          // the tucked-in chairs, too
+    y: mid.y - table.h / 2,
+    w: table.w + 14,
+    h: table.h,
   });
 
-  // one client at each head of the table, one on the near side
+  // One client down each side and one at the far head. The near head is left
+  // open: it is where you come in, and where you end up standing.
   const spots = [
     { x: mid.x - table.w / 2 - 20, y: mid.y },
     { x: mid.x + table.w / 2 + 20, y: mid.y },
-    { x: mid.x, y: mid.y + table.h / 2 + 22 },
+    { x: mid.x, y: mid.y + table.h / 2 + 14 },
   ];
   CLIENTS.slice(0, spots.length).forEach((client, i) => {
     const at = spots[i];
@@ -566,13 +572,6 @@ function dressBoardroom(c, w) {
     addProp({ kind: 'person', x: at.x, y: at.y, seed: i + 2, who });
     map.colliders.push({ x: at.x - 6, y: at.y - 10, w: 12, h: 10 });
   });
-
-  // planting in the four corners, as the galleries have
-  for (const sx of [-4, 4]) {
-    for (const sy of [-2, 2]) {
-      addProp({ kind: 'plant', x: (w.cx + sx) * TILE + 8, y: (w.cy + sy) * TILE + 14 });
-    }
-  }
 }
 
 /**
@@ -596,11 +595,11 @@ function dressAtrium(c) {
     doc: RESUME,
   });
 
-  // The lectern below it, with the rules open on it. The 6px drop clears the
-  // book off the compass's brass ring — any higher and it reads as standing on
-  // the inlay rather than at the foot of it.
+  // The lectern below it, on the last row of floor. It has to go that low: the
+  // book stands 27px up from its foot, and any higher would park it in the
+  // middle of the compass rather than at the foot of it.
   const lx = AXIS;
-  const ly = (ATRIUM_MID + 3) * TILE + 6;
+  const ly = (ATRIUM_MID + 2) * TILE + 14;
   addProp({ kind: 'lectern', x: lx, y: ly });
   // The block is the foot, not the whole drawn height — a lectern is tall, and
   // blocking all of it would leave a sliver of floor to read it from.
@@ -610,11 +609,13 @@ function dressAtrium(c) {
     lift: 52,   // the bubble clears the book rather than sitting on it
   });
 
-  // three pictures down each side wall, each level with the one opposite
+  // Two pictures down each side wall, each level with the one opposite. Two,
+  // not three: the frames run up to 30px tall and a five-row wall can't take a
+  // third without them touching.
   const captions = (PAINTINGS && PAINTINGS.atrium) || [];
   let slot = 0;
   for (const [side, wallX] of [['w', 11 * TILE], ['e', 29 * TILE]]) {
-    for (const row of [ATRIUM_MID - 2, ATRIUM_MID, ATRIUM_MID + 2]) {
+    for (const row of [ATRIUM_MID - 1, ATRIUM_MID + 1]) {
       const y = row * TILE + 8;
       drawSideFrame(c, wallX, y, side, row * 7 + slot);
       const info = captions[slot];

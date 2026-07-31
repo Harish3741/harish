@@ -196,9 +196,9 @@ export const PAINTINGS = {
   // The About Me wing is a cinema and hangs nothing, so this key is unused.
   // It stays here so the four wings still read as a set.
   about: [null, null, null, null],
-  // The atrium hangs six, three down each side wall: west top to bottom first,
+  // The atrium hangs four, two down each side wall: west top to bottom first,
   // then east. Nothing goes on its end wall — the résumé has that.
-  atrium: [null, null, null, null, null, null],
+  atrium: [null, null, null, null],
 };
 
 // ---------------------------------------------------------------------------

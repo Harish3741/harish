@@ -266,6 +266,15 @@ body.is-handheld { overflow: auto; }
   background: linear-gradient(90deg, var(--brass-d), transparent);
 }
 
+.detail-client {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .detail-body {
   margin: 0;
   max-width: 58ch;

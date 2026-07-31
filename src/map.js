@@ -25,13 +25,13 @@
 
 import { TILE, COL, THEATRE } from './config.js';
 import {
-  drawMarble, drawWood, drawCarpet, drawStone,
+  drawMarble, drawWood, drawCarpet, drawStone, drawCarpetTile,
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
-  drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawWhiteboard,
-  drawMachine, drawBelt, drawPipeRun, drawHazardLine,
+  drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawDownlight,
+  drawMachine, drawBelt, drawPipeRun, drawHazardLine, drawDrums,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
@@ -59,7 +59,7 @@ const REGIONS = [
   { rect: [10, 5, 9, 6], floor: 'stone', indoor: true, wing: 'automations' },
   { rect: [21, 5, 9, 6], floor: 'wood', indoor: true, wing: 'personal' },
   { rect: [12, 14, 16, 5], floor: 'marble', indoor: true },
-  { rect: [10, 22, 9, 6], floor: 'wood', indoor: true, wing: 'client' },
+  { rect: [10, 22, 9, 6], floor: 'office', indoor: true, wing: 'client' },
   { rect: [21, 22, 9, 6], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
   // Arches through the shared walls: five tiles wide, three deep because that
@@ -90,18 +90,19 @@ const MASONRY = [0, 0, 40, 33];
 // the doorway goes to the opposite side of the plinth.
 export const WING_ROOMS = {
   automations: {
-    cx: 14, entry: 'south', rail: 3, label: 'Automations',
+    cx: 14, entry: 'south', rail: 3, label: 'Automations', banner: 'AUTOMATIONS',
     accent: '#2E4A52', machineHall: true,
   },
   personal: {
-    cx: 25, entry: 'south', rail: 3, label: 'Personal Projects', accent: '#6B3F28',
+    cx: 25, entry: 'south', rail: 3, label: 'Personal Projects', banner: 'PERSONAL',
+    accent: '#6B3F28',
   },
   client: {
-    cx: 14, entry: 'north', rail: 20, label: 'Client Work',
+    cx: 14, entry: 'north', rail: 20, label: 'Client Work', banner: 'CLIENT WORK',
     accent: '#2F3A55', boardroom: true,
   },
   about: {
-    cx: 25, entry: 'north', rail: 20, label: 'About Me',
+    cx: 25, entry: 'north', rail: 20, label: 'About Me', banner: 'ABOUT ME',
     accent: '#33373C', theatre: true,
   },
 };
@@ -110,18 +111,6 @@ export const WING_ROOMS = {
 // two tiles above the floor it stands on).
 const RAIL = { northWings: 3, atrium: 12, southWings: 20 };
 
-// Wing names, on banners hung across each arch. The first attempt put them as
-// inscriptions on the atrium floor, but the south pair sat on the very last row
-// of marble and read as though they were outside the building. A banner is tied
-// to its opening, unmistakably indoors, and you walk under it.
-// [centre x px, y px of the arch mouth on the atrium side, text]
-const BANNERS = [
-  [232, 14 * TILE, 'AUTOMATIONS'],
-  [408, 14 * TILE, 'PERSONAL'],
-  [232, 19 * TILE, 'CLIENT WORK'],
-  [408, 19 * TILE, 'ABOUT ME'],
-];
-
 // Wall sconces: [tile x, rail row]. Their pools are painted with the rest of
 // the lighting, before the walls go down, so the glow can't spill onto plaster.
 const SCONCES = [
@@ -129,8 +118,8 @@ const SCONCES = [
   // the atrium is sixteen wide, so its end wall only shows either side of
   // the résumé — x11 and x28 are its side walls now, seen from above
   ...[18, 21].map((x) => [x, RAIL.atrium]),
-  // x22 and x28 would land in the screening room, which has no torches
-  ...[11, 17].map((x) => [x, RAIL.southWings]),
+  // Neither south wing takes a torch: the cinema is dark on purpose and the
+  // boardroom is lit by the downlights dressBoardroom paints on its wall.
 ];
 
 // Arch mouths, for the brass thresholds laid across them.
@@ -348,6 +337,7 @@ function renderBackground() {
       if (f === 'marble') drawMarble(c, px, py, x, y);
       else if (f === 'carpet') drawCarpet(c, px, py, x, y);
       else if (f === 'stone') drawStone(c, px, py, x, y);
+      else if (f === 'office') drawCarpetTile(c, px, py, x, y);
       else drawWood(c, px, py, x, y);
     }
   }
@@ -490,15 +480,17 @@ function decorate(c) {
   // ---- depth-sorted props ----
 
   for (const p of map.plinths) {
+    if (p.bare) continue;   // machines and the boardroom table are their own prop
     addProp({ kind: 'plinth', x: p.x, y: p.y, id: p.id });
   }
 
-  // Banners hang at the atrium mouth of each arch, so the droid passes under
-  // them on the way through.
-  for (const [bx, by, text] of BANNERS) {
-    const wing = Object.values(WING_ROOMS).find((w) => w.cx * TILE + 8 === bx
-      && (w.entry === 'south' ? by < 16 * TILE : by > 16 * TILE));
-    addProp({ kind: 'banner', x: bx, y: by, text, accent: wing ? wing.accent : COL.velvet });
+  // A wing's name hangs just inside its own doorway rather than on the atrium
+  // wall opposite it, so the title belongs to the room it names and the atrium
+  // is left to the résumé. You still walk under it on the way in.
+  for (const [id, w] of Object.entries(WING_ROOMS)) {
+    const box = roomBox(id);
+    const by = w.entry === 'south' ? box.y1 - 21 : box.y0;
+    addProp({ kind: 'banner', x: box.cx, y: by, text: w.banner, accent: w.accent });
   }
 
   for (const [id, w] of Object.entries(WING_ROOMS)) {
@@ -535,10 +527,10 @@ function decorate(c) {
     if (p.kind === 'plant') map.colliders.push({ x: p.x - 6, y: p.y - 9, w: 12, h: 9 });
     if (p.kind === 'statue') map.colliders.push({ x: p.x - 7, y: p.y - 15, w: 14, h: 15 });
     if (p.kind === 'vitrine') map.colliders.push({ x: p.x - 16, y: p.y - 11, w: 32, h: 11 });
-    if (p.kind === 'bench') {
-      // No collider: you sit *on* a bench, so walking into it has to be allowed.
-      map.seats.push({ x: p.x, y: p.y - 6, label: 'Bench' });
-    }
+    // Benches are decoration. They used to be sittable, which meant no
+    // collider — you cannot walk into something you sit on — so now that they
+    // are not, they get one and stop being furniture you stroll through.
+    if (p.kind === 'bench') map.colliders.push({ x: p.x - 12, y: p.y - 8, w: 24, h: 8 });
   }
 
   // draw order is fixed, so sort once rather than every frame
@@ -578,74 +570,62 @@ function dressMachineHall(c, w, box) {
   addProp({ kind: 'belt', x: left, y: beltY + beltH, w: run, h: beltH });
   map.colliders.push({ x: left, y: beltY, w: run, h: beltH });
 
-  // Three behind the belt, then one against each side wall down by the door.
-  // The back three are read from the safety line, which is why their anchor is
-  // the belt's near edge and not the cabinet — measured from the cabinet, the
-  // belt pushes you out of range.
+  // Three machines behind the belt, wired to each other. Any of them opens the
+  // wing's whole list — they are one plant, not three exhibits, and picking a
+  // flow off a list beats walking between cabinets to find it.
   //
-  // The back row is bunched into the middle rather than spread across the run.
-  // Spread out, its outer two sat close enough to the pair by the door that
-  // standing in front of one selected the other: the interact radius picks the
-  // nearest thing, and 17px sideways beats 24px forwards.
-  const bays = [];
-  for (const dx of [-32, 0, 32]) {
-    bays.push({ x: box.cx + dx, y: floorY, anchor: beltY + beltH, lift: 74 });
-  }
-  for (const bx of [box.x0 + 12, box.x1 - 12]) {
-    bays.push({ x: bx, y: box.y1 - 6, anchor: box.y1 - 6, lift: 46 });
-  }
-
+  // They read from the safety line, which is why the interact point is the
+  // belt's near edge and not the cabinet: measured from the cabinet, the belt
+  // pushes you far enough back to fall out of range.
+  //
+  // They spread across the run rather than bunching in the middle. They were
+  // bunched when two more machines stood by the door and the interact radius
+  // kept picking the wrong one; now that all three open the same list, their
+  // radii can overlap as much as they like.
   const mw = 24;
-  bays.forEach((bay, i) => {
-    const project = projects[i] || null;
+  const pitch = run / 3;
+  for (let i = 0; i < 3; i++) {
+    const mx = Math.round(left + pitch * (i + 0.5));
     addProp({
-      kind: 'machine', x: bay.x, y: bay.y, w: mw, seed: i + 1,
-      accent: w.accent, running: !!project,
+      kind: 'machine', x: mx, y: floorY, w: mw, seed: i + 1,
+      accent: w.accent, running: projects.length > 0,
     });
-    map.colliders.push({ x: bay.x - mw / 2, y: bay.y - 10, w: mw, h: 10 });
-    map.documents.push({
-      x: bay.x,
-      y: bay.anchor,
-      label: project ? project.title : `Bay ${i + 1}`,
-      blurb: project ? 'Running' : 'Idle',
-      hint: 'PRESS  E  TO  INSPECT',
-      lift: bay.lift,
-      doc: project || EMPTY_BAY,
+    map.colliders.push({ x: mx - mw / 2, y: floorY - 10, w: mw, h: 10 });
+    map.plinths.push({
+      id: 'automations',
+      x: mx,
+      y: beltY + beltH,
+      label: w.label,
+      accent: w.accent,
+      bare: true,            // the machine is the prop; no plinth stands here
+      lift: 74,              // the bubble clears the cabinet behind the belt
     });
-  });
-}
+  }
 
-// What a machine with nothing behind it says when you press E at it. Better
-// than a machine that swallows the keypress: the room has five bays and this
-// explains why one of them is dark.
-const EMPTY_BAY = {
-  title: 'Bay empty',
-  tagline: 'Nothing wired up here yet.',
-  description: 'This machine is idle because the Automations wing has fewer '
-    + 'entries than the room has bays. Add one to WINGS → automations → '
-    + 'projects in src/data/projects.js and it starts running.',
-};
-
-/** The projects tagged with one client's name, in the order they're written. */
-function clientProjects(name) {
-  const wing = wingById('client');
-  return ((wing && wing.projects) || []).filter((p) => p.client === name);
+  // Stock at either end of the line, where two more machines used to stand.
+  // Three cabinets is the plant; the drums are what it is fed and what it
+  // fills, and they fill the corners by the door without asking to be pressed.
+  for (const bx of [box.x0 + 16, box.x1 - 16]) {
+    addProp({ kind: 'drums', x: bx, y: box.y1 - 8, seed: bx });
+    map.colliders.push({ x: bx - 13, y: box.y1 - 20, w: 26, h: 12 });
+  }
 }
 
 /**
- * The boardroom. A table down the middle, three clients standing round it, and
- * charts on the wall rather than pictures. No plinth: press E on a client and
- * you get the work you did for them, which is what the plinth would have shown
- * anyway, only split three ways and attached to a face.
+ * The boardroom. A table end-on to the door with three clients standing round
+ * it. The table is what you press: the clients used to be three separate
+ * conversations, which meant walking round the table to find a particular
+ * project. One list at the table is quicker to read and quicker to leave, and
+ * the three of them are still who the room is about.
  *
- * The table stands end-on to the door rather than across it. Turned that way
- * it leaves close to three tiles of clear floor down each side instead of two,
- * so getting to the client at the far end is a walk rather than a squeeze.
+ * Turned end-on the table leaves close to three tiles of clear floor down each
+ * side instead of two, so getting round it is a walk rather than a squeeze.
  */
 function dressBoardroom(c, w, box) {
-  // charts either side of the arch, clear of the sconces at ±3 tiles
-  for (const d of [-4, 4]) {
-    drawWhiteboard(c, (w.cx + d) * TILE + 9, w.rail * TILE + 6, w.cx * d);
+  // Downlights rather than torches. A boardroom lit by an open flame was the
+  // one thing in the building that read as a mistake instead of a choice.
+  for (const d of [-3, 3]) {
+    drawDownlight(c, (w.cx + d) * TILE + 8, w.rail * TILE + 7);
   }
 
   const table = { w: 2 * TILE, h: 3 * TILE };
@@ -656,9 +636,18 @@ function dressBoardroom(c, w, box) {
     w: table.w + 14,
     h: table.h,
   });
+  map.plinths.push({
+    id: 'client',
+    x: box.cx,
+    y: box.cy,
+    label: w.label,
+    accent: w.accent,
+    bare: true,      // the table is the prop
+    lift: 46,
+  });
 
-  // One client down each side and one at the far head. The near head is left
-  // open: it is where you come in, and where you end up standing.
+  // One client down each side and one at the far head, all three decoration.
+  // The near head is left open: it is where you come in, and where you stand.
   const spots = [
     { x: box.cx - table.w / 2 - 20, y: box.cy },
     { x: box.cx + table.w / 2 + 20, y: box.cy },
@@ -666,18 +655,7 @@ function dressBoardroom(c, w, box) {
   ];
   CLIENTS.slice(0, spots.length).forEach((client, i) => {
     const at = spots[i];
-    const who = `client${i}`;
-    map.people.push({
-      x: at.x,
-      y: at.y,
-      label: client.name,
-      list: {
-        title: client.name,
-        blurb: client.greeting || client.role || '',
-        entries: clientProjects(client.name),
-      },
-    });
-    addProp({ kind: 'person', x: at.x, y: at.y, seed: i + 2, who });
+    addProp({ kind: 'person', x: at.x, y: at.y, seed: i + 2, who: `client${i}` });
     map.colliders.push({ x: at.x - 6, y: at.y - 10, w: 12, h: 10 });
   });
 }
@@ -825,6 +803,7 @@ export function drawProp(c, p, ox, oy, t) {
     case 'table': drawBoardTable(c, x, y, p.w, p.h); break;
     case 'machine': drawMachine(c, x, y, p.w, p.seed, t, p.accent, p.running); break;
     case 'belt': drawBelt(c, x, y - p.h, p.w, p.h, t); break;
+    case 'drums': drawDrums(c, x, y, p.seed || 0); break;
     case 'bench': drawBench(c, x, y); break;
     case 'rope': drawRopeLine(c, x, y, p.span); break;
     case 'lectern': drawLectern(c, x, y, t); break;

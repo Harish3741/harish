@@ -182,6 +182,7 @@ function renderWing(wing) {
     // the grey metadata line, the way a save file shows its date and mode
     const bits = [];
     if (entry.year) bits.push(entry.year);
+    if (entry.client) bits.push(`for ${entry.client}`);
     if (entry.tech && entry.tech.length) bits.push(entry.tech.join(', '));
     if (bits.length) text.appendChild(el('p', 'mc-world-meta', bits.join('  ·  ')));
 

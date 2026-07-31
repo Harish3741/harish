@@ -8,9 +8,9 @@ No two rooms are dressed the same way.
 
 | Wing | What's in it | Dressed as |
 | --- | --- | --- |
-| North-west | Automations | a machine hall — a belt, and five machines |
+| North-west | Automations | a machine hall — a belt and three machines |
 | North-east | Personal projects | a gallery — plinth, pictures, benches |
-| South-west | Client work | a boardroom — a table and three clients |
+| South-west | Client work | a boardroom — carpet tile, a table, three clients |
 | South-east | About me | a cinema — one screen, one chair |
 
 You start in the middle of the atrium, standing on the compass. Walk to the
@@ -77,7 +77,7 @@ picture inside the file, which is what the standalone build needs.
 The atrium hangs four, two down each side wall — `PAINTINGS.atrium` runs west
 top-to-bottom, then east. Its end wall carries the résumé instead. Only the
 Personal Projects wing is still a gallery; the other three hang pipework,
-charts and nothing at all, so their `PAINTINGS` keys go unused.
+downlights and nothing at all, so their `PAINTINGS` keys go unused.
 
 ### The résumé and the rules
 
@@ -97,47 +97,45 @@ export const RESUME = {
 
 ### The machine hall
 
-The Automations wing is a plant room: a row of machines against the back wall,
-a conveyor running past their feet with crates on it, pipework overhead and a
-safety line painted on the floor. There's no plinth — you stand at the line and
-press <kbd>E</kbd> at whichever machine you want.
+The Automations wing is a plant room: three machines along the back wall, a
+conveyor running past their feet with crates on it, pipework overhead, a safety
+line painted on the floor and drums stacked in the corners.
 
-There's no extra wiring. One machine per entry in `WINGS → automations →
-projects`, in order. The room has five bays — three behind the belt, one
-against each side wall by the door — and all five can be pressed. A bay with
-nothing behind it stands there with its lamps out and its needle at rest, and
-says so when you inspect it. A sixth entry still shows in the skip-to-list;
-there just isn't a sixth place to stand a machine.
+The three machines are wired to each other — press <kbd>E</kbd> at any of them
+and the wing's whole list opens. They are one plant, not three exhibits, and
+picking a flow off a list beats walking between cabinets to find it. Nothing to
+configure: add entries to `WINGS → automations → projects` and they're in the
+list.
 
 ### The boardroom
 
-The Client Work wing is a boardroom, not a gallery: a table standing end-on to
-the door and three clients round it — one down each side, one at the far head.
-There's no plinth. Press <kbd>E</kbd> on a client and you get the work you did
-for them.
+The Client Work wing is a boardroom, not a gallery: office carpet tile, two
+downlights, a table standing end-on to the door and three clients round it —
+one down each side, one at the far head.
 
-The wiring is one field. Tag a project with `client:` and it appears at that
-person's place at the table; `CLIENTS` gives the three of them a name, a line
-to greet you with, and a look.
+**The table is what you press.** Get anywhere near it and the wing's list
+opens. The three clients used to be three separate conversations, which meant
+walking round the table to find a particular project; one list at the table is
+quicker to read and quicker to leave. They are still who the room is about.
+
+`CLIENTS` gives the three of them a name and a look, and `client:` on a project
+puts that name on the entry.
 
 ```js
 // in WINGS → client → projects
 { title: 'Invoice reconciler', client: 'Acme Ltd', … }
 
 export const CLIENTS = [
-  { name: 'Acme Ltd',                       // must match the `client` field
+  { name: 'Acme Ltd',
     role: 'Logistics, badly organised',
-    greeting: 'You built the thing that runs our mornings.',
     hair: 'short',                          // or 'long'
     palette: { K: '#2E2018', S: '#C98F63', T: '#3A5A78', P: '#2A2E38' } },
   // …two more
 ];
 ```
 
-Three is what the room is built for — fewer leaves a place at the table empty.
-A project with no `client` still shows in the skip-to-list; it just isn't
-standing at the table. A client with nothing matching still turns up and says
-the shelf is bare.
+Three is what the room is built for — fewer leaves a place at the table
+empty.
 
 ### The screening room
 
@@ -195,7 +193,7 @@ modules declare the same top-level name.
 | | |
 | --- | --- |
 | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> | walk |
-| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture or the résumé, sit on a bench |
+| <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture or the résumé, take a seat in the cinema |
 | <kbd>Esc</kbd> | close whatever is open |
 
 Leave the droid alone for nine seconds and it powers down; any key wakes it.

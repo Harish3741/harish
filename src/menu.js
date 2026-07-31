@@ -100,11 +100,6 @@ export function openMenu(wingId, closedCallback) {
   openEntries(wing.title, wing.blurb, wing.projects, closedCallback);
 }
 
-/** What a client at the boardroom table hands you: { title, blurb, entries }. */
-export function openPersonList(list, closedCallback) {
-  openEntries(list.title, list.blurb, list.entries, closedCallback);
-}
-
 export function closeMenu() {
   if (!open) return;
   open = false;
@@ -211,6 +206,13 @@ function renderDetail() {
       fig.appendChild(slot);
     }
     detailEl.appendChild(fig);
+  }
+
+  if (entry.client) {
+    const cl = document.createElement('p');
+    cl.className = 'detail-client';
+    cl.textContent = `For ${entry.client}`;
+    detailEl.appendChild(cl);
   }
 
   if (entry.description) {

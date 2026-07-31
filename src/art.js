@@ -251,6 +251,42 @@ export function drawStone(ctx, px, py, tx, ty) {
   }
 }
 
+/**
+ * Commercial carpet tile, for the boardroom. Laid the way it is in every office
+ * in the world: square tiles, each one quarter-turned against its neighbour, so
+ * the pile catches the light in alternating directions and the grid only just
+ * shows. Cool grey-blue, to sit under the navy rug rather than fight it.
+ */
+export function drawCarpetTile(ctx, px, py, tx, ty) {
+  const turned = (tx + ty) % 2 === 0;
+  ctx.fillStyle = turned ? '#6C7480' : '#67707B';
+  ctx.fillRect(px, py, TILE, TILE);
+
+  // pile, running one way on this tile and the other way on the next
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+  for (let i = 1; i < TILE; i += 3) {
+    if (turned) ctx.fillRect(px + i, py, 1, TILE);
+    else ctx.fillRect(px, py + i, TILE, 1);
+  }
+  ctx.fillStyle = 'rgba(20, 24, 30, 0.14)';
+  for (let i = 2; i < TILE; i += 6) {
+    if (turned) ctx.fillRect(px + i, py, 1, TILE);
+    else ctx.fillRect(px, py + i, TILE, 1);
+  }
+
+  // the seam between tiles, barely there
+  ctx.fillStyle = 'rgba(20, 24, 30, 0.18)';
+  ctx.fillRect(px, py, TILE, 1);
+  ctx.fillRect(px, py, 1, TILE);
+
+  // a fleck or two of the darker fibre in the weave
+  const h = hash(tx * 5, ty * 3);
+  if (h > 0.72) {
+    ctx.fillStyle = 'rgba(20, 24, 30, 0.22)';
+    ctx.fillRect(px + Math.floor(h * 11) + 2, py + Math.floor(h * 9) + 3, 2, 1);
+  }
+}
+
 export function drawGrass(ctx, px, py, tx, ty) {
   ctx.fillStyle = COL.grass;
   ctx.fillRect(px, py, TILE, TILE);
@@ -992,6 +1028,74 @@ export function drawPipeRun(ctx, x, y, w, seed) {
   ctx.fillRect(x + w - 6, y + 8, 1, 3);
 }
 
+/**
+ * A pair of steel drums, of the sort that get wheeled in and out of a plant
+ * room. They stand where two more machines used to: they fill the corner
+ * without asking to be pressed. (px, py) is the bottom-centre.
+ */
+export function drawDrums(ctx, px, py, seed) {
+  const h = hash(seed, 23);
+  ctx.fillStyle = COL.shadow;
+  ctx.fillRect(px - 13, py - 3, 26, 3);
+
+  // two side by side, the far one set back and a shade darker
+  const drums = [
+    [px - 12, py - 4, 11, 16, '#6E6A62', '#8A867C'],
+    [px + 1, py - 8, 11, 16, '#5E5A54', '#7A766E'],
+  ];
+  for (const [x, y, w, ht, body, lit] of drums) {
+    ctx.fillStyle = body;
+    ctx.fillRect(x, y - ht, w, ht);
+    ctx.fillStyle = lit;
+    ctx.fillRect(x, y - ht, 3, ht);
+    ctx.fillStyle = '#43403A';
+    ctx.fillRect(x + w - 2, y - ht, 2, ht);
+    // rolling hoops
+    ctx.fillStyle = '#43403A';
+    ctx.fillRect(x, y - ht + 4, w, 1);
+    ctx.fillRect(x, y - 5, w, 1);
+    // the lid, seen from just above
+    ctx.fillStyle = lit;
+    ctx.fillRect(x + 1, y - ht, w - 2, 2);
+    ctx.fillStyle = COL.brassDim;
+    ctx.fillRect(x + 3, y - ht + 1, 3, 1);
+    // a stencilled band, so they aren't two blank cylinders
+    ctx.fillStyle = h > 0.5 ? 'rgba(220, 166, 70, 0.45)' : 'rgba(156, 64, 56, 0.45)';
+    ctx.fillRect(x + 1, y - ht + 7, w - 2, 3);
+  }
+}
+
+/**
+ * A recessed downlight, for a room that would not have an open flame in it.
+ * Baked with the walls rather than drawn live: an LED does not flicker, and the
+ * whole point of it is that it is the calm opposite of a torch.
+ */
+export function drawDownlight(ctx, px, py) {
+  // The cone first, so the housing sits on top of it. It has to be a long,
+  // widening wash rather than a neat rectangle, or the fitting reads as a
+  // blank plaque hung on the wall instead of as something switched on.
+  for (let i = 8; i >= 1; i--) {
+    ctx.fillStyle = `rgba(238, 240, 232, ${(0.020 * i).toFixed(3)})`;
+    ctx.fillRect(px - 3 - i * 2, py + 5 + (8 - i) * 2, 6 + i * 4, 3);
+  }
+
+  // housing, recessed and dark so the lamp inside it looks bright
+  ctx.fillStyle = '#1E2126';
+  ctx.fillRect(px - 8, py - 1, 16, 7);
+  ctx.fillStyle = '#575D66';
+  ctx.fillRect(px - 8, py - 1, 16, 1);
+  ctx.fillStyle = '#101317';
+  ctx.fillRect(px - 8, py + 5, 16, 1);
+
+  // the lamp, with a hot centre
+  ctx.fillStyle = '#DCE4E8';
+  ctx.fillRect(px - 6, py + 1, 12, 4);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(px - 4, py + 2, 8, 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.fillRect(px - 6, py + 1, 12, 1);
+}
+
 /** A painted safety line on the floor: brass and dark, to stay in palette. */
 export function drawHazardLine(ctx, x, y, w) {
   ctx.fillStyle = 'rgba(58, 42, 30, 0.35)';
@@ -1088,45 +1192,6 @@ export function drawBoardTable(ctx, cx, cy, w, h) {
     ctx.fillStyle = '#6B4830';
     ctx.fillRect(mx + 1, my + 1, 3, 3);
   }
-}
-
-/**
- * A chart pinned up on the wall — the boardroom's answer to a painting. Bars
- * rather than a landscape, and the trend always goes up, because nobody pins up
- * the other kind.
- */
-export function drawWhiteboard(ctx, px, py, seed) {
-  const w = 18;
-  const ht = 16;
-  const x = px - Math.floor(w / 2);
-
-  ctx.fillStyle = 'rgba(58, 42, 30, 0.22)';
-  ctx.fillRect(x + 2, py + 2, w, ht);
-
-  // board and its aluminium edge
-  ctx.fillStyle = '#8A8578';
-  ctx.fillRect(x, py, w, ht);
-  ctx.fillStyle = '#F3F1E8';
-  ctx.fillRect(x + 1, py + 1, w - 2, ht - 3);
-  ctx.fillStyle = '#C9C4B4';
-  ctx.fillRect(x + 1, py + ht - 3, w - 2, 2);
-
-  // axes and bars
-  ctx.fillStyle = 'rgba(60, 60, 60, 0.55)';
-  ctx.fillRect(x + 3, py + 3, 1, ht - 7);
-  ctx.fillRect(x + 3, py + ht - 5, w - 6, 1);
-  for (let i = 0; i < 3; i++) {
-    const bh = 3 + Math.floor(hash(seed + i, 7) * 3) + i * 2;
-    ctx.fillStyle = i === 2 ? COL.velvet : '#4F7A8C';
-    ctx.fillRect(x + 5 + i * 4, py + ht - 5 - bh, 3, bh);
-  }
-
-  // a pen on the tray, and the pins holding it up
-  ctx.fillStyle = hash(seed, 11) > 0.5 ? COL.velvet : '#3F5A7A';
-  ctx.fillRect(x + w - 7, py + ht - 3, 4, 1);
-  ctx.fillStyle = COL.brass;
-  ctx.fillRect(x + 2, py - 1, 2, 2);
-  ctx.fillRect(x + w - 4, py - 1, 2, 2);
 }
 
 /**

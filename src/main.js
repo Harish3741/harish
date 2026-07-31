@@ -19,7 +19,7 @@ import {
   player, spawnAt, movePlayer, updatePlayer, drawPlayer, focusY, toggleSeat, rouse,
 } from './player.js';
 import {
-  initMenu, openMenu, openArtwork, openDocument, openPersonList, isMenuOpen, closeMenu,
+  initMenu, openMenu, openArtwork, openDocument, isMenuOpen, closeMenu,
 } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
@@ -157,10 +157,6 @@ function update(dt, ts) {
       clearHeldKeys();
       // drop any keys held while the menu was up, or the droid bolts on close
       openMenu(near.id, clearHeldKeys);
-    } else if (near.list) {
-      // a client at the boardroom table: the work you did for them
-      clearHeldKeys();
-      openPersonList(near.list, clearHeldKeys);
     } else if (near.wing) {
       // the person by the door: their summary is the wing's own entries
       clearHeldKeys();
@@ -292,7 +288,7 @@ function drawPrompt(ts, ox, oy) {
   const label = near.label.toUpperCase();
   const hint = near.hint ? near.hint
     : near.id ? 'PRESS  E'
-      : near.wing || near.list ? 'PRESS  E  TO  TALK'
+      : near.wing ? 'PRESS  E  TO  TALK'
         : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
           : near.theatre ? 'PRESS  E  TO  WATCH'
             : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';

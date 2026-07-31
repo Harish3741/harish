@@ -28,9 +28,6 @@ const PAN_SECONDS = 2.2;
 // so nobody is ever held there.
 const VISIT_KEY = 'harish-museum-visited';
 
-// How far above the droid the camera sits while the title card is up.
-const CARD_LIFT = 58;
-
 export const intro = {
   phase: 'walk',
   t: 0,
@@ -66,7 +63,7 @@ export function startIntro() {
 
 /** Jump straight to the title card. */
 function cutToTitle() {
-  centreCamera(player.x, focusY() - CARD_LIFT);
+  centreCamera(player.x, focusY());
   intro.phase = 'title';
   intro.t = 0;
 }
@@ -93,7 +90,11 @@ export function updateIntro(dt) {
   }
 
   if (intro.phase === 'settle') {
-    followCamera(player.x, focusY() - CARD_LIFT, 0.09);
+    // The camera does not move again once the pan has landed. It used to lift
+    // to drop the droid into the lower third, which read as the shot jerking
+    // back up the moment the card appeared; the card is laid around the droid
+    // instead, which is the same framing without moving the camera to get it.
+    followCamera(player.x, focusY(), 0.09);
     if (anyPressed() || intro.t > 0.7) {
       intro.phase = 'title';
       intro.t = 0;
@@ -103,9 +104,7 @@ export function updateIntro(dt) {
 
   if (intro.phase === 'title') {
     intro.cardAlpha = Math.min(1, intro.cardAlpha + dt * 2.4);
-    // sit the camera high so the droid drops into the lower third, clear of
-    // the title rather than behind it
-    followCamera(player.x, focusY() - CARD_LIFT, 0.06);
+    followCamera(player.x, focusY(), 0.06);
     // require the card to be readable before a keypress can dismiss it,
     // otherwise a held key from the skip blows straight through it
     if (intro.cardAlpha >= 1 && intro.t > 0.35 && anyPressed()) {
@@ -157,9 +156,12 @@ export function drawIntroOverlay(ctx, now) {
   ctx.fillStyle = 'rgba(26, 19, 15, 0.87)';
   ctx.fillRect(0, 0, view.w, view.h);
 
-  // laid out from the middle, since the logical viewport follows the window
+  // Laid out in fractions of the viewport, which follows the window, and
+  // around the droid rather than over it: the title block sits above centre
+  // and the prompt below it, leaving the middle of the frame to the droid the
+  // camera is centred on.
   const cx = Math.round(view.w / 2);
-  const top = Math.round(view.h * 0.36);
+  const top = Math.round(view.h * 0.20);
 
   // brass rules bracketing the name
   const nameW = textWidth(SITE.name) * 4;
@@ -175,9 +177,9 @@ export function drawIntroOverlay(ctx, now) {
 
   drawTextCentered(ctx, SITE.tagline, cx, top + 46, { color: COL.brass });
 
-  // blinking prompt
+  // blinking prompt, below the droid
   if (Math.floor(now / 500) % 2 === 0) {
-    drawTextCentered(ctx, 'PRESS START', cx, top + 78, {
+    drawTextCentered(ctx, 'PRESS START', cx, Math.round(view.h * 0.62), {
       color: COL.paper,
       scale: 2,
       shadow: 'rgba(0,0,0,0.5)',

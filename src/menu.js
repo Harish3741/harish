@@ -156,7 +156,9 @@ function renderList() {
       item.appendChild(launch);
     }
 
-    item.addEventListener('mouseenter', () => select(i));
+    // Click, not hover. Selecting on mouseenter meant the panel changed under
+    // you on the way to somewhere else — crossing the rail to reach the close
+    // button loaded every project on the way past.
     item.addEventListener('click', () => select(i));
     listEl.appendChild(item);
   });

@@ -50,7 +50,7 @@ export const WINGS = [
         title: 'Job Scraper',
         launch: 'Jun 2026',
         images: [{ src: 'img/automations/job-scraper-workflow.png',
-          caption: 'The flow: two branches in, dedupe and score, one sheet out.' }],
+          caption: 'searches jobs, scores them and stores them in a sheet' }],
         tagline: 'An n8n workflow that finds job postings and scores them '
           + 'against my own criteria.',
         description: [
@@ -157,13 +157,13 @@ export const WINGS = [
         client: 'Hannah',
         images: [
           { src: 'img/client/01-home-hero-desktop.jpg',
-            caption: 'The landing page: what it is, where it is, and the one '
-              + 'thing to do next.' },
+            caption: 'The landing page' },
           { src: 'img/client/08-booking-form-conditional-desktop.png',
-            caption: 'The waiting list form. It posts to Apps Script, which '
+            caption: 'The waiting list form. It posts to Apps Script which '
               + 'notifies the owner.' },
           { src: 'img/client/nail-studio-gallery.jpg',
-            caption: 'The gallery — recent work, tap any image to view.' },
+            caption: 'A gallery of recent work. User can tap any image to '
+              + 'view.' },
         ],
         tagline: 'A customised website to suit a nail tech\'s needs.',
         description:

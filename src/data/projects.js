@@ -10,7 +10,7 @@
 //
 //   {
 //     title:       'Invoice reconciler',
-//     year:        '2025',
+//     launch:      'Mar 2025',   // when it went live. A bare year is fine too
 //     tagline:     'One line. What it is, in plain words.',
 //     description: 'A paragraph. What problem it solved, what you decided, '
 //                + 'what happened after.',
@@ -48,7 +48,7 @@ export const WINGS = [
       {
         title: 'Placeholder — automation one',
         image: null,
-        year: '2025',
+        launch: '2025',
         tagline: 'Replace me with something that runs on a schedule.',
         description:
           'This is placeholder copy so the wing has something in it while the '
@@ -61,7 +61,7 @@ export const WINGS = [
       {
         title: 'Placeholder — automation two',
         image: null,
-        year: '2024',
+        launch: '2024',
         tagline: 'A second slot, so the list has something to scroll.',
         description:
           'Same idea. Delete this entry entirely if you only have one — the '
@@ -72,7 +72,7 @@ export const WINGS = [
       {
         title: 'Placeholder — automation three',
         image: null,
-        year: '2024',
+        launch: '2024',
         tagline: 'The machine hall has five bays.',
         description:
           'Five machines stand in that room and all five can be pressed. An '
@@ -84,7 +84,7 @@ export const WINGS = [
       {
         title: 'Placeholder — automation four',
         image: null,
-        year: '2023',
+        launch: '2023',
         tagline: 'Fourth bay.',
         description: 'Replace or delete. Nothing breaks either way.',
         tech: ['n8n', 'Postgres'],
@@ -93,7 +93,7 @@ export const WINGS = [
       {
         title: 'Placeholder — automation five',
         image: null,
-        year: '2023',
+        launch: '2023',
         tagline: 'Fifth and last bay.',
         description:
           'A sixth entry would still show in the skip-to-list; the room only '
@@ -112,7 +112,7 @@ export const WINGS = [
       {
         title: 'Placeholder — personal one',
         image: null,
-        year: '2025',
+        launch: '2025',
         tagline: 'The thing you made because you wanted it to exist.',
         description:
           'Placeholder. Good candidates for this wing: the side project that '
@@ -124,7 +124,7 @@ export const WINGS = [
       {
         title: 'This museum',
         image: null,
-        year: '2026',
+        launch: '2026',
         tagline: 'The site you are standing in.',
         description:
           'A third-person portfolio built on a canvas: a hand-drawn pixel '
@@ -143,17 +143,47 @@ export const WINGS = [
     blurb: 'Built for other people, to a brief and a deadline.',
     projects: [
       {
+        title: 'Scorify — NSW Selective Test Prep',
+        launch: 'Feb 2026',
+        images: [],
+        tagline: 'Subscription practice platform for the NSW Selective High '
+          + 'School Placement Test.',
+        description:
+          'Year 5 and 6 students preparing for the NSW Selective test needed '
+          + 'practice that matched the real paper. So I built a subscription '
+          + 'platform that mirrors the exam format: topic-based question sets '
+          + 'and five full mock papers per subject across Reading, '
+          + 'Mathematical Reasoning, Thinking Skills and Writing. Users pay '
+          + 'through Stripe, and n8n workflows handle AI marking on written '
+          + 'responses. It has been live and taking paying subscribers since '
+          + 'February 2026, acquired through Google and Meta ads I ran myself.',
+        tech: [
+          'React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui',
+          'React Router v6', 'TanStack Query',
+          'Supabase Postgres (21 tables, RLS on all)', 'Supabase Auth',
+          'Supabase Edge Functions (Deno)',
+          'Stripe (subscriptions + webhooks)', 'n8n',
+          'Gemini 2.5 Flash via Lovable AI Gateway', 'Resend',
+          'Lovable (build + hosting)',
+        ],
+        highlights: [
+          '1,392 visitors and 5,167 pageviews since launch.',
+          'Four figures in revenue in the first two months.',
+        ],
+        links: [{ label: 'Live site', url: 'https://scorify100.com/' }],
+      },
+      {
         title: 'Nail Studio by H',
-        year: '2026',
+        launch: 'Jun 2026',
         client: 'Hannah',
         images: [
-          { src: 'img/client/nail-studio-home.png',
+          { src: 'img/client/01-home-hero-desktop.png',
             caption: 'The landing page: what it is, where it is, and the one '
               + 'thing to do next.' },
-          { src: 'img/client/nail-studio-booking-form.png',
+          { src: 'img/client/08-booking-form-conditional-desktop.png',
             caption: 'The waiting list form. It posts to Apps Script, which '
               + 'notifies the owner.' },
-          { src: 'img/client/nail-studio-gallery.png',
+          { src: 'img/client/nail studio gallery.png',
             caption: 'The gallery — recent work, tap any image to view.' },
         ],
         tagline: 'A customised website to suit a nail tech\'s needs.',

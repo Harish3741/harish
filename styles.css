@@ -211,12 +211,16 @@ body.is-handheld { overflow: auto; }
   transition: color 120ms ease;
 }
 
-.entry-year {
+/* A launch date is a month and a year, so it is wider than the bare year it
+   replaced. Kept on one line — it is the rail's second column and the title
+   beside it is the thing allowed to wrap. */
+.entry-launch {
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.08em;
   color: #6F5B47;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .entry:hover .entry-label { color: var(--paper); }
@@ -228,7 +232,7 @@ body.is-handheld { overflow: auto; }
 
 .entry[aria-selected="true"] .entry-cursor { opacity: 1; transform: none; }
 .entry[aria-selected="true"] .entry-label { color: var(--paper); }
-.entry[aria-selected="true"] .entry-year { color: var(--brass-d); }
+.entry[aria-selected="true"] .entry-launch { color: var(--brass-d); }
 
 .entry-empty {
   margin: 0;

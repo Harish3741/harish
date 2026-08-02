@@ -36,7 +36,7 @@ you leave out simply doesn't render.
 ```js
 {
   title:       'Invoice reconciler',
-  year:        '2025',
+  launch:      'Mar 2025',           // when it went live; a bare year is fine
   tagline:     'One line. What it is, in plain words.',
   description: 'A paragraph. What problem it solved, what you decided, '
              + 'what happened after.',

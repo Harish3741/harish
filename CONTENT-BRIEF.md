@@ -22,7 +22,7 @@ at a time — a session that worked on three things will blur them together.
 > ```js
 > {
 >   title: '',        // what it is called. 2-5 words
->   year: '',         // when it shipped, or when it was last worked on
+>   launch: '',       // when it went live, as 'Feb 2026'. Not when work started
 >   images: [],       // leave empty, I'll fill it in
 >   tagline: '',      // one line. What it is, in plain words, no adjectives
 >   description: '',  // 2-4 sentences: the problem, what we decided, what happened after
@@ -70,7 +70,7 @@ but the objects skip a step and skip my guesswork.
 
 ```js
 // AUTOMATIONS
-{ title: '…', year: '…', images: [], tagline: '…', description: '…',
+{ title: '…', launch: 'Feb 2026', images: [], tagline: '…', description: '…',
   tech: ['…'], highlights: ['…'], links: [] },
 
 // CLIENT WORK — same, plus one extra field:
@@ -106,7 +106,7 @@ write-ups and screenshots can arrive separately.
 
 | You give me | Where it shows up |
 | --- | --- |
-| `title`, `year` | the list rail on the left of the exhibit window |
+| `title`, `launch` | the list rail on the left of the exhibit window |
 | `tagline` | the brass line under the title |
 | `images` | framed pictures in the panel; a dashed *photo goes here* until then |
 | `description`, `highlights`, `tech`, `links` | the body of the panel |

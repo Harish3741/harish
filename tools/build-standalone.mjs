@@ -135,9 +135,11 @@ async function inlineImages(src) {
       missing.push(`${path} (unknown image type)`);
       continue;
     }
+    // A filename can arrive already percent-encoded, or with the spaces still
+    // in it — a browser accepts either in a src, so the build has to as well.
     let data;
     try {
-      data = await readFile(join(ROOT, path));
+      data = await readFile(join(ROOT, decodeURI(path)));
     } catch {
       missing.push(path);
       continue;

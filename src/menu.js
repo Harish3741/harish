@@ -149,11 +149,11 @@ function renderList() {
 
     item.append(cursor, label);
 
-    if (entry.year) {
-      const year = document.createElement('span');
-      year.className = 'entry-year';
-      year.textContent = entry.year;
-      item.appendChild(year);
+    if (entry.launch) {
+      const launch = document.createElement('span');
+      launch.className = 'entry-launch';
+      launch.textContent = entry.launch;
+      item.appendChild(launch);
     }
 
     item.addEventListener('mouseenter', () => select(i));

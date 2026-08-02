@@ -71,15 +71,23 @@ still drew at its own shape with 200px of empty frame beneath it. The frame
 never changes what size the picture renders at — only how much room is set
 aside for it.
 
-Where the frame is short enough that two pictures fit at once, a nested array
-puts them in the same view rather than making you swipe for the second:
+A single picture can overrule its entry, including with `ratio: 'auto'` for no
+frame at all — full width at its own shape. That is what a tall picture wants
+when it shares an entry with wide ones.
+
+Where two pictures belong together, a nested array puts them in the same view
+rather than making you swipe for the second:
 
 ```js
 images: [
-  [pictureA, pictureB],   // one view, the two stacked
-  pictureC,               // the next view
+  pictureA,               // one view
+  [pictureB, pictureC],   // the next view, the two stacked
 ]
 ```
+
+The strip is as tall as the view you are looking at, not as tall as the tallest
+one in it — otherwise a full-page screenshot in view two puts 700px of empty
+space under the short one in view one, and pushes the writing that far down.
 
 Files go in `img/<wing>/` and are referenced by path. **A path with no file
 behind it draws the dashed *photo goes here* slot rather than a broken image**,

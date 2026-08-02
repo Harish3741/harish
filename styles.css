@@ -632,11 +632,14 @@ body.is-handheld { overflow: auto; }
 
 .mc-world-track {
   display: flex;
+  align-items: flex-start;
   overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  transition: height 180ms ease;
 }
 
 .mc-world-track::-webkit-scrollbar { display: none; }
@@ -758,11 +761,14 @@ body.is-handheld { overflow: auto; }
 
 .detail-track {
   display: flex;
+  align-items: flex-start;
   overflow-x: auto;
+  overflow-y: hidden;                 /* the height follows the active slide */
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   scrollbar-width: none;              /* the dots below say where you are */
+  transition: height 180ms ease;
 }
 
 .detail-track::-webkit-scrollbar { display: none; }
@@ -857,7 +863,7 @@ body.is-handheld { overflow: auto; }
 .gal-dot:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .detail-track, .mc-world-track { scroll-behavior: auto; }
+  .detail-track, .mc-world-track { scroll-behavior: auto; transition: none; }
 }
 
 .detail-figure img {

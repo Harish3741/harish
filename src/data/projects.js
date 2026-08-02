@@ -84,14 +84,20 @@ export const WINGS = [
       {
         title: 'Spending Tracker',
         ratio: '3 / 1',
-        // Both in one view rather than two — the frame is short enough that
-        // stacking them costs less than making you swipe for the second.
-        images: [[
+        images: [
           { src: 'img/automations/spending-tracker-workflow.png',
             caption: 'Reads the card alert, categorises it and logs it to a sheet' },
-          { src: 'img/automations/spending-tracker-sheet.png',
-            caption: 'The sheet it writes to, and the month as a graph' },
-        ]],
+          // The two halves of what it produces, in one view rather than two.
+          // Both take their own shape rather than the wide frame the workflow
+          // wants: the summary is square, and squeezed into a 3:1 frame it
+          // would come out a third of the width and unreadable.
+          [
+            { src: 'img/automations/spending-tracker-data.png', ratio: 'auto',
+              caption: 'Every transaction, categorised, as it lands in the sheet' },
+            { src: 'img/automations/spending-tracker-graph.png', ratio: 'auto',
+              caption: 'The month against budget, at a glance' },
+          ],
+        ],
         tagline: 'An n8n workflow that logs and categorises every card '
           + 'transaction as it lands.',
         description:

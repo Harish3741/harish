@@ -127,12 +127,27 @@ function addNav(wrap, strip, track, count, cls) {
     marks.forEach((d, n) => d.setAttribute('aria-current', String(n === i)));
     prev.disabled = i <= 0;
     next.disabled = i >= count - 1;
+    fitHeight(track, i);
   };
 
   prev.addEventListener('click', () => scrollTo(track, current(track) - 1));
   next.addEventListener('click', () => scrollTo(track, current(track) + 1));
   track.addEventListener('scroll', sync, { passive: true });
+  // pictures arriving, and the window changing size, both change the fit
+  track.addEventListener('load', () => sync(), true);
+  window.addEventListener('resize', sync);
   sync();
+}
+
+/**
+ * The strip is as tall as the picture you are looking at, not as tall as the
+ * tallest one in it. Left to itself a flex row takes the tallest, which put
+ * 700px of empty space under a short workflow shot because the next view along
+ * was a full-page screenshot — and pushed the writing that far down with it.
+ */
+function fitHeight(track, i) {
+  const slide = track.children[i];
+  if (slide) track.style.height = `${slide.scrollHeight}px`;
 }
 
 function arrowButton(glyph, label, cls, where) {
@@ -167,6 +182,11 @@ function emptyFigure(cls) {
 function pictureFigure(pic, entry, cls) {
   const fig = document.createElement('figure');
   fig.className = cls.figure;
+
+  // A picture can overrule the entry's frame. `auto` means no frame at all —
+  // the picture takes the full width at its own shape, which is what a tall
+  // one needs when its neighbours are wide.
+  if (pic.ratio) fig.style.setProperty('--pic-ratio', pic.ratio);
 
   const img = document.createElement('img');
   img.src = pic.src;

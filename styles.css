@@ -627,6 +627,7 @@ body.is-handheld { overflow: auto; }
 .mc-world-gallery {
   margin: 12px 0 0;
   max-width: 420px;
+  --pic-ratio: 3 / 2;                 /* an entry's `ratio` overrides this */
 }
 
 .mc-world-track {
@@ -643,9 +644,15 @@ body.is-handheld { overflow: auto; }
 .mc-world-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .mc-world-gallery.is-one .mc-world-track { overflow-x: hidden; }
 
-.mc-world-figure {
+.mc-world-slide {
   flex: 0 0 100%;
   scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mc-world-figure {
   margin: 0;
   padding: 6px;
   background: rgba(0, 0, 0, 0.28);
@@ -653,7 +660,7 @@ body.is-handheld { overflow: auto; }
 }
 
 .mc-world-figure img {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: var(--pic-ratio);
   object-fit: contain;
   background: #16100A;
 }
@@ -744,7 +751,10 @@ body.is-handheld { overflow: auto; }
 /* Several pictures are a filmstrip you swipe sideways, one at a time — stacked
    they pushed the writing most of a panel down, and the writing is the point.
    Everything else about the entry still stacks vertically underneath. */
-.detail-gallery { margin: 0 0 18px; }
+.detail-gallery {
+  margin: 0 0 18px;
+  --pic-ratio: 3 / 2;                 /* an entry's `ratio` overrides this */
+}
 
 .detail-track {
   display: flex;
@@ -762,10 +772,17 @@ body.is-handheld { overflow: auto; }
 
 /* One slide is exactly one strip wide, which is what makes the dots' arithmetic
    (scrollLeft / clientWidth) hold — so no gap here; the spacing is the
-   figure's own padding. */
-.detail-figure {
+   figure's own padding. A slide usually holds one picture; where the frame is
+   short enough for two to fit, it holds both, stacked. */
+.detail-slide {
   flex: 0 0 100%;
   scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-figure {
   margin: 0;
   padding: 8px;
   background: var(--panel);
@@ -775,7 +792,7 @@ body.is-handheld { overflow: auto; }
 /* A fixed frame, letterboxed rather than cropped. Screenshots come in every
    shape and cropping a UI to fit loses the part that explains it. */
 .detail-figure img {
-  aspect-ratio: 3 / 2;
+  aspect-ratio: var(--pic-ratio);
   object-fit: contain;
   background: #16100A;
 }
@@ -787,6 +804,9 @@ body.is-handheld { overflow: auto; }
   font-size: 12px;
   line-height: 1.5;
 }
+
+/* nothing to swipe between, so nothing to keep a height for */
+.detail-gallery.is-one .detail-caption { min-height: 0; }
 
 /* Arrows sit on the pictures rather than under them. Under, they fall past the
    bottom of the panel on a laptop, and nobody scrolls to find out that a thing

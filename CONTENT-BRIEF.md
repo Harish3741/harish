@@ -89,7 +89,9 @@ invisible until it breaks.
 
 What photographs well here:
 
-- **Landscape**, roughly 3:2 or 16:9. The slot is wider than it is tall.
+- **Landscape**, roughly 3:2 or 16:9. The slot is wider than it is tall. Much
+  wider than that is fine — a workflow canvas, say — just say so and the frame
+  goes wide with it.
 - **Cropped tight** to the thing worth seeing. The panel is around 600px wide
   on a laptop, so a full-screen capture of a dense dashboard reads as grey mush.
 - **One idea per picture.** A chart, a workflow canvas, a before/after. Not a

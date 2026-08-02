@@ -48,8 +48,12 @@ export const WINGS = [
     projects: [
       {
         title: 'Job Scraper',
+        // A workflow canvas is about three times as wide as it is tall, so the
+        // picture frame is too. In the default 3:2 the canvas rendered at the
+        // same size with 200px of empty frame under it.
+        ratio: '3 / 1',
         images: [{ src: 'img/automations/job-scraper-workflow.png',
-          caption: 'searches jobs, scores them and stores them in a sheet' }],
+          caption: 'Searches jobs, scores them and stores them in a sheet' }],
         tagline: 'An n8n workflow that finds job postings and scores them '
           + 'against my own criteria.',
         description: [
@@ -74,6 +78,35 @@ export const WINGS = [
           + 'filtering listings.',
           'Planning to extend it to auto-draft a customised resume per job, '
           + 'pulled from my documented achievements.',
+        ],
+      },
+
+      {
+        title: 'Spending Tracker',
+        ratio: '3 / 1',
+        // Both in one view rather than two — the frame is short enough that
+        // stacking them costs less than making you swipe for the second.
+        images: [[
+          { src: 'img/automations/spending-tracker-workflow.png',
+            caption: 'Reads the card alert, categorises it and logs it to a sheet' },
+          { src: 'img/automations/spending-tracker-sheet.png',
+            caption: 'The sheet it writes to, and the month as a graph' },
+        ]],
+        tagline: 'An n8n workflow that logs and categorises every card '
+          + 'transaction as it lands.',
+        description:
+          'This automation is a personal spending tracker that watches Gmail '
+          + 'every minute for "Transaction Update" alert emails from my '
+          + 'American Express card. Whenever one arrives, it extracts the '
+          + 'merchant name, amount and date from the email text, uses an AI '
+          + 'model to categorise the purchase as Food, Essentials, '
+          + 'Subscriptions, Travel or Other, then logs all of that into a '
+          + 'Google Sheet and labels the email so it is marked as processed. '
+          + 'The sheet is set up so a month\'s entries can be read at a glance '
+          + 'as a graph.',
+        highlights: [
+          'No manual tracking of my spending.',
+          'Helped me reduce my spending.',
         ],
       },
     ],

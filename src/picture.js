@@ -24,12 +24,22 @@ export function hasPictures(entry) {
   return 'image' in entry || 'images' in entry;
 }
 
-/** Whatever the content file said, as a list of `{ src, caption }`. */
-export function pictureList(entry) {
+function onePicture(p) {
+  return typeof p === 'string' ? { src: p, caption: '' } : p;
+}
+
+/**
+ * Whatever the content file said, as a list of slides — one swipe position
+ * each. A nested array is a slide holding more than one picture, stacked: two
+ * short ones can share a view rather than making you swipe between them.
+ */
+export function pictureSlides(entry) {
   const raw = 'images' in entry ? entry.images : [entry.image];
   return (raw || [])
-    .map((p) => (typeof p === 'string' ? { src: p, caption: '' } : p))
-    .filter((p) => p && p.src);
+    .map((slide) => (Array.isArray(slide) ? slide : [slide])
+      .map(onePicture)
+      .filter((p) => p && p.src))
+    .filter((slide) => slide.length);
 }
 
 /**
@@ -38,9 +48,15 @@ export function pictureList(entry) {
  * use, so the two renderers can look like themselves while behaving the same.
  */
 export function buildGallery(entry, cls) {
-  const pics = pictureList(entry);
+  const slides = pictureSlides(entry);
   const wrap = document.createElement('div');
   wrap.className = cls.gallery;
+
+  // The frame defaults to 3:2 and an entry can say otherwise. A workflow canvas
+  // is three times as wide as it is tall: in a 3:2 frame it still renders at
+  // its own shape, with the rest of the frame left empty, so a wide entry
+  // declares a wide frame and loses the dead space rather than the picture.
+  if (entry.ratio) wrap.style.setProperty('--pic-ratio', entry.ratio);
 
   // The strip wraps the track so the arrows can sit on top of the pictures.
   // Below them they fall past the bottom of the panel on a laptop, and a
@@ -52,15 +68,17 @@ export function buildGallery(entry, cls) {
   strip.appendChild(track);
   wrap.appendChild(strip);
 
-  if (!pics.length) {
+  if (!slides.length) {
     wrap.classList.add('is-one');
-    track.appendChild(emptyFigure(cls));
+    track.appendChild(slideOf([emptyFigure(cls)], cls));
     return wrap;
   }
 
-  for (const pic of pics) track.appendChild(pictureFigure(pic, entry, cls));
+  for (const pics of slides) {
+    track.appendChild(slideOf(pics.map((p) => pictureFigure(p, entry, cls)), cls));
+  }
 
-  if (pics.length < 2) {
+  if (slides.length < 2) {
     wrap.classList.add('is-one');
     return wrap;
   }
@@ -69,9 +87,17 @@ export function buildGallery(entry, cls) {
   // the arrow keys alone while focus is in here.
   track.tabIndex = 0;
   track.setAttribute('role', 'group');
-  track.setAttribute('aria-label', `${pics.length} pictures — scroll sideways`);
-  addNav(wrap, strip, track, pics.length, cls);
+  track.setAttribute('aria-label', `${slides.length} views — scroll sideways`);
+  addNav(wrap, strip, track, slides.length, cls);
   return wrap;
+}
+
+/** One swipe position. Usually one picture; sometimes two, stacked. */
+function slideOf(figures, cls) {
+  const slide = document.createElement('div');
+  slide.className = cls.slide;
+  for (const f of figures) slide.appendChild(f);
+  return slide;
 }
 
 /* ------------------------------------------------------------------ */

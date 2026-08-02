@@ -13,6 +13,7 @@ import { hasPictures, buildGallery } from './picture.js';
 const DETAIL_PICS = {
   gallery: 'detail-gallery',
   strip: 'detail-strip',
+  slide: 'detail-slide',
   track: 'detail-track',
   figure: 'detail-figure',
   slot: 'detail-slot',

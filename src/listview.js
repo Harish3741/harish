@@ -17,6 +17,7 @@ import { hasPictures, buildGallery } from './picture.js';
 const WORLD_PICS = {
   gallery: 'mc-world-gallery',
   strip: 'mc-world-strip',
+  slide: 'mc-world-slide',
   track: 'mc-world-track',
   figure: 'mc-world-figure',
   slot: 'mc-world-slot',

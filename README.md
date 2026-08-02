@@ -59,7 +59,27 @@ people came to read. Captions are optional. For a single picture,
 `image: 'img/…'` says the same thing more briefly and no strip furniture shows.
 
 Pictures sit in a 3:2 frame and are letterboxed, never cropped — screenshots
-arrive in every shape and cropping a UI loses the part that explains it.
+arrive in every shape and cropping a UI loses the part that explains it. An
+entry whose pictures are all a different shape says so with `ratio`:
+
+```js
+{ title: 'Job Scraper', ratio: '3 / 1', images: [ … ] }
+```
+
+An n8n canvas is about three times as wide as it is tall, and in a 3:2 frame it
+still drew at its own shape with 200px of empty frame beneath it. The frame
+never changes what size the picture renders at — only how much room is set
+aside for it.
+
+Where the frame is short enough that two pictures fit at once, a nested array
+puts them in the same view rather than making you swipe for the second:
+
+```js
+images: [
+  [pictureA, pictureB],   // one view, the two stacked
+  pictureC,               // the next view
+]
+```
 
 Files go in `img/<wing>/` and are referenced by path. **A path with no file
 behind it draws the dashed *photo goes here* slot rather than a broken image**,

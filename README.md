@@ -37,22 +37,34 @@ you leave out simply doesn't render.
 {
   title:       'Invoice reconciler',
   year:        '2025',
-  image:       null,                 // ← a picture slot, empty for now
   tagline:     'One line. What it is, in plain words.',
   description: 'A paragraph. What problem it solved, what you decided, '
              + 'what happened after.',
   tech:        ['Python', 'n8n', 'Postgres'],
   highlights:  ['Cut a 6-hour week to 20 minutes'],
   links:       [{ label: 'Repo', url: 'https://…' }],
+  images:      [{ src: 'img/automations/dashboard.png',
+                  caption: 'What it writes to, every morning at six.' }],
 }
 ```
 
-Every entry carries an `image`. Left `null` it draws a dashed frame saying
-*photo goes here*, in the exhibit panel and in the list — a slot waiting to be
-filled rather than a layout that jumps when the pictures arrive. Fill it with
-any URL a browser can load; a data URI keeps the picture inside the file, which
-is what the standalone build needs. Delete the key entirely and no slot shows
-at all.
+### Pictures
+
+`images` takes as many as a project deserves: the first gets the full width of
+the panel — it is the one that says what the thing is — and the rest pair up
+underneath it. Captions are optional. For a single picture, `image: 'img/…'`
+says the same thing more briefly.
+
+Files go in `img/<wing>/` and are referenced by path. **A path with no file
+behind it draws the dashed *photo goes here* slot rather than a broken image**,
+so a path can be committed before its picture is. `image: null` — the key with
+nothing in it — asks for that same slot deliberately, which keeps the layout
+from jumping about later. Leave both keys out and no slot shows at all.
+
+The standalone build reads whatever is referenced and inlines it as a data URI,
+so the same content file serves the hosted folder and the single file, and the
+bundle still makes no requests to anything. See `img/README.md` for what
+photographs well at this size.
 
 A wing with no entries says so rather than breaking, and a wing with twelve
 scrolls. Renaming a wing is the `title` field on that wing; the id (used by the
@@ -69,11 +81,11 @@ the keypress teaches you not to bother pressing E at the next one.
 ```js
 { title: 'Invoice reconciler',
   caption: 'The dashboard it writes to, every morning at six.',
-  image: 'data:image/png;base64,…' }   // or 'img/dashboard.png'
+  image: 'img/atrium/dashboard.png' }
 ```
 
-`image` is optional and takes any URL a browser can load. A data URI keeps the
-picture inside the file, which is what the standalone build needs.
+A picture on a wall is one picture, not a set — `image` only. These want a
+caption rather than a write-up.
 
 The atrium hangs four, two down each side wall — `PAINTINGS.atrium` runs west
 top-to-bottom, then east. Its end wall carries the résumé instead. Only the
@@ -119,24 +131,29 @@ opens. The three clients used to be three separate conversations, which meant
 walking round the table to find a particular project; one list at the table is
 quicker to read and quicker to leave. They are still who the room is about.
 
-`CLIENTS` gives the three of them a name and a look, and `client:` on a project
-puts that name on the entry.
+The two things are wired separately, and it's worth being clear which does
+what. `client:` on a project is a plain string, and it is what renders — *For
+Hannah* above the description, and `for Hannah` in the skip-to-list. `CLIENTS`
+only dresses the three figures standing round the table: `hair` and `palette`,
+nothing else. They are the room's furniture, not a lookup.
 
 ```js
-// in WINGS → client → projects
-{ title: 'Invoice reconciler', client: 'Acme Ltd', … }
+// in WINGS → client → projects — this string is what shows
+{ title: 'Nail Studio by H', client: 'Hannah', … }
 
 export const CLIENTS = [
-  { name: 'Acme Ltd',
-    role: 'Logistics, badly organised',
-    hair: 'short',                          // or 'long'
+  { hair: 'short',                          // or 'long'
     palette: { K: '#2E2018', S: '#C98F63', T: '#3A5A78', P: '#2A2E38' } },
   // …two more
 ];
 ```
 
 Three is what the room is built for — fewer leaves a place at the table
-empty.
+empty. They don't have to correspond to three real clients, and with the table
+holding one list they no longer do.
+
+`CLIENTS` still carries `name`, `role` and `greeting` from when each figure was
+its own conversation. Nothing reads them now.
 
 ### The screening room
 
@@ -235,9 +252,11 @@ src/
   intro.js          the arrival cinematic and title card
   menu.js           the exhibit menu (DOM)
   listview.js       the plain list (DOM), for the skip button and for mobile
+  picture.js        the picture slot both of those share
   input.js          keyboard
   renderer.js       canvas sizing, integer pixel scale, camera
   data/projects.js  ← the content
+img/                screenshots, one folder per wing
 ```
 
 A few decisions worth knowing about, if you come back to this later:

@@ -612,12 +612,29 @@ body.is-handheld { overflow: auto; }
 }
 
 /* the picture slot on a world row, same idea as the exhibit panel's */
-.mc-world-figure {
+.mc-world-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin: 12px 0 0;
-  padding: 6px;
   max-width: 420px;
+}
+
+.mc-world-gallery > :first-child { grid-column: 1 / -1; }
+.mc-world-gallery.is-one { grid-template-columns: 1fr; }
+
+.mc-world-figure {
+  margin: 0;
+  padding: 6px;
   background: rgba(0, 0, 0, 0.28);
   border: 2px solid #16100A;
+}
+
+.mc-world-caption {
+  margin: 6px 2px 0;
+  color: #9A8A70;
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .mc-world-figure img {
@@ -650,11 +667,31 @@ body.is-handheld { overflow: auto; }
 .overlay.is-single .window-body { grid-template-columns: 1fr; }
 .overlay.is-single .window { max-height: min(560px, 100%); }
 
-.detail-figure {
+/* A project usually has more than one shot worth showing. The first gets the
+   full width — it is the one that says what the thing is — and the rest pair
+   up underneath it. One picture and it is simply the picture, as before. */
+.detail-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin: 0 0 18px;
+}
+
+.detail-gallery > :first-child { grid-column: 1 / -1; }
+.detail-gallery.is-one { grid-template-columns: 1fr; }
+
+.detail-figure {
+  margin: 0;
   padding: 8px;
   background: var(--panel);
   border: 1px solid var(--edge);
+}
+
+.detail-caption {
+  margin: 8px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .detail-figure img {

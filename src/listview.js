@@ -11,6 +11,15 @@
 // title, a subtitle line of metadata, and one obvious button per row.
 
 import { SITE, WINGS, RESUME } from './data/projects.js';
+import { hasPictures, buildGallery } from './picture.js';
+
+// what the shared picture slot calls itself out here
+const WORLD_PICS = {
+  gallery: 'mc-world-gallery',
+  figure: 'mc-world-figure',
+  slot: 'mc-world-slot',
+  caption: 'mc-world-caption',
+};
 
 let listRoot, bodyEl, openBtn, closeBtn;
 let isOpen = false;
@@ -190,20 +199,7 @@ function renderWing(wing) {
     if (entry.description) text.appendChild(el('p', 'mc-world-desc', entry.description));
 
     // the same picture slot the exhibit panel shows, filled or waiting
-    if ('image' in entry) {
-      const fig = el('figure', 'mc-world-figure');
-      if (entry.image) {
-        const img = el('img');
-        img.src = entry.image;
-        img.alt = entry.title;
-        img.loading = 'lazy';
-        fig.appendChild(img);
-      } else {
-        fig.classList.add('is-empty');
-        fig.appendChild(el('div', 'mc-world-slot', 'Photo goes here'));
-      }
-      text.appendChild(fig);
-    }
+    if (hasPictures(entry)) text.appendChild(buildGallery(entry, WORLD_PICS));
 
     if (entry.highlights && entry.highlights.length) {
       const ul = el('ul', 'mc-world-points');

@@ -7,6 +7,15 @@
 // art (chunky stepped borders, brass rules) and the *content* is real text.
 
 import { wingById } from './data/projects.js';
+import { hasPictures, buildGallery } from './picture.js';
+
+// what the shared picture slot calls itself in here
+const DETAIL_PICS = {
+  gallery: 'detail-gallery',
+  figure: 'detail-figure',
+  slot: 'detail-slot',
+  caption: 'detail-caption',
+};
 
 let root, listEl, detailEl, titleEl, blurbEl;
 let entries = [];
@@ -186,27 +195,10 @@ function renderDetail() {
   plate.setAttribute('aria-hidden', 'true');
   detailEl.appendChild(plate);
 
-  // An entry that declares an `image` key gets a picture slot whether or not
-  // there is a picture in it yet — an empty frame is a prompt to fill it, and
-  // it keeps the layout from jumping about once the photos arrive.
-  if ('image' in entry) {
-    const fig = document.createElement('figure');
-    fig.className = 'detail-figure';
-    if (entry.image) {
-      const img = document.createElement('img');
-      img.src = entry.image;
-      img.alt = entry.title;
-      img.loading = 'lazy';
-      fig.appendChild(img);
-    } else {
-      fig.classList.add('is-empty');
-      const slot = document.createElement('div');
-      slot.className = 'detail-slot';
-      slot.textContent = 'Photo goes here';
-      fig.appendChild(slot);
-    }
-    detailEl.appendChild(fig);
-  }
+  // An entry that declares `image` or `images` gets a picture slot whether or
+  // not there is a picture in it yet — an empty frame is a prompt to fill it,
+  // and it keeps the layout from jumping about once the photos arrive.
+  if (hasPictures(entry)) detailEl.appendChild(buildGallery(entry, DETAIL_PICS));
 
   if (entry.client) {
     const cl = document.createElement('p');

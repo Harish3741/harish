@@ -17,7 +17,20 @@
 //     tech:        ['Python', 'n8n', 'Postgres'],
 //     highlights:  ['Cut a 6-hour week to 20 minutes'],
 //     links:       [{ label: 'Repo', url: 'https://…' }],
+//     images:      [{ src: 'img/…', caption: 'What you are looking at.' }],
 //   }
+//
+// PICTURES. `images` takes as many as you like: the first gets the full width
+// of the panel and the rest pair up under it. A caption is optional. One
+// picture and `image: 'img/…'` says the same thing more briefly.
+//
+// Put the files in img/<wing>/ and reference them by path. A path with no file
+// behind it draws a dashed "photo goes here" slot rather than a broken image,
+// so you can commit the path now and the picture later. `image: null` — the
+// key with nothing in it — draws that same slot deliberately.
+//
+// The standalone build inlines whatever is referenced as data URIs, so one
+// content file serves both the hosted folder and the single-file version.
 // ---------------------------------------------------------------------------
 
 export const SITE = {
@@ -130,41 +143,34 @@ export const WINGS = [
     blurb: 'Built for other people, to a brief and a deadline.',
     projects: [
       {
-        title: 'Placeholder — client one',
-        image: null,
-        year: '2025',
-        client: 'Placeholder — first client',
-        tagline: 'What you were hired to solve.',
+        title: 'Nail Studio by H',
+        year: '2026',
+        client: 'Hannah',
+        images: [
+          { src: 'img/client/nail-studio-home.png',
+            caption: 'The landing page: what it is, where it is, and the one '
+              + 'thing to do next.' },
+          { src: 'img/client/nail-studio-booking-form.png',
+            caption: 'The waiting list form. It posts to Apps Script, which '
+              + 'notifies the owner.' },
+          { src: 'img/client/nail-studio-gallery.png',
+            caption: 'The gallery — recent work, tap any image to view.' },
+        ],
+        tagline: 'A customised website to suit a nail tech\'s needs.',
         description:
-          'Placeholder. If any of this is under NDA, keep the entry and '
-          + 'describe the shape of the problem without naming the client — '
-          + '"a logistics company", "a mid-size retailer".',
-        tech: ['React', 'Supabase'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — client two',
-        image: null,
-        year: '2025',
-        client: 'Placeholder — second client',
-        tagline: 'A second brief, for someone else.',
-        description:
-          'Placeholder. The `client` field is what puts an entry at one of '
-          + 'the three places round the boardroom table.',
-        tech: ['Python', 'Postgres'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — client three',
-        image: null,
-        year: '2024',
-        client: 'Placeholder — third client',
-        tagline: 'And a third.',
-        description:
-          'Placeholder. An entry with no `client` still shows up in the '
-          + 'skip-to-list; it just isn\'t standing at the table.',
-        tech: ['n8n'],
-        links: [],
+          'Designed and built a website for Hannah that streamlines her '
+          + 'booking process, with clear, upfront pricing and a portfolio '
+          + 'section showcasing her work. This made it easy for potential '
+          + 'customers to see what they offer, know what it costs, and book '
+          + 'directly.',
+        tech: ['HTML', 'CSS', 'Vanilla JavaScript', 'Google Apps Script',
+          'GitHub Pages'],
+        highlights: [
+          'Four static files, 1,769 lines, no dependencies and no build step.',
+          'The booking form posts to a Google Apps Script endpoint, which '
+          + 'notifies the owner so they can follow up on requests.',
+        ],
+        links: [{ label: 'Visit the site', url: 'https://nailstudiobyh.site/' }],
       },
     ],
   },
@@ -211,12 +217,9 @@ export const WINGS = [
 // becomes something you can walk up to and read; leave it out and the frame is
 // simply decoration. Order is left to right along the wall.
 //
-// `image` takes any URL a browser can load — most usefully a data URI, so the
-// picture travels with the file and needs no server:
-//
-//   image: 'data:image/png;base64,iVBORw0KGgo…'
-//
-// A plain path works too if you are hosting the folder: image: 'img/thing.png'.
+// A picture on a wall is one picture, not a set: `image` takes a path under
+// img/, the same as a project entry. These want a caption rather than a
+// write-up — a sentence or two about what you are looking at.
 // ---------------------------------------------------------------------------
 
 export const PAINTINGS = {

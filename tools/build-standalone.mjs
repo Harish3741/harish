@@ -14,7 +14,7 @@
 // the same top-level name — `npm run check-names`, below, is what enforces it.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,6 +29,7 @@ const MODULES = [
   'renderer',
   'input',
   'player',
+  'picture',
   'menu',
   'listview',
   'screening',
@@ -106,6 +107,49 @@ function extractBody(html) {
   return body.replace(/^\s*<script\s+type="module"[^>]*><\/script>\s*$/m, '').trim();
 }
 
+// Pictures are referenced by path, which is right for the served folder and
+// useless in a single file — a bundle that fetches three PNGs off a relative
+// path isn't self-contained. So every 'img/…' the content file mentions is read
+// off disk and inlined as a data URI. A path with no file behind it is left
+// alone and warned about; the page falls back to its dashed slot, which is what
+// a picture that hasn't arrived yet is supposed to look like.
+// The extension is part of the pattern on purpose, so prose in a comment —
+// `image: 'img/…'` in the instructions at the top of the content file — is not
+// mistaken for a picture that failed to turn up.
+const IMG_RE = /'(img\/[^']+\.(?:png|jpe?g|gif|webp|avif|svg))'/gi;
+const MIME = {
+  '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.webp': 'image/webp', '.avif': 'image/avif',
+  '.svg': 'image/svg+xml',
+};
+
+async function inlineImages(src) {
+  const paths = [...new Set([...src.matchAll(IMG_RE)].map((m) => m[1]))];
+  const missing = [];
+  let out = src;
+  let bytes = 0;
+
+  for (const path of paths) {
+    const mime = MIME[extname(path).toLowerCase()];
+    if (!mime) {
+      missing.push(`${path} (unknown image type)`);
+      continue;
+    }
+    let data;
+    try {
+      data = await readFile(join(ROOT, path));
+    } catch {
+      missing.push(path);
+      continue;
+    }
+    bytes += data.length;
+    const uri = `data:${mime};base64,${data.toString('base64')}`;
+    out = out.split(`'${path}'`).join(`'${uri}'`);
+  }
+
+  return { out, count: paths.length - missing.length, missing, bytes };
+}
+
 function extractHead(html) {
   return html.slice(html.indexOf('<head>') + '<head>'.length, html.indexOf('</head>'))
     .replace(/^\s*<link\s+rel="stylesheet"[^>]*>\s*$/m, '')
@@ -120,10 +164,12 @@ const [html, css, modules] = await Promise.all([
 
 assertNoCollisions(modules);
 
+const pictures = await inlineImages(bundle(modules));
+
 const content = [
   `<style>\n${css.trim()}\n</style>`,
   extractBody(html),
-  `<script type="module">\n${bundle(modules)}\n</script>`,
+  `<script type="module">\n${pictures.out}\n</script>`,
 ].join('\n\n');
 
 const page = `<!DOCTYPE html>
@@ -145,3 +191,11 @@ await writeFile(join(ROOT, 'dist', 'body.html'), `${content}\n`);
 
 const kb = (Buffer.byteLength(page) / 1024).toFixed(1);
 console.log(`dist/index.html  ${kb} KB  (${modules.length} modules, no dependencies)`);
+
+if (pictures.count) {
+  const picKb = (pictures.bytes / 1024).toFixed(1);
+  console.log(`  ${pictures.count} picture(s) inlined, ${picKb} KB of it`);
+}
+for (const path of pictures.missing) {
+  console.warn(`  ! no file at ${path} — it will show as an empty slot`);
+}

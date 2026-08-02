@@ -48,7 +48,6 @@ export const WINGS = [
     projects: [
       {
         title: 'Job Scraper',
-        launch: 'Jun 2026',
         images: [{ src: 'img/automations/job-scraper-workflow.png',
           caption: 'searches jobs, scores them and stores them in a sheet' }],
         tagline: 'An n8n workflow that finds job postings and scores them '

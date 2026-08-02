@@ -16,9 +16,14 @@ import { hasPictures, buildGallery } from './picture.js';
 // what the shared picture slot calls itself out here
 const WORLD_PICS = {
   gallery: 'mc-world-gallery',
+  strip: 'mc-world-strip',
+  track: 'mc-world-track',
   figure: 'mc-world-figure',
   slot: 'mc-world-slot',
   caption: 'mc-world-caption',
+  nav: 'mc-gal-dots',
+  arrow: 'mc-gal-arrow',
+  dot: 'mc-gal-dot',
 };
 
 let listRoot, bodyEl, openBtn, closeBtn;

@@ -66,8 +66,7 @@ export const WINGS = [
           + 'written description of roles I actually want. Only postings that '
           + 'clear the bar get written to a Google Sheet with the score.',
         ],
-        tech: ['n8n', 'Claude', 'OpenAI', 'Adzuna API', 'Greenhouse', 'Lever',
-          'Ashby', 'Google Sheets'],
+        tech: ['n8n', 'Claude', 'OpenAI', 'Adzuna API'],
         highlights: [
           'Scores every new posting against my actual fit criteria instead of '
           + 'just keyword matches, so what lands in the sheet is consistently '

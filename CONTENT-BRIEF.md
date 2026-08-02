@@ -81,10 +81,11 @@ but the objects skip a step and skip my guesswork.
 ### Pictures
 
 Send me the image files and say which project each belongs to, with a sentence
-per picture. **Two or three per project** — the first is the one that says what
-the thing is, the rest sit under it half-width. Don't base64 anything: I do the
-conversion, because the single-file build needs data URIs and the served version
-doesn't, and getting that wrong is invisible until it breaks.
+per picture. **Two or three per project** — they become a filmstrip you swipe
+through, one at a time, so the first should be the one that says what the thing
+is. Don't base64 anything: I do the conversion, because the single-file build
+needs data URIs and the served version doesn't, and getting that wrong is
+invisible until it breaks.
 
 What photographs well here:
 
@@ -109,7 +110,7 @@ write-ups and screenshots can arrive separately.
 | --- | --- |
 | `title`, `launch` | the list rail on the left of the exhibit window |
 | `tagline` | the brass line under the title |
-| `images` | framed pictures in the panel; a dashed *photo goes here* until then |
+| `images` | a filmstrip at the top of the panel; a dashed *photo goes here* until then |
 | `description`, `highlights`, `tech`, `links` | the body of the panel |
 | `client` | a small line above the description, and in the skip-to-list |
 

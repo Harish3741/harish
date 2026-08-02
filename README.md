@@ -50,10 +50,16 @@ you leave out simply doesn't render.
 
 ### Pictures
 
-`images` takes as many as a project deserves: the first gets the full width of
-the panel — it is the one that says what the thing is — and the rest pair up
-underneath it. Captions are optional. For a single picture, `image: 'img/…'`
-says the same thing more briefly.
+`images` takes as many as a project deserves. Several become a filmstrip you
+swipe sideways — trackpad, touch, the arrows on the picture, the dots under it,
+or the arrow keys once the strip has focus — one picture at a time, with
+everything else about the entry stacked underneath. Stacked instead, the third
+screenshot pushed the writing most of a panel down, and the writing is the part
+people came to read. Captions are optional. For a single picture,
+`image: 'img/…'` says the same thing more briefly and no strip furniture shows.
+
+Pictures sit in a 3:2 frame and are letterboxed, never cropped — screenshots
+arrive in every shape and cropping a UI loses the part that explains it.
 
 Files go in `img/<wing>/` and are referenced by path. **A path with no file
 behind it draws the dashed *photo goes here* slot rather than a broken image**,

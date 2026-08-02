@@ -625,22 +625,81 @@ body.is-handheld { overflow: auto; }
 
 /* the picture slot on a world row, same idea as the exhibit panel's */
 .mc-world-gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
   margin: 12px 0 0;
   max-width: 420px;
 }
 
-.mc-world-gallery > :first-child { grid-column: 1 / -1; }
-.mc-world-gallery.is-one { grid-template-columns: 1fr; }
+.mc-world-track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.mc-world-track::-webkit-scrollbar { display: none; }
+.mc-world-track:focus { outline: none; }
+.mc-world-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.mc-world-gallery.is-one .mc-world-track { overflow-x: hidden; }
 
 .mc-world-figure {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
   margin: 0;
   padding: 6px;
   background: rgba(0, 0, 0, 0.28);
   border: 2px solid #16100A;
 }
+
+.mc-world-figure img {
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  background: #16100A;
+}
+
+.mc-world-strip { position: relative; }
+
+.mc-gal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 38px;
+  padding: 0;
+  background: rgba(10, 7, 4, 0.82);
+  border: 2px solid var(--brass-d);
+  color: #F0E6D2;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mc-gal-arrow.is-prev { left: 8px; }
+.mc-gal-arrow.is-next { right: 8px; }
+.mc-gal-arrow:hover:not(:disabled) { border-color: var(--brass); color: var(--brass); }
+.mc-gal-arrow:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.mc-gal-arrow:disabled { opacity: 0.25; cursor: default; }
+
+.mc-gal-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.mc-gal-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  background: #4A3B29;
+  border: 0;
+  cursor: pointer;
+}
+
+.mc-gal-dot:hover { background: var(--brass-d); }
+.mc-gal-dot[aria-current="true"] { background: var(--brass); }
+.mc-gal-dot:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
 .mc-world-caption {
   margin: 6px 2px 0;
@@ -682,31 +741,103 @@ body.is-handheld { overflow: auto; }
    frame. */
 .overlay.is-single .window { height: auto; max-height: min(560px, 100%); }
 
-/* A project usually has more than one shot worth showing. The first gets the
-   full width — it is the one that says what the thing is — and the rest pair
-   up underneath it. One picture and it is simply the picture, as before. */
-.detail-gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin: 0 0 18px;
+/* Several pictures are a filmstrip you swipe sideways, one at a time — stacked
+   they pushed the writing most of a panel down, and the writing is the point.
+   Everything else about the entry still stacks vertically underneath. */
+.detail-gallery { margin: 0 0 18px; }
+
+.detail-track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;              /* the dots below say where you are */
 }
 
-.detail-gallery > :first-child { grid-column: 1 / -1; }
-.detail-gallery.is-one { grid-template-columns: 1fr; }
+.detail-track::-webkit-scrollbar { display: none; }
+.detail-track:focus { outline: none; }
+.detail-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.detail-gallery.is-one .detail-track { overflow-x: hidden; }
 
+/* One slide is exactly one strip wide, which is what makes the dots' arithmetic
+   (scrollLeft / clientWidth) hold — so no gap here; the spacing is the
+   figure's own padding. */
 .detail-figure {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
   margin: 0;
   padding: 8px;
   background: var(--panel);
   border: 1px solid var(--edge);
 }
 
+/* A fixed frame, letterboxed rather than cropped. Screenshots come in every
+   shape and cropping a UI to fit loses the part that explains it. */
+.detail-figure img {
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  background: #16100A;
+}
+
 .detail-caption {
   margin: 8px 2px 0;
+  min-height: 2.9em;                  /* so the strip doesn't jolt per caption */
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
+}
+
+/* Arrows sit on the pictures rather than under them. Under, they fall past the
+   bottom of the panel on a laptop, and nobody scrolls to find out that a thing
+   they cannot see is swipeable. */
+.detail-strip { position: relative; }
+
+.gal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 44px;
+  padding: 0;
+  background: rgba(22, 16, 10, 0.82);
+  border: 2px solid var(--brass-d);
+  color: var(--paper);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.gal-arrow.is-prev { left: 10px; }
+.gal-arrow.is-next { right: 10px; }
+.gal-arrow:hover:not(:disabled) { border-color: var(--brass); color: var(--brass); }
+.gal-arrow:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.gal-arrow:disabled { opacity: 0.25; cursor: default; }
+
+.gal-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gal-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  background: var(--edge);
+  border: 0;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.gal-dot:hover { background: var(--brass-d); }
+.gal-dot[aria-current="true"] { background: var(--brass); }
+.gal-dot:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-track, .mc-world-track { scroll-behavior: auto; }
 }
 
 .detail-figure img {

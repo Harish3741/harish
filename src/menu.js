@@ -12,9 +12,14 @@ import { hasPictures, buildGallery } from './picture.js';
 // what the shared picture slot calls itself in here
 const DETAIL_PICS = {
   gallery: 'detail-gallery',
+  strip: 'detail-strip',
+  track: 'detail-track',
   figure: 'detail-figure',
   slot: 'detail-slot',
   caption: 'detail-caption',
+  nav: 'gal-dots',
+  arrow: 'gal-arrow',
+  dot: 'gal-dot',
 };
 
 let root, listEl, detailEl, titleEl, blurbEl;
@@ -267,6 +272,10 @@ function onKeydown(e) {
     closeMenu();
     return;
   }
+
+  // Inside the picture strip the arrows belong to the strip — it is a scroll
+  // container, and the browser already scrolls it a slide at a time.
+  if (e.target.closest && e.target.closest('.detail-track')) return;
 
   if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
     e.preventDefault();

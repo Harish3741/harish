@@ -28,7 +28,7 @@ import {
   drawMarble, drawWood, drawCarpet, drawStone, drawCarpetTile,
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
-  drawPlinth, drawPlinthIcon, drawFrame, drawPlant, drawBench, drawRopeLine,
+  drawPlinth, drawPlinthIcon, drawPlant, drawBench, drawRopeLine,
   drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
   drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawDownlight,
   drawMachine, drawBelt, drawPipeRun, drawHazardLine, drawDrums,
@@ -94,7 +94,7 @@ export const WING_ROOMS = {
     accent: '#2E4A52', machineHall: true,
   },
   personal: {
-    cx: 25, entry: 'south', rail: 3, label: 'Personal Projects', banner: 'PERSONAL',
+    cx: 25, entry: 'south', rail: 3, label: 'Initiatives', banner: 'INITIATIVES',
     accent: '#6B3F28',
   },
   client: {
@@ -423,39 +423,6 @@ function renderBackground() {
 /* Dressing                                                            */
 /* ------------------------------------------------------------------ */
 
-/**
- * Hang pictures symmetrically about a centre line. `offsets` are tile deltas
- * from that centre and must themselves be symmetric; sizes are mirrored, so the
- * pair at -3 and +3 match. Anything landing on an arch is skipped.
- *
- * Each frame also becomes an entry in map.artworks, so it can be read from the
- * floor in front of it. Captions come from data/projects.js by index; a frame
- * with no caption is simply decorative.
- */
-function hangSymmetric(c, cx, ty, offsets, wingId) {
-  const captions = (PAINTINGS && PAINTINGS[wingId]) || [];
-  let slot = 0;
-  for (const d of offsets) {
-    const x = cx + d;
-    if (wallFaceDepth(x, ty) !== 1) { slot += 1; continue; }
-    // mirrored size: the pair either side of centre are the same
-    const size = [0, 1, 2, 1][Math.min(3, Math.abs(d))];
-    drawFrame(c, x * TILE + 8, ty * TILE + 6, x * 7 + ty, size);
-
-    const info = captions[slot] || EMPTY_FRAME;
-    map.artworks.push({
-      x: x * TILE + 8,
-      y: (ty + 2) * TILE + 14,     // the floor tile in front of the frame
-      title: info.title,
-      caption: info.caption,
-      image: info.image || null,
-      label: 'Painting',
-      top: ty * TILE + 4,
-    });
-    slot += 1;
-  }
-}
-
 // Every frame on every wall can be walked up to and read, whether or not
 // there is a caption behind it yet. A frame that swallows the keypress teaches
 // you not to bother pressing E at the next one.
@@ -474,16 +441,9 @@ function addProp(p) {
 function decorate(c) {
   // ---- baked: wall-mounted, and flat on the ground ----
 
-  // North wings have a clear back wall, so four pictures sit evenly across it.
-  // South wings are entered through that same wall, so their pictures go either
-  // side of the arch. Both sets are symmetric about the room's centre line.
-  for (const [id, w] of Object.entries(WING_ROOMS)) {
-    // the cinema hangs nothing; the boardroom hangs charts and the machine
-    // hall hangs pipework, both dressed by their own function below
-    if (w.theatre || w.boardroom || w.machineHall) continue;
-    const offsets = w.entry === 'south' ? [-3, -1, 1, 3] : [-4, -3, 3, 4];
-    hangSymmetric(c, w.cx, w.rail, offsets, id);
-  }
+  // No wing hangs pictures any more: the machine hall has pipework, the
+  // boardroom downlights, the cinema a screen, and Initiatives its plinth and
+  // benches. The eight frames left in the building are the atrium's.
   dressAtrium(c);
 
   // ---- depth-sorted props ----

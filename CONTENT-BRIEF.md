@@ -58,7 +58,7 @@ at a time — a session that worked on three things will blur them together.
   neutral stand-in ('a logistics company') if it can't be named."
 - **Automations** — "Say what fires it: a schedule, a webhook, a file landing,
   someone pressing a button. And roughly how often it runs."
-- **Personal projects** — "Say what made you want it to exist. That is the
+- **Initiatives** — "Say what made you want it to exist. That is the
   interesting part for this one, more than the outcome."
 
 ---
@@ -121,15 +121,16 @@ Rooms and how much each holds:
 | Wing | What opens the list | How many entries |
 | --- | --- | --- |
 | Automations | any of the three machines | any number |
-| Personal projects | the plinth | any number |
+| Initiatives | the plinth | any number |
 | Client work | the boardroom table | any number |
 | About me | the character by the door | any number |
 
 Plus, separately from the project lists:
 
-- **8 wall pictures** — 4 in the gallery, 4 down the atrium's side walls. Each
-  takes `{ title, caption, image }` in `PAINTINGS`. These are a caption and a
-  picture, not a project: one or two sentences about what you're looking at.
+- **4 wall pictures** — down the atrium's side walls, the only frames left in
+  the building. Each takes `{ title, caption, image }` in `PAINTINGS`. These are
+  a caption and a picture, not a project: one or two sentences about what you're
+  looking at.
 - **The résumé** — the sheet on the atrium wall. Same fields as a project.
   `links` is where the PDF goes.
 - **The film** — `ABOUT.video`, played when you sit in the cinema chair. Any

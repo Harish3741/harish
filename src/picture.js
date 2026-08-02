@@ -24,22 +24,32 @@ export function hasPictures(entry) {
   return 'image' in entry || 'images' in entry;
 }
 
-function onePicture(p) {
-  return typeof p === 'string' ? { src: p, caption: '' } : p;
+/** Whatever the content file said, as a list of `{ src, caption }`. */
+export function pictureList(entry) {
+  const raw = 'images' in entry ? entry.images : [entry.image];
+  return (raw || [])
+    .map((p) => (typeof p === 'string' ? { src: p, caption: '' } : p))
+    .filter((p) => p && p.src);
 }
 
 /**
- * Whatever the content file said, as a list of slides — one swipe position
- * each. A nested array is a slide holding more than one picture, stacked: two
- * short ones can share a view rather than making you swipe between them.
+ * Fetch and decode every picture in these entries, so a panel is complete the
+ * moment it opens instead of assembling itself while you look at it. Called
+ * once at boot: you walk to a room before you press E at anything in it, and
+ * that walk is time the pictures can use.
  */
-export function pictureSlides(entry) {
-  const raw = 'images' in entry ? entry.images : [entry.image];
-  return (raw || [])
-    .map((slide) => (Array.isArray(slide) ? slide : [slide])
-      .map(onePicture)
-      .filter((p) => p && p.src))
-    .filter((slide) => slide.length);
+export function preloadPictures(entries) {
+  const seen = new Set();
+  for (const entry of entries) {
+    if (!entry || !hasPictures(entry)) continue;
+    for (const pic of pictureList(entry)) {
+      if (seen.has(pic.src)) continue;
+      seen.add(pic.src);
+      const img = new Image();
+      img.src = pic.src;
+      if (img.decode) img.decode().catch(() => {});   // a missing file is fine
+    }
+  }
 }
 
 /**
@@ -48,7 +58,7 @@ export function pictureSlides(entry) {
  * use, so the two renderers can look like themselves while behaving the same.
  */
 export function buildGallery(entry, cls) {
-  const slides = pictureSlides(entry);
+  const pics = pictureList(entry);
   const wrap = document.createElement('div');
   wrap.className = cls.gallery;
 
@@ -68,17 +78,15 @@ export function buildGallery(entry, cls) {
   strip.appendChild(track);
   wrap.appendChild(strip);
 
-  if (!slides.length) {
+  if (!pics.length) {
     wrap.classList.add('is-one');
-    track.appendChild(slideOf([emptyFigure(cls)], cls));
+    track.appendChild(emptyFigure(cls));
     return wrap;
   }
 
-  for (const pics of slides) {
-    track.appendChild(slideOf(pics.map((p) => pictureFigure(p, entry, cls)), cls));
-  }
+  for (const pic of pics) track.appendChild(pictureFigure(pic, entry, cls));
 
-  if (slides.length < 2) {
+  if (pics.length < 2) {
     wrap.classList.add('is-one');
     return wrap;
   }
@@ -87,17 +95,9 @@ export function buildGallery(entry, cls) {
   // the arrow keys alone while focus is in here.
   track.tabIndex = 0;
   track.setAttribute('role', 'group');
-  track.setAttribute('aria-label', `${slides.length} views — scroll sideways`);
-  addNav(wrap, strip, track, slides.length, cls);
+  track.setAttribute('aria-label', `${pics.length} pictures — scroll sideways`);
+  addNav(wrap, strip, track, pics.length, cls);
   return wrap;
-}
-
-/** One swipe position. Usually one picture; sometimes two, stacked. */
-function slideOf(figures, cls) {
-  const slide = document.createElement('div');
-  slide.className = cls.slide;
-  for (const f of figures) slide.appendChild(f);
-  return slide;
 }
 
 /* ------------------------------------------------------------------ */
@@ -191,7 +191,9 @@ function pictureFigure(pic, entry, cls) {
   const img = document.createElement('img');
   img.src = pic.src;
   img.alt = pic.caption || entry.title || '';
-  img.loading = 'lazy';
+  // Not lazy. These are preloaded at boot and there are a handful of them, so
+  // deferring only bought a panel that filled itself in while you watched.
+  img.decoding = 'sync';
 
   // A path can be committed before the file is. Rather than leaving a broken
   // image glyph in the panel, fall back to the same dashed slot an empty entry

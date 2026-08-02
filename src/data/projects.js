@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Automations and Client Work hold real entries. Personal Projects and About Me
-// are still placeholder — replace them, keeping the shape.
+// Automations and Client Work hold real entries. Initiatives and About Me are
+// still placeholder — replace them, keeping the shape.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //
@@ -21,9 +21,13 @@
 //     images:      [{ src: 'img/…', caption: 'What you are looking at.' }],
 //   }
 //
-// PICTURES. `images` takes as many as you like: the first gets the full width
-// of the panel and the rest pair up under it. A caption is optional. One
-// picture and `image: 'img/…'` says the same thing more briefly.
+// PICTURES. `images` takes as many as you like; several become a filmstrip you
+// swipe sideways, one at a time. A caption is optional. One picture and
+// `image: 'img/…'` says the same thing more briefly.
+//
+// Pictures sit in a 3:2 frame, letterboxed rather than cropped. `ratio` on the
+// entry changes that frame ('3 / 1' for a workflow canvas); `ratio` on a single
+// picture overrules it, and 'auto' means no frame at all.
 //
 // Put the files in img/<wing>/ and reference them by path. A path with no file
 // behind it draws a dashed "photo goes here" slot rather than a broken image,
@@ -91,15 +95,13 @@ export const WINGS = [
           // Both take their own shape rather than the wide frame the workflow
           // wants: the summary is square, and squeezed into a 3:1 frame it
           // would come out a third of the width and unreadable.
-          [
-            { src: 'img/automations/spending-tracker-data.png', ratio: 'auto',
-              caption: 'Every transaction, categorised, as it lands in the sheet' },
-            { src: 'img/automations/spending-tracker-graph.png', ratio: 'auto',
-              caption: 'The month against budget, at a glance' },
-          ],
+          { src: 'img/automations/spending-tracker-data.png', ratio: 'auto',
+            caption: 'Every transaction, categorised, as it lands in the sheet' },
+          { src: 'img/automations/spending-tracker-graph.png', ratio: 'auto',
+            caption: 'The month against budget, at a glance' },
         ],
         tagline: 'An n8n workflow that logs and categorises every card '
-          + 'transaction as it lands.',
+          + 'transaction',
         description:
           'This automation is a personal spending tracker that watches Gmail '
           + 'every minute for "Transaction Update" alert emails from my '
@@ -110,6 +112,7 @@ export const WINGS = [
           + 'Google Sheet and labels the email so it is marked as processed. '
           + 'The sheet is set up so a month\'s entries can be read at a glance '
           + 'as a graph.',
+        tech: ['n8n', 'OpenAI'],
         highlights: [
           'No manual tracking of my spending.',
           'Helped me reduce my spending.',
@@ -120,7 +123,7 @@ export const WINGS = [
 
   {
     id: 'personal',
-    title: 'Personal Projects',
+    title: 'Initiatives',
     blurb: 'Built for me, for the pleasure of building them.',
     projects: [
       {
@@ -157,7 +160,7 @@ export const WINGS = [
     blurb: 'Built for other people, to a brief and a deadline.',
     projects: [
       {
-        title: 'Scorify — NSW Selective Test Prep',
+        title: 'Scorify',
         launch: 'Feb 2026',
         images: [],
         tagline: 'Subscription practice platform for the NSW Selective High '
@@ -168,10 +171,9 @@ export const WINGS = [
           + 'subscription platform in December 2025 that mirrors the exam '
           + 'format: topic-based question sets '
           + 'and five full mock papers per subject across Reading, '
-          + 'Mathematical Reasoning, Thinking Skills and Writing. Users pay '
-          + 'through Stripe, and n8n workflows handle AI marking on written '
-          + 'responses. It has been live and taking paying subscribers since '
-          + 'February 2026, acquired through Google and Meta ads I ran myself.',
+          + 'Mathematical Reasoning, Thinking Skills and Writing. It has been '
+          + 'live and taking paying subscribers since February 2026, acquired '
+          + 'through Google and Meta ads I ran myself.',
         tech: [
           'React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui',
           'React Router v6', 'TanStack Query',
@@ -187,7 +189,7 @@ export const WINGS = [
           '4.2% click-through rate, and 11% conversion from ad click to paid '
           + 'subscription.',
         ],
-        links: [{ label: 'Live site', url: 'https://scorify100.com/' }],
+        links: [{ label: 'Visit site', url: 'https://scorify100.com/' }],
       },
       {
         title: 'Nail Studio by H',
@@ -260,9 +262,10 @@ export const WINGS = [
 // ---------------------------------------------------------------------------
 // PICTURES ON THE WALLS
 //
-// Each wing hangs four framed pictures. Give an entry here and that frame
-// becomes something you can walk up to and read; leave it out and the frame is
-// simply decoration. Order is left to right along the wall.
+// The atrium hangs four framed pictures. Give an entry here and that frame
+// becomes something you can walk up to and read; leave it out and it says so
+// and points back at this file, because a frame that swallows the keypress
+// teaches you not to press E at the next one.
 //
 // A picture on a wall is one picture, not a set: `image` takes a path under
 // img/, the same as a project entry. These want a caption rather than a
@@ -270,23 +273,10 @@ export const WINGS = [
 // ---------------------------------------------------------------------------
 
 export const PAINTINGS = {
-  // The Automations wing is a machine hall and hangs pipework rather than
-  // pictures, so this key is unused. It stays so the four wings read as a set.
-  automations: [null, null, null, null],
-  personal: [
-    { title: 'Placeholder — picture one', caption: 'Personal work tends to photograph better than client work. Use the good screenshots here.' },
-    null,
-    { title: 'Placeholder — picture three', caption: 'Another slot.' },
-    null,
-  ],
-  // The Client Work wing is a boardroom and hangs charts rather than pictures,
-  // so this key is unused. It stays so the four wings still read as a set.
-  client: [null, null, null, null],
-  // The About Me wing is a cinema and hangs nothing, so this key is unused.
-  // It stays here so the four wings still read as a set.
-  about: [null, null, null, null],
-  // The atrium hangs four, two down each side wall: west top to bottom first,
-  // then east. Nothing goes on its end wall — the résumé has that.
+  // The atrium is the only room that hangs pictures now: four, two down each
+  // side wall, west top to bottom first, then east. Nothing goes on its end
+  // wall — the résumé has that. Every wing is dressed as itself instead — a
+  // machine hall, a boardroom, a cinema, and Initiatives' plinth and benches.
   atrium: [null, null, null, null],
 };
 

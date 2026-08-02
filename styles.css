@@ -647,15 +647,9 @@ body.is-handheld { overflow: auto; }
 .mc-world-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .mc-world-gallery.is-one .mc-world-track { overflow-x: hidden; }
 
-.mc-world-slide {
+.mc-world-figure {
   flex: 0 0 100%;
   scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.mc-world-figure {
   margin: 0;
   padding: 6px;
   background: rgba(0, 0, 0, 0.28);
@@ -776,19 +770,12 @@ body.is-handheld { overflow: auto; }
 .detail-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .detail-gallery.is-one .detail-track { overflow-x: hidden; }
 
-/* One slide is exactly one strip wide, which is what makes the dots' arithmetic
-   (scrollLeft / clientWidth) hold — so no gap here; the spacing is the
-   figure's own padding. A slide usually holds one picture; where the frame is
-   short enough for two to fit, it holds both, stacked. */
-.detail-slide {
+/* One picture is exactly one strip wide, which is what makes the dots'
+   arithmetic (scrollLeft / clientWidth) hold — so no gap here; the spacing is
+   the figure's own padding. */
+.detail-figure {
   flex: 0 0 100%;
   scroll-snap-align: start;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.detail-figure {
   margin: 0;
   padding: 8px;
   background: var(--panel);

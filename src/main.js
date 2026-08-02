@@ -6,7 +6,8 @@
 
 import { view, COL } from './config.js';
 import { buildSprites } from './art.js';
-import { ABOUT, CLIENTS } from './data/projects.js';
+import { ABOUT, CLIENTS, WINGS, RESUME, RULES } from './data/projects.js';
+import { preloadPictures } from './picture.js';
 import {
   buildMap, map, plinthNear, interactableNear, drawProp, drawSconces, START_PX,
 } from './map.js';
@@ -64,6 +65,15 @@ function personCast() {
   return cast;
 }
 
+/** Every entry that might have a picture in it, in one flat list. */
+function everyEntry() {
+  return [
+    ...WINGS.flatMap((w) => w.projects || []),
+    RESUME, RULES,
+    ...map.artworks,
+  ];
+}
+
 function boot() {
   const canvas = document.getElementById('game');
 
@@ -71,6 +81,7 @@ function boot() {
     // No game on a phone: a thumb is a bad D-pad. Serve the same content flat.
     document.body.classList.add('is-handheld');
     initListView({ standalone: true });
+    preloadPictures([...WINGS.flatMap((w) => w.projects || []), RESUME, RULES]);
     return;
   }
 
@@ -84,6 +95,11 @@ function boot() {
   initScreening();
 
   document.body.classList.add('is-playing');
+
+  // Fetch and decode every picture now rather than when a panel opens. You
+  // walk to a room before you press E at anything in it, and that walk is time
+  // the pictures can use — so the panel is complete the moment it appears.
+  preloadPictures(everyEntry());
 
   // You always begin in the middle of the atrium, on the medallion.
   spawnAt(START_PX.x, START_PX.y, 'down');

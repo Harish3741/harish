@@ -9,7 +9,7 @@ No two rooms are dressed the same way.
 | Wing | What's in it | Dressed as |
 | --- | --- | --- |
 | North-west | Automations | a machine hall — a belt and three machines |
-| North-east | Personal projects | a gallery — plinth, pictures, benches |
+| North-east | Initiatives | a gallery — plinth, benches, statues |
 | South-west | Client work | a boardroom — carpet tile, a table, three clients |
 | South-east | About me | a cinema — one screen, one chair |
 
@@ -75,19 +75,15 @@ A single picture can overrule its entry, including with `ratio: 'auto'` for no
 frame at all — full width at its own shape. That is what a tall picture wants
 when it shares an entry with wide ones.
 
-Where two pictures belong together, a nested array puts them in the same view
-rather than making you swipe for the second:
+The strip is as tall as the picture you are looking at, not as tall as the
+tallest one in it — otherwise a full-page screenshot in view two puts 700px of
+empty space under the short one in view one, and pushes the writing that far
+down.
 
-```js
-images: [
-  pictureA,               // one view
-  [pictureB, pictureC],   // the next view, the two stacked
-]
-```
-
-The strip is as tall as the view you are looking at, not as tall as the tallest
-one in it — otherwise a full-page screenshot in view two puts 700px of empty
-space under the short one in view one, and pushes the writing that far down.
+Every picture in the whole museum is fetched and decoded at boot, not when a
+panel opens. You walk to a room before you press E at anything in it, and that
+walk is time the pictures can use, so a panel arrives finished rather than
+assembling itself while you look at it.
 
 Files go in `img/<wing>/` and are referenced by path. **A path with no file
 behind it draws the dashed *photo goes here* slot rather than a broken image**,
@@ -106,11 +102,11 @@ plinth) stays put.
 
 ### Pictures on the walls
 
-The Personal Projects wing hangs four frames and the atrium four more.
-`PAINTINGS` in the same file gives them captions, left to right along the wall.
-Every frame can be walked up to and read whether or not it has an entry yet —
-a `null` slot says so and points at this file, because a frame that swallows
-the keypress teaches you not to bother pressing E at the next one.
+The atrium hangs four frames, and it is the only room that does. `PAINTINGS`
+in the same file gives them captions. Every frame can be walked up to and read
+whether or not it has an entry yet — a `null` slot says so and points at this
+file, because a frame that swallows the keypress teaches you not to bother
+pressing E at the next one.
 
 ```js
 { title: 'Invoice reconciler',
@@ -121,10 +117,9 @@ the keypress teaches you not to bother pressing E at the next one.
 A picture on a wall is one picture, not a set — `image` only. These want a
 caption rather than a write-up.
 
-The atrium hangs four, two down each side wall — `PAINTINGS.atrium` runs west
-top-to-bottom, then east. Its end wall carries the résumé instead. Only the
-Personal Projects wing is still a gallery; the other three hang pipework,
-downlights and nothing at all, so their `PAINTINGS` keys go unused.
+`PAINTINGS.atrium` runs west top-to-bottom, then east. The end wall carries
+the résumé instead. No wing hangs pictures any more: each is dressed as itself
+— pipework, downlights, a screen, and Initiatives' plinth and benches.
 
 ### The résumé and the rules
 

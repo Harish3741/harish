@@ -150,8 +150,9 @@ export const WINGS = [
           + 'School Placement Test.',
         description:
           'Year 5 and 6 students preparing for the NSW Selective test needed '
-          + 'practice that matched the real paper. So I built a subscription '
-          + 'platform that mirrors the exam format: topic-based question sets '
+          + 'practice that matched the real paper. So I started building a '
+          + 'subscription platform in December 2025 that mirrors the exam '
+          + 'format: topic-based question sets '
           + 'and five full mock papers per subject across Reading, '
           + 'Mathematical Reasoning, Thinking Skills and Writing. Users pay '
           + 'through Stripe, and n8n workflows handle AI marking on written '
@@ -168,7 +169,9 @@ export const WINGS = [
         ],
         highlights: [
           '1,392 visitors and 5,167 pageviews since launch.',
-          'Four figures in revenue in the first two months.',
+          'Three figures in revenue within the first month.',
+          '4.2% click-through rate, and 11% conversion from ad click to paid '
+          + 'subscription.',
         ],
         links: [{ label: 'Live site', url: 'https://scorify100.com/' }],
       },
@@ -177,13 +180,13 @@ export const WINGS = [
         launch: 'Jun 2026',
         client: 'Hannah',
         images: [
-          { src: 'img/client/01-home-hero-desktop.png',
+          { src: 'img/client/01-home-hero-desktop.jpg',
             caption: 'The landing page: what it is, where it is, and the one '
               + 'thing to do next.' },
           { src: 'img/client/08-booking-form-conditional-desktop.png',
             caption: 'The waiting list form. It posts to Apps Script, which '
               + 'notifies the owner.' },
-          { src: 'img/client/nail studio gallery.png',
+          { src: 'img/client/nail-studio-gallery.jpg',
             caption: 'The gallery — recent work, tap any image to view.' },
         ],
         tagline: 'A customised website to suit a nail tech\'s needs.',

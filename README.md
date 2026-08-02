@@ -198,8 +198,13 @@ host that won't serve modules, a strict content policy — there is a bundler:
 
 ```sh
 node tools/build-standalone.mjs
-# dist/index.html   one file, ~105 KB, no requests to anything
+# dist/index.html   one file, no requests to anything
 ```
+
+It reports its own size, and pictures are most of it — the code is around
+110 KB and every screenshot referenced is inlined as base64 on top of that, a
+third larger than the file on disk. Which is the reason for resizing them
+before they go in `img/`.
 
 It concatenates the modules into one scope, so it refuses to build if two
 modules declare the same top-level name.

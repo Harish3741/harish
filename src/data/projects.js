@@ -1,7 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Everything below is placeholder. Replace the entries, keep the shape.
+// Automations and Client Work hold real entries. Personal Projects and About Me
+// are still placeholder — replace them, keeping the shape.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //
@@ -13,7 +14,7 @@
 //     launch:      'Mar 2025',   // when it went live. A bare year is fine too
 //     tagline:     'One line. What it is, in plain words.',
 //     description: 'A paragraph. What problem it solved, what you decided, '
-//                + 'what happened after.',
+//                + 'what happened after.',    // or an array, for two paragraphs
 //     tech:        ['Python', 'n8n', 'Postgres'],
 //     highlights:  ['Cut a 6-hour week to 20 minutes'],
 //     links:       [{ label: 'Repo', url: 'https://…' }],
@@ -46,60 +47,36 @@ export const WINGS = [
     blurb: 'Things that now happen without me.',
     projects: [
       {
-        title: 'Placeholder — automation one',
-        image: null,
-        launch: '2025',
-        tagline: 'Replace me with something that runs on a schedule.',
-        description:
-          'This is placeholder copy so the wing has something in it while the '
-          + 'museum is being built. Swap it for a real automation: what was '
-          + 'manual before, what triggers it now, and what it saves.',
-        tech: ['Python', 'n8n'],
-        highlights: ['Placeholder result, e.g. "6 hours a week back"'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — automation two',
-        image: null,
-        launch: '2024',
-        tagline: 'A second slot, so the list has something to scroll.',
-        description:
-          'Same idea. Delete this entry entirely if you only have one — the '
-          + 'menu adapts to however many are here.',
-        tech: ['Apps Script'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — automation three',
-        image: null,
-        launch: '2024',
-        tagline: 'The machine hall has five bays.',
-        description:
-          'Five machines stand in that room and all five can be pressed. An '
-          + 'entry here lights one of them up; a bay with no entry behind it '
-          + 'stands there with its lamps out and says so when you inspect it.',
-        tech: ['n8n'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — automation four',
-        image: null,
-        launch: '2023',
-        tagline: 'Fourth bay.',
-        description: 'Replace or delete. Nothing breaks either way.',
-        tech: ['n8n', 'Postgres'],
-        links: [],
-      },
-      {
-        title: 'Placeholder — automation five',
-        image: null,
-        launch: '2023',
-        tagline: 'Fifth and last bay.',
-        description:
-          'A sixth entry would still show in the skip-to-list; the room only '
-          + 'has five places to stand a machine.',
-        tech: ['Zapier'],
-        links: [],
+        title: 'Job Scraper',
+        launch: 'Jun 2026',
+        images: [{ src: 'img/automations/job-scraper-workflow.png',
+          caption: 'The flow: two branches in, dedupe and score, one sheet out.' }],
+        tagline: 'An n8n workflow that finds job postings and scores them '
+          + 'against my own criteria.',
+        description: [
+          'I wanted a way to catch suitable roles without manually checking '
+          + 'each site every week, and without drowning in irrelevant jobs. So '
+          + 'I built this.',
+          'A Claude research routine finds which companies are hiring the most '
+          + 'right now for the roles I care about and sends that list into n8n '
+          + 'via webhook, where it is checked against Greenhouse, Lever and '
+          + 'Ashby and logged to a sheet. A separate Adzuna branch searches '
+          + 'directly by job title in parallel. Every new posting from both '
+          + 'branches gets deduped and scored 0-10 by an OpenAI node against a '
+          + 'written description of roles I actually want. Only postings that '
+          + 'clear the bar get written to a Google Sheet with the score.',
+        ],
+        tech: ['n8n', 'Claude', 'OpenAI', 'Adzuna API', 'Greenhouse', 'Lever',
+          'Ashby', 'Google Sheets'],
+        highlights: [
+          'Scores every new posting against my actual fit criteria instead of '
+          + 'just keyword matches, so what lands in the sheet is consistently '
+          + 'relevant.',
+          'Saves 2-3 hours a week I used to spend manually searching and '
+          + 'filtering listings.',
+          'Planning to extend it to auto-draft a customised resume per job, '
+          + 'pulled from my documented achievements.',
+        ],
       },
     ],
   },

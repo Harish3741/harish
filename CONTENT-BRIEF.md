@@ -26,6 +26,7 @@ at a time — a session that worked on three things will blur them together.
 >   images: [],       // leave empty, I'll fill it in
 >   tagline: '',      // one line. What it is, in plain words, no adjectives
 >   description: '',  // 2-4 sentences: the problem, what we decided, what happened after
+>                     // an array of strings if it wants two paragraphs
 >   tech: [],         // what it is actually built on. No aspirational entries
 >   highlights: [],   // 1-3 concrete outcomes. Numbers if we have them, nothing if we don't
 >   links: [],        // [{ label: 'Repo', url: '…' }] — only links that resolve

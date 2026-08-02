@@ -209,11 +209,15 @@ function renderDetail() {
     detailEl.appendChild(cl);
   }
 
+  // A description can be one string or several. Several become paragraphs —
+  // a workflow that takes four sentences to describe wants a break in it.
   if (entry.description) {
-    const d = document.createElement('p');
-    d.className = 'detail-body';
-    d.textContent = entry.description;
-    detailEl.appendChild(d);
+    for (const para of [].concat(entry.description)) {
+      const d = document.createElement('p');
+      d.className = 'detail-body';
+      d.textContent = para;
+      detailEl.appendChild(d);
+    }
   }
 
   if (entry.highlights && entry.highlights.length) {

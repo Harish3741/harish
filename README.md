@@ -39,7 +39,7 @@ you leave out simply doesn't render.
   launch:      'Mar 2025',           // when it went live; a bare year is fine
   tagline:     'One line. What it is, in plain words.',
   description: 'A paragraph. What problem it solved, what you decided, '
-             + 'what happened after.',
+             + 'what happened after.',   // or an array, for two paragraphs
   tech:        ['Python', 'n8n', 'Postgres'],
   highlights:  ['Cut a 6-hour week to 20 minutes'],
   links:       [{ label: 'Repo', url: 'https://…' }],

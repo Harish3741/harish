@@ -196,7 +196,12 @@ function renderWing(wing) {
     if (bits.length) text.appendChild(el('p', 'mc-world-meta', bits.join('  ·  ')));
 
     if (entry.tagline) text.appendChild(el('p', 'mc-world-tagline', entry.tagline));
-    if (entry.description) text.appendChild(el('p', 'mc-world-desc', entry.description));
+    // one string or several; several become paragraphs
+    if (entry.description) {
+      for (const para of [].concat(entry.description)) {
+        text.appendChild(el('p', 'mc-world-desc', para));
+      }
+    }
 
     // the same picture slot the exhibit panel shows, filled or waiting
     if (hasPictures(entry)) text.appendChild(buildGallery(entry, WORLD_PICS));

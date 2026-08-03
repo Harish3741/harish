@@ -62,25 +62,25 @@ export const WINGS = [
           + 'against my own criteria.',
         description: [
           'I wanted a way to catch suitable roles without manually checking '
-          + 'each site every week, and without drowning in irrelevant jobs. So '
+          + 'each site every week and without drowning in irrelevant jobs. So '
           + 'I built this.',
           'A Claude research routine finds which companies are hiring the most '
           + 'right now for the roles I care about and sends that list into n8n '
-          + 'via webhook, where it is checked against Greenhouse, Lever and '
-          + 'Ashby and logged to a sheet. A separate Adzuna branch searches '
-          + 'directly by job title in parallel. Every new posting from both '
-          + 'branches gets deduped and scored 0-10 by an OpenAI node against a '
-          + 'written description of roles I actually want. Only postings that '
-          + 'clear the bar get written to a Google Sheet with the score.',
+          + 'via webhook, where it\'s checked against Greenhouse/Lever/Ashby '
+          + 'and logged to a sheet. A separate Adzuna branch searches directly '
+          + 'by job title in parallel. Every new posting from both branches '
+          + 'gets deduped and scored 0-10 by an OpenAI node against a written '
+          + 'description of roles I actually want. Only postings that clear '
+          + 'the bar get written to a Google Sheet with the score.',
         ],
         highlights: [
           'Scores every new posting against my actual fit criteria instead of '
           + 'just keyword matches, so what lands in the sheet is consistently '
-          + 'relevant.',
+          + 'relevant',
           'Saves 2-3 hours a week I used to spend manually searching and '
-          + 'filtering listings.',
-          'Planning to extend it to auto-draft a customised resume per job, '
-          + 'pulled from my documented achievements.',
+          + 'filtering listings',
+          'Planning to explain it to auto-draft a customised resume per job, '
+          + 'pulled from my documented achievements',
         ],
       },
 
@@ -105,15 +105,15 @@ export const WINGS = [
           'This automation is a personal spending tracker that watches Gmail '
           + 'every minute for "Transaction Update" alert emails from my '
           + 'American Express card. Whenever one arrives, it extracts the '
-          + 'merchant name, amount and date from the email text, uses an AI '
-          + 'model to categorise the purchase as Food, Essentials, '
-          + 'Subscriptions, Travel or Other, then logs all of that into a '
-          + 'Google Sheet and labels the email so it is marked as processed. '
-          + 'The sheet is set up so a month\'s entries can be read at a glance '
-          + 'as a graph.',
+          + 'merchant name, amount, and date from the email text, uses an AI '
+          + 'model to automatically categorize the purchase as Food, '
+          + 'Essentials, Subscriptions, Travel, or Other, then logs all of '
+          + 'that into a Google Sheet and labels the email so it\'s marked as '
+          + 'processed. The google sheet is customised so date entered for the '
+          + 'month can be easily seen through a graph.',
         highlights: [
-          'No manual tracking of my spending.',
-          'Helped me reduce my spending.',
+          'No need for manual tracking of my spenditure',
+          'Helped me reduce my spending',
         ],
       },
 
@@ -128,22 +128,21 @@ export const WINGS = [
             caption: 'Digs an email out of each one and sends the first note' },
         ],
         tagline: 'An n8n workflow that finds businesses and their details',
-        description: [
-          'This automation is a two-step lead-gen and outreach machine built in '
-          + 'n8n. The first workflow searches Google Maps for local businesses '
-          + 'matching a keyword and pulls their names, addresses and phone '
-          + 'numbers across multiple result pages. Then it removes duplicates '
-          + 'and anyone previously contacted, and saves the new ones.',
-          'A second workflow is triggered which looks up each business\'s '
-          + 'website, scrapes the page for a contact email — even decoding '
-          + 'hidden or obfuscated addresses — filters out junk emails and '
+        description:
+          'This automation is a two-step lead-gen and outreach machine built '
+          + 'in n8n. The first workflow searches Google Maps for local '
+          + 'businesses matching a keyword and pulls their names, addresses, '
+          + 'and phone numbers across multiple result pages. Then it removes '
+          + 'duplicates and previously-contacted and saves the new ones. A '
+          + 'second workflow is triggered which looks up each business\'s '
+          + 'website, scrapes the page for a contact email (even decoding '
+          + 'hidden or obfuscated addresses), filters out junk emails and '
           + 'updates a spreadsheet with what it finds. If a real email turns '
           + 'up, we are able to send a pre-written cold outreach email.',
-        ],
         highlights: [
-          'Used it to find leads for Scorify, my edtech platform.',
-          'Helped me compare prices when I wanted my car tinted.',
-          'Can be pointed at any kind of business.',
+          'Used it to find leads for Scorify (my edtech platform)',
+          'Helped me compare prices for when I wanted to tint my car',
+          'Can be edited to find any business',
         ],
       },
     ],
@@ -200,7 +199,7 @@ export const WINGS = [
           + 'format: topic-based question sets '
           + 'and five full mock papers per subject across Reading, '
           + 'Mathematical Reasoning, Thinking Skills and Writing. It has been '
-          + 'live and taking paying subscribers since February 2026, acquired '
+          + 'live and taking paying subscribers since February 2025, acquired '
           + 'through Google and Meta ads I ran myself.',
         tech: [
           'React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui',
@@ -212,10 +211,10 @@ export const WINGS = [
           'Lovable (build + hosting)',
         ],
         highlights: [
-          '1,392 visitors and 5,167 pageviews since launch.',
-          'Three figures in revenue within the first month.',
-          '4.2% click-through rate, and 11% conversion from ad click to paid '
-          + 'subscription.',
+          '1,392 visitors and 5,167 pageviews since launch',
+          '3 figure revenue within first month',
+          '4.2% click through rate and 11% conversion rate from ad click to '
+          + 'paid subscription',
         ],
         links: [{ label: 'Visit site', url: 'https://scorify100.com/' }],
       },
@@ -233,7 +232,7 @@ export const WINGS = [
             caption: 'A gallery of recent work. User can tap any image to '
               + 'view.' },
         ],
-        tagline: 'A customised website to suit a nail tech\'s needs.',
+        tagline: 'A customised website to suit a nail techs need.',
         description:
           'Designed and built a website for Hannah that streamlines her '
           + 'booking process, with clear, upfront pricing and a portfolio '
@@ -243,9 +242,10 @@ export const WINGS = [
         tech: ['HTML', 'CSS', 'Vanilla JavaScript', 'Google Apps Script',
           'GitHub Pages'],
         highlights: [
-          'Four static files, 1,769 lines, no dependencies and no build step.',
-          'The booking form posts to a Google Apps Script endpoint, which '
-          + 'notifies the owner so they can follow up on requests.',
+          'Four static files, 1,769 lines total, zero dependencies and no '
+          + 'build step. The on-site form posts to a Google Apps Script '
+          + 'endpoint. This then sends a notification to the business owner so '
+          + 'that they can follow up on requests.',
         ],
         links: [{ label: 'Visit the site', url: 'https://nailstudiobyh.site/' }],
       },

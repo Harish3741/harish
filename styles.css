@@ -289,9 +289,12 @@ body.is-handheld { overflow: auto; }
   text-transform: uppercase;
 }
 
+/* Runs the width of the pane. It used to stop at 58ch, which is the readable
+   measure for a column of prose but left half the panel empty once the window
+   grew — and a paragraph that stops in the middle of the space it was given
+   looks like something went wrong rather than like typography. */
 .detail-body {
   margin: 0;
-  max-width: 58ch;
   color: #DED0BA;
   font-size: 15px;
   line-height: 1.62;
@@ -793,8 +796,13 @@ body.is-handheld { overflow: auto; }
 
 /* A fixed frame, letterboxed rather than cropped. Screenshots come in every
    shape and cropping a UI to fit loses the part that explains it. */
+/* The frame gives the shape; the cap stops it running away. A `ratio: auto`
+   picture takes its own proportions, and a nearly square one in a window this
+   wide came out as tall as it was — most of a screen of one screenshot. Capped,
+   it letterboxes sideways instead and the writing stays in view. */
 .detail-figure img {
   aspect-ratio: var(--pic-ratio);
+  max-height: min(46vh, 520px);
   object-fit: contain;
   background: #16100A;
 }

@@ -123,7 +123,8 @@ export const WINGS = [
         images: [
           { src: 'img/automations/lead-gen-maps-scraper.png',
             caption: 'Finds the businesses and pulls their details' },
-          { src: 'img/automations/lead-gen-website-scraper.png',
+          // this canvas is a longer, thinner run than the first
+          { src: 'img/automations/lead-gen-website-scraper.png', ratio: '4 / 1',
             caption: 'Digs an email out of each one and sends the first note' },
         ],
         tagline: 'An n8n workflow that finds businesses and their details',

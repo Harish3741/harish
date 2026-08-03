@@ -10,7 +10,7 @@ No two rooms are dressed the same way.
 | --- | --- | --- |
 | North-west | Automations | a machine hall — a belt and three machines |
 | North-east | Initiatives | a gallery — plinth, benches, statues |
-| South-west | Client work | a boardroom — carpet tile, a table, three clients |
+| South-west | Projects | a boardroom — carpet tile, a table, three clients |
 | South-east | About me | a cinema — one screen, one chair |
 
 You start in the middle of the atrium, standing on the compass. Walk to the
@@ -151,7 +151,7 @@ list.
 
 ### The boardroom
 
-The Client Work wing is a boardroom, not a gallery: office carpet tile, two
+The Projects wing is a boardroom, not a gallery: office carpet tile, two
 downlights, a table standing end-on to the door and three clients round it —
 one down each side, one at the far head.
 

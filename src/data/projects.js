@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Automations and Client Work hold real entries. Initiatives and About Me are
+// Automations and Projects hold real entries. Initiatives and About Me are
 // still placeholder — replace them, keeping the shape.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
@@ -73,7 +73,6 @@ export const WINGS = [
           + 'written description of roles I actually want. Only postings that '
           + 'clear the bar get written to a Google Sheet with the score.',
         ],
-        tech: ['n8n', 'Claude', 'OpenAI', 'Adzuna API'],
         highlights: [
           'Scores every new posting against my actual fit criteria instead of '
           + 'just keyword matches, so what lands in the sheet is consistently '
@@ -112,10 +111,38 @@ export const WINGS = [
           + 'Google Sheet and labels the email so it is marked as processed. '
           + 'The sheet is set up so a month\'s entries can be read at a glance '
           + 'as a graph.',
-        tech: ['n8n', 'OpenAI'],
         highlights: [
           'No manual tracking of my spending.',
           'Helped me reduce my spending.',
+        ],
+      },
+
+      {
+        title: 'Lead Gen',
+        ratio: '3 / 1',
+        images: [
+          { src: 'img/automations/lead-gen-maps-scraper.png',
+            caption: 'Finds the businesses and pulls their details' },
+          { src: 'img/automations/lead-gen-website-scraper.png',
+            caption: 'Digs an email out of each one and sends the first note' },
+        ],
+        tagline: 'An n8n workflow that finds businesses and their details',
+        description: [
+          'This automation is a two-step lead-gen and outreach machine built in '
+          + 'n8n. The first workflow searches Google Maps for local businesses '
+          + 'matching a keyword and pulls their names, addresses and phone '
+          + 'numbers across multiple result pages. Then it removes duplicates '
+          + 'and anyone previously contacted, and saves the new ones.',
+          'A second workflow is triggered which looks up each business\'s '
+          + 'website, scrapes the page for a contact email — even decoding '
+          + 'hidden or obfuscated addresses — filters out junk emails and '
+          + 'updates a spreadsheet with what it finds. If a real email turns '
+          + 'up, we are able to send a pre-written cold outreach email.',
+        ],
+        highlights: [
+          'Used it to find leads for Scorify, my edtech platform.',
+          'Helped me compare prices when I wanted my car tinted.',
+          'Can be pointed at any kind of business.',
         ],
       },
     ],
@@ -156,7 +183,7 @@ export const WINGS = [
 
   {
     id: 'client',
-    title: 'Client Work',
+    title: 'Projects',
     blurb: 'Built for other people, to a brief and a deadline.',
     projects: [
       {
@@ -283,7 +310,7 @@ export const PAINTINGS = {
 // ---------------------------------------------------------------------------
 // THE BOARDROOM
 //
-// The Client Work wing is a boardroom rather than a gallery: three clients
+// The Projects wing is a boardroom rather than a gallery: three clients
 // standing round a table, and pressing E on one shows the work you did for
 // them. There is no plinth in that room — the people are the exhibit.
 //

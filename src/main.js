@@ -162,7 +162,9 @@ function update(dt, ts) {
     movePlayer(axis.x, axis.y, dt);
   }
 
-  followCamera(player.x, focusY(), 0.14);
+  // Snapped, not eased. See followCamera: an eased camera rounds on its own
+  // beat and leaves the droid shivering a pixel against a smooth world.
+  centreCamera(player.x, focusY());
 
   const near = interactableNear(player.x, player.y);
   promptPulse = near ? Math.min(1, promptPulse + dt * 7) : Math.max(0, promptPulse - dt * 9);

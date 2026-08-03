@@ -98,7 +98,7 @@ export const WING_ROOMS = {
     accent: '#6B3F28',
   },
   client: {
-    cx: 14, entry: 'north', rail: 20, label: 'Client Work', banner: 'CLIENT WORK',
+    cx: 14, entry: 'north', rail: 20, label: 'Projects', banner: 'PROJECTS',
     accent: '#2F3A55', boardroom: true,
   },
   about: {

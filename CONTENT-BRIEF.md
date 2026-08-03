@@ -54,7 +54,7 @@ at a time — a session that worked on three things will blur them together.
 
 ### One line to add depending on the wing
 
-- **Client work** — "Also give me the client's name as I should print it, or a
+- **Projects** — "Also give me the client's name as I should print it, or a
   neutral stand-in ('a logistics company') if it can't be named."
 - **Automations** — "Say what fires it: a schedule, a webhook, a file landing,
   someone pressing a button. And roughly how often it runs."
@@ -74,7 +74,7 @@ but the objects skip a step and skip my guesswork.
 { title: '…', launch: 'Feb 2026', images: [], tagline: '…', description: '…',
   tech: ['…'], highlights: ['…'], links: [] },
 
-// CLIENT WORK — same, plus one extra field:
+// PROJECTS — same, plus one extra field:
 { title: '…', client: 'Hannah', … },
 ```
 
@@ -122,7 +122,7 @@ Rooms and how much each holds:
 | --- | --- | --- |
 | Automations | any of the three machines | any number |
 | Initiatives | the plinth | any number |
-| Client work | the boardroom table | any number |
+| Projects | the boardroom table | any number |
 | About me | the character by the door | any number |
 
 Plus, separately from the project lists:

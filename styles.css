@@ -115,9 +115,14 @@ body.is-handheld { overflow: auto; }
    height means every entry you move to resizes it and both edges slide — one
    project with three screenshots and the next with none made the whole frame
    jump. Fixed, the frame is furniture and only what's inside it changes. */
+/* Sized off the viewport, not fixed. At 920x660 the window was a third of the
+   width of a large monitor and read as a small box in the middle of a big dark
+   screen; the floors keep it exactly as it was on a laptop, where it already
+   filled its share, and the caps stop a very wide screen stretching the
+   pictures past the point of being worth looking at. */
 .window {
-  width: min(920px, 100%);
-  height: min(660px, 100%);
+  width: min(100%, max(920px, min(65vw, 1500px)));
+  height: min(100%, max(660px, min(72vh, 940px)));
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -743,7 +748,11 @@ body.is-handheld { overflow: auto; }
 /* A single picture or document has nothing to move between, so it keeps a
    content-driven height — a two-line caption in a 660px frame is mostly empty
    frame. */
-.overlay.is-single .window { height: auto; max-height: min(560px, 100%); }
+.overlay.is-single .window {
+  width: min(100%, 920px);            /* one document; no need for the extra */
+  height: auto;
+  max-height: min(560px, 100%);
+}
 
 /* Several pictures are a filmstrip you swipe sideways, one at a time — stacked
    they pushed the writing most of a panel down, and the writing is the point.

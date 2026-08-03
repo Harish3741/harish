@@ -30,8 +30,12 @@ function resize() {
   // smallest whole scale that keeps the logical view inside its bounds
   scale = Math.max(2, Math.ceil(w / MAX_VIEW_W), Math.ceil(h / MAX_VIEW_H));
 
-  view.w = Math.ceil(w / scale);
-  view.h = Math.ceil(h / scale);
+  // Even, so half a viewport is a whole number of pixels. The camera centres on
+  // the droid by subtracting exactly that, and on an odd width the half-pixel
+  // left over rounds differently depending on where the droid happens to be —
+  // which is a one-pixel wobble under the sprite the whole time it walks.
+  view.w = Math.ceil(w / scale / 2) * 2;
+  view.h = Math.ceil(h / scale / 2) * 2;
 
   canvas.width = view.w * scale;
   canvas.height = view.h * scale;
@@ -51,14 +55,22 @@ export function centreCamera(x, y) {
   camera.y = clamp(Math.round(y - view.h / 2), 0, maxCamY());
 }
 
-/** Ease the camera toward a point. `k` is roughly "fraction closed per frame". */
+/**
+ * Ease the camera toward a point. `k` is roughly "fraction closed per frame".
+ *
+ * For the cinematic only. It must not be used to follow the droid while you
+ * walk: the camera position is fractional here and rounded at draw time, so it
+ * crosses pixel boundaries on a different beat from the droid's own position.
+ * The two roundings disagree by a pixel several times a second, and the sprite
+ * shivers against a world that is scrolling perfectly smoothly — worst on a
+ * diagonal, where it happens on both axes at once. Following the droid is
+ * centreCamera's job, which rounds once and pins it.
+ */
 export function followCamera(x, y, k = 0.12) {
   const tx = clamp(x - view.w / 2, 0, maxCamX());
   const ty = clamp(y - view.h / 2, 0, maxCamY());
   camera.x += (tx - camera.x) * k;
   camera.y += (ty - camera.y) * k;
-  // kept smooth here and rounded only at draw time, so the camera doesn't
-  // stutter a pixel at a time on slow approaches
 }
 
 export const camX = () => Math.round(camera.x);

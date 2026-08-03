@@ -79,7 +79,7 @@ export const WINGS = [
           + 'relevant',
           'Saves 2-3 hours a week I used to spend manually searching and '
           + 'filtering listings',
-          'Planning to explain it to auto-draft a customised resume per job, '
+          'Planning to extend it to auto-draft a customised resume per job, '
           + 'pulled from my documented achievements',
         ],
       },
@@ -112,7 +112,7 @@ export const WINGS = [
           + 'processed. The google sheet is customised so date entered for the '
           + 'month can be easily seen through a graph.',
         highlights: [
-          'No need for manual tracking of my spenditure',
+          'No need for manual tracking of my expenditure',
           'Helped me reduce my spending',
         ],
       },
@@ -199,7 +199,7 @@ export const WINGS = [
           + 'format: topic-based question sets '
           + 'and five full mock papers per subject across Reading, '
           + 'Mathematical Reasoning, Thinking Skills and Writing. It has been '
-          + 'live and taking paying subscribers since February 2025, acquired '
+          + 'live and taking paying subscribers since February 2026, acquired '
           + 'through Google and Meta ads I ran myself.',
         tech: [
           'React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui',

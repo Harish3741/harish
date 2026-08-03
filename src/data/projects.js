@@ -109,7 +109,7 @@ export const WINGS = [
           + 'model to automatically categorize the purchase as Food, '
           + 'Essentials, Subscriptions, Travel, or Other, then logs all of '
           + 'that into a Google Sheet and labels the email so it\'s marked as '
-          + 'processed. The google sheet is customised so date entered for the '
+          + 'processed. The google sheet is customised so data entered for the '
           + 'month can be easily seen through a graph.',
         highlights: [
           'No need for manual tracking of my expenditure',

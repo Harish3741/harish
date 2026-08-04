@@ -208,14 +208,15 @@ function renderWing(wing) {
       }
     }
 
-    // the same picture slot the exhibit panel shows, filled or waiting
-    if (hasPictures(entry)) text.appendChild(buildGallery(entry, WORLD_PICS));
-
     if (entry.highlights && entry.highlights.length) {
       const ul = el('ul', 'mc-world-points');
       entry.highlights.forEach((line) => ul.appendChild(el('li', null, line)));
       text.appendChild(ul);
     }
+
+    // the same picture slot the exhibit panel shows, filled or waiting, and in
+    // the same place: after the writing rather than in front of it
+    if (hasPictures(entry)) text.appendChild(buildGallery(entry, WORLD_PICS));
 
     if (entry.links && entry.links.length) {
       const wrap = el('p', 'mc-world-links');

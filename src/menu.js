@@ -202,11 +202,6 @@ function renderDetail() {
   plate.setAttribute('aria-hidden', 'true');
   detailEl.appendChild(plate);
 
-  // An entry that declares `image` or `images` gets a picture slot whether or
-  // not there is a picture in it yet — an empty frame is a prompt to fill it,
-  // and it keeps the layout from jumping about once the photos arrive.
-  if (hasPictures(entry)) detailEl.appendChild(buildGallery(entry, DETAIL_PICS));
-
   if (entry.client) {
     const cl = document.createElement('p');
     cl.className = 'detail-client';
@@ -235,6 +230,13 @@ function renderDetail() {
     });
     detailEl.appendChild(ul);
   }
+
+  // The pictures come after the writing. At the top they were the first thing
+  // in the panel and pushed the description below the fold; what someone wants
+  // first is what the thing is. An entry that declares `image` or `images` gets
+  // the slot whether or not there is a picture in it yet — an empty frame is a
+  // prompt to fill it, and it keeps the layout from moving once they arrive.
+  if (hasPictures(entry)) detailEl.appendChild(buildGallery(entry, DETAIL_PICS));
 
   if (entry.tech && entry.tech.length) {
     const wrap = document.createElement('div');

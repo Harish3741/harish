@@ -761,7 +761,7 @@ body.is-handheld { overflow: auto; }
    they pushed the writing most of a panel down, and the writing is the point.
    Everything else about the entry still stacks vertically underneath. */
 .detail-gallery {
-  margin: 0 0 18px;
+  margin: 18px 0 0;                   /* it follows the writing now */
   --pic-ratio: 3 / 2;                 /* an entry's `ratio` overrides this */
 }
 

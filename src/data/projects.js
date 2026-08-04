@@ -48,7 +48,7 @@ export const WINGS = [
   {
     id: 'automations',
     title: 'Automations',
-    blurb: 'Things that now happen without me.',
+    blurb: 'Automating my to-do list one workflow at a time',
     projects: [
       {
         title: 'Job Scraper',
@@ -151,7 +151,7 @@ export const WINGS = [
   {
     id: 'personal',
     title: 'Initiatives',
-    blurb: 'Built for me, for the pleasure of building them.',
+    blurb: 'Talent is something you make bloom, instinct is something you polish.',
     projects: [
       {
         title: 'Placeholder — personal one',
@@ -171,7 +171,7 @@ export const WINGS = [
   {
     id: 'client',
     title: 'Projects',
-    blurb: 'Built for other people, to a brief and a deadline.',
+    blurb: 'Built for monetisation',
     projects: [
       {
         title: 'Scorify',

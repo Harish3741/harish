@@ -165,19 +165,6 @@ export const WINGS = [
         tech: ['JavaScript'],
         links: [],
       },
-      {
-        title: 'This museum',
-        image: null,
-        launch: '2026',
-        tagline: 'The site you are standing in.',
-        description:
-          'A third-person portfolio built on a canvas: a hand-drawn pixel '
-          + 'museum with four wings, a hovering droid, and no framework '
-          + 'anywhere. Vanilla JavaScript, no build step, no dependencies.',
-        tech: ['JavaScript', 'Canvas', 'Pixel art'],
-        highlights: ['Zero dependencies', 'Loads in under a second'],
-        links: [],
-      },
     ],
   },
 
@@ -242,12 +229,40 @@ export const WINGS = [
         tech: ['HTML', 'CSS', 'Vanilla JavaScript', 'Google Apps Script',
           'GitHub Pages'],
         highlights: [
-          'Four static files, 1,769 lines total, zero dependencies and no '
-          + 'build step. The on-site form posts to a Google Apps Script '
-          + 'endpoint. This then sends a notification to the business owner so '
-          + 'that they can follow up on requests.',
+          'automated messages to business owner on new booking requests',
+          'saves the business 4-5 hours weekly',
+          'monthly upkeep the website to update policies, gallery and to '
+          + 'customise flow',
         ],
         links: [{ label: 'Visit the site', url: 'https://nailstudiobyh.site/' }],
+      },
+
+      {
+        title: 'This Museum',
+        launch: '2026',
+        // the captures are 1200x750, so the frame is their own shape exactly
+        ratio: '8 / 5',
+        images: [
+          { src: 'img/client/this-museum-title.png',
+            caption: 'Where you come in' },
+          { src: 'img/client/this-museum-atrium.png',
+            caption: 'The atrium, with a way into each of the four rooms' },
+          { src: 'img/client/this-museum-wing.png',
+            caption: 'Inside a room, standing at something you can press' },
+        ],
+        tagline: 'A portfolio of things I\'ve built in a 2D game.',
+        description:
+          'It felt boring to list out all the things I\'ve done when trying to '
+          + 'introduce myself. I wanted a fun way for someone to know what '
+          + 'I\'ve done so I decided to built an interactive game with a '
+          + 'collection of everything I\'ve done',
+        tech: ['JavaScript', 'HTML Canvas'],
+        highlights: [
+          'built with no framework, no dependencies and no build step',
+          'each room is set up differently so it doesn\'t feel like the same '
+          + 'list four times',
+          'there\'s a plain list for anyone who doesn\'t want to play through it',
+        ],
       },
     ],
   },

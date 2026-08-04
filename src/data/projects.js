@@ -254,8 +254,10 @@ export const WINGS = [
         description:
           'It felt boring to list out all the things I\'ve done when trying to '
           + 'introduce myself. I wanted a fun way for someone to know what '
-          + 'I\'ve done so I decided to built an interactive game with a '
-          + 'collection of everything I\'ve done',
+          + 'I\'ve done so I decided to build an interactive game with a '
+          + 'collection of everything I\'ve done. Player is able to move around '
+          + 'into different rooms and explore all the work I\'ve done with '
+          + 'photos and descriptions of each project.',
         tech: ['JavaScript', 'HTML Canvas'],
         highlights: [
           'built with no framework, no dependencies and no build step',

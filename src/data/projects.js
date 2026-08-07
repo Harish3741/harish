@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Automations and Projects hold real entries. Initiatives and About Me are
-// still placeholder — replace them, keeping the shape.
+// Automations, Initiatives and Projects hold real entries. About Me is still
+// placeholder — replace it, keeping the shape.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //
@@ -154,16 +154,80 @@ export const WINGS = [
     blurb: 'Talent is something you make bloom, instinct is something you polish.',
     projects: [
       {
-        title: 'Placeholder — personal one',
-        image: null,
-        launch: '2025',
-        tagline: 'The thing you made because you wanted it to exist.',
+        title: 'No-Code UNSW',
+        // a different set of pictures is coming for this one
+        images: [],
+        tagline: 'Co-founded a tech society for building apps and automations '
+          + 'without code',
+        description: [
+          'Students are always thinking up ideas and not going through with it '
+          + 'because they think they need high technical skills to build their '
+          + 'product. We wanted to show them, now more than ever, anyone can '
+          + 'build anything.',
+          'No-Code UNSW is a tech society focused on building apps, '
+          + 'automations and tools using no-code or low-code platforms instead '
+          + 'of traditional programming. As Co-Founder and Co-President I '
+          + 'helped start the society and now guide its direction by '
+          + 'organising events, coordinating with the team and creating a '
+          + 'space where students feel empowered.',
+        ],
+        highlights: [
+          'secured collabs with Notion Sydney, UNSW Founders, A1ZAP (VC backed '
+          + 'startup), MLAI and Base44',
+          'run workshops and events for students building real projects',
+          'organised overnight hackathons with over 150 attendees at offsite '
+          + 'locations such as stone and chalk',
+          'coordinated interuniversity with USYD, MQ and UTS to organise events',
+        ],
+      },
+
+      {
+        title: 'RAPSOC UNSW',
+        images: [],
+        tagline: 'Co-founded and President of RAPSOC at UNSW',
+        description: [
+          'We wanted to create a community centred around music, performance '
+          + 'and freedom. RAPSOC is a space where students feel comfortable '
+          + 'sharing the beat they made when they were 12 or the rap they '
+          + 'randomly sang in the shower.',
+          'As Co-Founder and President I helped bring the society to life and '
+          + 'grew it from a small exec only team of 7 person team to now a 45 '
+          + 'member team. I oversee all planning and decision making across '
+          + 'marketing, HR, creatives and events.',
+        ],
+        highlights: [
+          'built an established UNSW society from ground up',
+          'over 300 members',
+          'organised social events such as pubcrawls with over 100 attendees '
+          + 'at a time',
+          'weekly community based events such as beat making workshop, games '
+          + 'night, etc.',
+          'secured collaborations with established societies such as enactus, '
+          + 'CEVsoc, FABsoc, etc.',
+        ],
+      },
+
+      {
+        title: 'Toastmasters UNSW',
+        images: [
+          { src: 'img/personal/toastmasters-speaking-2.jpg' },
+          // shot portrait, so it keeps its own shape rather than the 3:2 frame
+          { src: 'img/personal/toastmasters-speaking.jpg', ratio: 'auto' },
+        ],
+        tagline: 'Treasurer of a public speaking and leadership club at UNSW',
         description:
-          'Placeholder. Good candidates for this wing: the side project that '
-          + 'got away from you, the tool you use every day, the thing nobody '
-          + 'asked for.',
-        tech: ['JavaScript'],
-        links: [],
+          'Toastmasters UNSW is a public speaking and leadership club where '
+          + 'students practise giving speeches, thinking on their feet and '
+          + 'giving each other feedback in a structured, supportive setting. '
+          + 'As Treasurer I looked after the club\'s money. I track income and '
+          + 'spending, helped plan budgets for events and make sure payments, '
+          + 'reimbursements and records were accurate so the club can keep '
+          + 'running smoothly.',
+        highlights: [
+          'increased the societies profits by 12%',
+          'maintained well organised financials',
+          'built a custom flow to track spending and income',
+        ],
       },
     ],
   },

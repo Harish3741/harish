@@ -153,8 +153,14 @@ export const WINGS = [
     projects: [
       {
         title: 'No-Code UNSW',
-        // a different set of pictures is coming for this one
-        images: [],
+        // The society is its events, so they get a row of their own rather
+        // than one description trying to cover four things at once.
+        events: [
+          { name: 'Notion Workshop', description: 'Write-up coming.', images: [] },
+          { name: 'Debugged', description: 'Write-up coming.', images: [] },
+          { name: 'Healthack', description: 'Write-up coming.', images: [] },
+          { name: 'Hack for Humanity', description: 'Write-up coming.', images: [] },
+        ],
         tagline: 'Co-founded a tech society for building apps and automations '
           + 'without code',
         description: [

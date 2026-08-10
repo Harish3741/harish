@@ -12,6 +12,7 @@
 
 import { SITE, WINGS, RESUME } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
+import { hasEvents, buildEvents } from './eventpicker.js';
 
 // what the shared picture slot calls itself out here
 const WORLD_PICS = {
@@ -24,6 +25,15 @@ const WORLD_PICS = {
   nav: 'mc-gal-dots',
   arrow: 'mc-gal-arrow',
   dot: 'mc-gal-dot',
+};
+
+// and what the event picker calls itself
+const WORLD_EVENTS = {
+  events: 'mc-world-events',
+  tabs: 'mc-world-tabs',
+  tab: 'mc-world-tab',
+  panel: 'mc-world-event',
+  body: 'mc-world-desc',
 };
 
 let listRoot, bodyEl, openBtn, closeBtn;
@@ -216,7 +226,11 @@ function renderWing(wing) {
 
     // the same picture slot the exhibit panel shows, filled or waiting, and in
     // the same place: after the writing rather than in front of it
-    if (hasPictures(entry)) text.appendChild(buildGallery(entry, WORLD_PICS));
+    if (hasEvents(entry)) {
+      text.appendChild(buildEvents(entry, WORLD_EVENTS, WORLD_PICS));
+    } else if (hasPictures(entry)) {
+      text.appendChild(buildGallery(entry, WORLD_PICS));
+    }
 
     if (entry.links && entry.links.length) {
       const wrap = el('p', 'mc-world-links');

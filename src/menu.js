@@ -8,6 +8,7 @@
 
 import { wingById } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
+import { hasEvents, buildEvents } from './eventpicker.js';
 
 // what the shared picture slot calls itself in here
 const DETAIL_PICS = {
@@ -20,6 +21,15 @@ const DETAIL_PICS = {
   nav: 'gal-dots',
   arrow: 'gal-arrow',
   dot: 'gal-dot',
+};
+
+// and what the event picker calls itself
+const DETAIL_EVENTS = {
+  events: 'detail-events',
+  tabs: 'detail-tabs',
+  tab: 'detail-tab',
+  panel: 'detail-event',
+  body: 'detail-desc',
 };
 
 let root, listEl, detailEl, titleEl, blurbEl;
@@ -235,7 +245,12 @@ function renderDetail() {
   // first is what the thing is. An entry that declares `image` or `images` gets
   // the slot whether or not there is a picture in it yet — an empty frame is a
   // prompt to fill it, and it keeps the layout from moving once they arrive.
-  if (hasPictures(entry)) detailEl.appendChild(buildGallery(entry, DETAIL_PICS));
+  // An entry with events shows those instead: the pictures live inside them.
+  if (hasEvents(entry)) {
+    detailEl.appendChild(buildEvents(entry, DETAIL_EVENTS, DETAIL_PICS));
+  } else if (hasPictures(entry)) {
+    detailEl.appendChild(buildGallery(entry, DETAIL_PICS));
+  }
 
   if (entry.tech && entry.tech.length) {
     const wrap = document.createElement('div');
@@ -278,7 +293,8 @@ function onKeydown(e) {
 
   // Inside the picture strip the arrows belong to the strip — it is a scroll
   // container, and the browser already scrolls it a slide at a time.
-  if (e.target.closest && e.target.closest('.detail-track')) return;
+  if (e.target.closest
+      && e.target.closest('.detail-track, .detail-tabs')) return;
 
   if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
     e.preventDefault();

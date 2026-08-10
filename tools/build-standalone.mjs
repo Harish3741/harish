@@ -30,6 +30,7 @@ const MODULES = [
   'input',
   'player',
   'picture',
+  'eventpicker',
   'menu',
   'listview',
   'screening',

@@ -100,6 +100,25 @@ A wing with no entries says so rather than breaking, and a wing with twelve
 scrolls. Renaming a wing is the `title` field on that wing; the id (used by the
 plinth) stays put.
 
+### Entries that are several things
+
+Some entries are not one thing with one write-up — a society is its events, and
+listing four of them as four projects would say the society was four societies.
+Such an entry declares `events` instead of `images`, and they appear as a row
+you pick from, under the entry's own description:
+
+```js
+events: [
+  { name: 'Notion Workshop', description: '…', images: [ … ] },
+  { name: 'Debugged',        description: '…', images: [ … ] },
+]
+```
+
+Each event is a picture slot in its own right, so captions, per-picture `ratio`
+and the dashed placeholder all work inside one. The row is a proper tablist:
+click, or arrow along it once it has focus — and while focus is in there the
+arrows belong to the row rather than to the project list beside it.
+
 ### The résumé and the rules
 
 `RESUME` and `RULES`, same file. Both take the same fields as a project entry,

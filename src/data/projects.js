@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Automations, Initiatives and Projects hold real entries. About Me is still
-// placeholder — replace it, keeping the shape.
+// Every wing holds real entries. RESUME is still placeholder, and ABOUT.video
+// is empty — the cinema says so rather than breaking.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //

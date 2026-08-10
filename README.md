@@ -42,6 +42,7 @@ you leave out simply doesn't render.
              + 'what happened after.',   // or an array, for two paragraphs
   tech:        ['Python', 'n8n', 'Postgres'],
   highlights:  ['Cut a 6-hour week to 20 minutes'],
+  outro:       'A closing line, under the pictures.',
   links:       [{ label: 'Repo', url: 'https://…' }],
   images:      [{ src: 'img/automations/dashboard.png',
                   caption: 'What it writes to, every morning at six.' }],
@@ -118,6 +119,18 @@ Each event is a picture slot in its own right, so captions, per-picture `ratio`
 and the dashed placeholder all work inside one. The row is a proper tablist:
 click, or arrow along it once it has focus — and while focus is in there the
 arrows belong to the row rather than to the project list beside it.
+
+### A wing with one thing in it
+
+The left rail is for choosing between exhibits. A wing holding a single entry
+has nothing to choose, so the rail collapses and the entry takes the whole
+window — the same shape the résumé and the rules already open in. The entry's
+own title is dropped there too, because the window header is already saying it.
+
+`outro` is for the line that belongs *after* the pictures rather than before
+them. A description paragraph renders above the highlights, which is too early
+for a sign-off: "reach me here" three sections above the button it means leaves
+the reader pointing at something they cannot see yet.
 
 ### The résumé and the rules
 

@@ -97,7 +97,9 @@ function openEntries(title, blurb, list, closedCallback) {
 
   titleEl.textContent = title;
   blurbEl.textContent = blurb || '';
-  root.classList.remove('is-single');
+  // A rail is for choosing between things. With one entry there is nothing to
+  // choose, so it collapses to the same full-width panel a document gets.
+  root.classList.toggle('is-single', entries.length === 1);
 
   renderList();
   renderDetail();
@@ -262,6 +264,15 @@ function renderDetail() {
       wrap.appendChild(s);
     });
     detailEl.appendChild(wrap);
+  }
+
+  // A sign-off, after everything it is signing off from. `description` would
+  // put it above the pictures, which is too early for "get in touch".
+  if (entry.outro) {
+    const o = document.createElement('p');
+    o.className = 'detail-body detail-outro';
+    o.textContent = entry.outro;
+    detailEl.appendChild(o);
   }
 
   if (entry.links && entry.links.length) {

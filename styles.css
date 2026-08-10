@@ -303,6 +303,10 @@ body.is-handheld { overflow: auto; }
 /* only between paragraphs, so a one-paragraph description sits where it did */
 .detail-body + .detail-body { margin-top: 13px; }
 
+/* the sign-off follows the pictures rather than another paragraph, so the rule
+   above never reaches it; it needs the gap of a new section instead */
+.detail-outro { margin-top: 18px; }
+
 .detail-highlights {
   margin: 14px 0 0;
   padding: 0;

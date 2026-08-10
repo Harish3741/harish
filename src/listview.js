@@ -232,6 +232,8 @@ function renderWing(wing) {
       text.appendChild(buildGallery(entry, WORLD_PICS));
     }
 
+    if (entry.outro) text.appendChild(el('p', 'mc-world-desc', entry.outro));
+
     if (entry.links && entry.links.length) {
       const wrap = el('p', 'mc-world-links');
       entry.links.forEach((link) => {

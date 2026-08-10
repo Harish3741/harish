@@ -344,30 +344,28 @@ export const WINGS = [
     blurb: 'Who is running this place.',
     projects: [
       {
-        title: 'Who I am',
-        image: null,
-        tagline: 'The short version.',
-        description:
-          'Placeholder. A few sentences: what you do, what you are drawn to, '
-          + 'and what you are looking for next.',
-        links: [],
-      },
-      {
-        title: 'What I work with',
-        image: null,
-        tagline: 'Tools and languages I reach for.',
-        description:
-          'Placeholder. List the things you would be happy to be handed a '
-          + 'problem in.',
-        tech: ['Placeholder', 'Placeholder', 'Placeholder'],
-        links: [],
-      },
-      {
-        title: 'Get in touch',
-        image: null,
-        tagline: 'The fastest way to reach me.',
-        description: 'Placeholder. Email, and wherever else you want to be found.',
-        links: [],
+        title: 'Harish',
+        tagline: 'UNSW student who builds apps, automations and societies.',
+        description: [
+          'I build things. Most of what\'s in this museum started because '
+          + 'something was annoying me or someone I know had a problem worth '
+          + 'solving, so I built it instead of leaving it as an idea.',
+          'Despite not having a technical background, I\'ve always been eager '
+          + 'to try new products that can make my life easier.',
+        ],
+        highlights: [
+          'I love playing literally any sport other than cricket (although I '
+          + 'suck at every sport)',
+          'UNSW Actuarial student graduating EOY 2026 with a distinction WAM',
+        ],
+        images: [],
+        // The closing line sits under the pictures, next to the button it is
+        // talking about — a "reach me here" three paragraphs above the link
+        // is pointing at something you cannot see yet.
+        outro: 'LinkedIn DM is the best. Happy to talk about work, a build you '
+          + 'want done or anything in this museum!',
+        links: [{ label: 'LinkedIn',
+          url: 'https://www.linkedin.com/in/harish-prabhu-9a93b0284' }],
       },
     ],
   },

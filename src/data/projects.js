@@ -209,11 +209,11 @@ export const WINGS = [
 
       {
         title: 'Toastmasters UNSW',
-        images: [
-          { src: 'img/personal/toastmasters-speaking-2.jpg' },
-          // shot portrait, so it keeps its own shape rather than the 3:2 frame
-          { src: 'img/personal/toastmasters-speaking.jpg', ratio: 'auto' },
-        ],
+        // One rectangle rather than two slides: the two shots are composited
+        // side by side at a matched height, so the portrait one sits next to
+        // the landscape one without either being cropped or left in a gap.
+        ratio: '1400 / 642',
+        images: [{ src: 'img/personal/toastmasters-speaking.jpg' }],
         tagline: 'Treasurer of a public speaking and leadership club at UNSW',
         description:
           'Toastmasters UNSW is a public speaking and leadership club where '

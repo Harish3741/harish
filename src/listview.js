@@ -52,7 +52,7 @@ export function initListView({ standalone = false } = {}) {
   openBtn.addEventListener('click', openList);
   closeBtn.addEventListener('click', closeList);
   listRoot.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' || e.code === 'KeyE') {
       e.preventDefault();
       e.stopPropagation();
       // Escape backs out one screen at a time, then leaves

@@ -127,10 +127,6 @@ Rooms and how much each holds:
 
 Plus, separately from the project lists:
 
-- **4 wall pictures** — down the atrium's side walls, the only frames left in
-  the building. Each takes `{ title, caption, image }` in `PAINTINGS`. These are
-  a caption and a picture, not a project: one or two sentences about what you're
-  looking at.
 - **The résumé** — the sheet on the atrium wall. Same fields as a project.
   `links` is where the PDF goes.
 - **The film** — `ABOUT.video`, played when you sit in the cinema chair. Any

@@ -36,7 +36,7 @@ import {
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
 import {
-  PAINTINGS, ABOUT, RESUME, RULES, CLIENTS, wingById,
+  ABOUT, RESUME, RULES, CLIENTS, wingById,
 } from './data/projects.js';
 
 export const MAP_W = 40;
@@ -146,7 +146,6 @@ export const map = {
   plinths: [],
   props: [],
   colliders: [],
-  artworks: [],   // framed pictures you can walk up to and read
   documents: [],  // the résumé on the wall, the rules on the lectern
   seats: [],      // benches you can sit on
   people: [],     // characters you can talk to
@@ -191,11 +190,6 @@ export function plinthNear(px, py) {
   return nearest(map.plinths, px, py, 42);
 }
 
-/** The picture you are standing in front of, or null. */
-export function artworkNear(px, py) {
-  return nearest(map.artworks, px, py, 26);
-}
-
 /** The résumé or the rules, if you're standing at one. */
 export function documentNear(px, py) {
   return nearest(map.documents, px, py, 28);
@@ -218,7 +212,7 @@ export function personNear(px, py) {
  */
 export function interactableNear(px, py) {
   return plinthNear(px, py) || personNear(px, py) || documentNear(px, py)
-    || artworkNear(px, py) || seatNear(px, py);
+    || seatNear(px, py);
 }
 
 /* ------------------------------------------------------------------ */
@@ -422,16 +416,6 @@ function renderBackground() {
 /* ------------------------------------------------------------------ */
 /* Dressing                                                            */
 /* ------------------------------------------------------------------ */
-
-// Every frame on every wall can be walked up to and read, whether or not
-// there is a caption behind it yet. A frame that swallows the keypress teaches
-// you not to bother pressing E at the next one.
-const EMPTY_FRAME = {
-  title: 'Untitled',
-  caption: 'Nothing hung here yet. Give this frame a title and a caption in '
-    + 'PAINTINGS in src/data/projects.js — its slot is the position it hangs '
-    + 'in, left to right along the wall.',
-};
 
 /** Anything standing on the floor is depth-sorted, so the droid can pass behind it. */
 function addProp(p) {
@@ -674,29 +658,18 @@ function dressAtrium(c) {
   // blocking all of it would leave a sliver of floor to read it from.
   map.colliders.push({ x: lx - 9, y: ly - 10, w: 18, h: 10 });
   map.documents.push({
-    x: lx, y: ly, label: 'The rules', blurb: 'Open on the lectern', doc: RULES,
+    x: lx, y: ly, label: 'The rules', doc: RULES,
     top: ly - 28,
   });
 
   // Two pictures down each side wall, each level with the one opposite. Two,
   // not three: the frames run up to 30px tall and a five-row wall can't take a
-  // third without them touching.
-  const captions = (PAINTINGS && PAINTINGS.atrium) || [];
+  // third without them touching. They are decoration — nothing to press.
   let slot = 0;
   for (const [side, wallX] of [['w', 12 * TILE], ['e', 28 * TILE]]) {
     for (const row of [ATRIUM_MID - 1, ATRIUM_MID + 1]) {
       const y = row * TILE + 8;
       drawSideFrame(c, wallX, y, side, row * 7 + slot);
-      const info = captions[slot] || EMPTY_FRAME;
-      map.artworks.push({
-        x: wallX + (side === 'w' ? 22 : -22),
-        y,
-        title: info.title,
-        caption: info.caption,
-        image: info.image || null,
-        label: 'Painting',
-        top: y - 17,
-      });
       slot += 1;
     }
   }

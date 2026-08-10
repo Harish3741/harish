@@ -100,27 +100,6 @@ A wing with no entries says so rather than breaking, and a wing with twelve
 scrolls. Renaming a wing is the `title` field on that wing; the id (used by the
 plinth) stays put.
 
-### Pictures on the walls
-
-The atrium hangs four frames, and it is the only room that does. `PAINTINGS`
-in the same file gives them captions. Every frame can be walked up to and read
-whether or not it has an entry yet — a `null` slot says so and points at this
-file, because a frame that swallows the keypress teaches you not to bother
-pressing E at the next one.
-
-```js
-{ title: 'Invoice reconciler',
-  caption: 'The dashboard it writes to, every morning at six.',
-  image: 'img/atrium/dashboard.png' }
-```
-
-A picture on a wall is one picture, not a set — `image` only. These want a
-caption rather than a write-up.
-
-`PAINTINGS.atrium` runs west top-to-bottom, then east. The end wall carries
-the résumé instead. No wing hangs pictures any more: each is dressed as itself
-— pipework, downlights, a screen, and Initiatives' plinth and benches.
-
 ### The résumé and the rules
 
 `RESUME` and `RULES`, same file. Both take the same fields as a project entry,
@@ -246,7 +225,7 @@ modules declare the same top-level name.
 | --- | --- |
 | <kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> or <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> | walk |
 | <kbd>E</kbd> / <kbd>Enter</kbd> / <kbd>Space</kbd> | look at an exhibit, read a picture or the résumé, take a seat in the cinema |
-| <kbd>Esc</kbd> | close whatever is open |
+| <kbd>Esc</kbd> or <kbd>E</kbd> | close whatever is open |
 
 Leave the droid alone for nine seconds and it powers down; any key wakes it.
 

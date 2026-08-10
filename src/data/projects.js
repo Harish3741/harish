@@ -368,27 +368,6 @@ export const WINGS = [
 ];
 
 // ---------------------------------------------------------------------------
-// PICTURES ON THE WALLS
-//
-// The atrium hangs four framed pictures. Give an entry here and that frame
-// becomes something you can walk up to and read; leave it out and it says so
-// and points back at this file, because a frame that swallows the keypress
-// teaches you not to press E at the next one.
-//
-// A picture on a wall is one picture, not a set: `image` takes a path under
-// img/, the same as a project entry. These want a caption rather than a
-// write-up — a sentence or two about what you are looking at.
-// ---------------------------------------------------------------------------
-
-export const PAINTINGS = {
-  // The atrium is the only room that hangs pictures now: four, two down each
-  // side wall, west top to bottom first, then east. Nothing goes on its end
-  // wall — the résumé has that. Every wing is dressed as itself instead — a
-  // machine hall, a boardroom, a cinema, and Initiatives' plinth and benches.
-  atrium: [null, null, null, null],
-};
-
-// ---------------------------------------------------------------------------
 // THE BOARDROOM
 //
 // The Projects wing is a boardroom rather than a gallery: three clients
@@ -456,17 +435,13 @@ export const RESUME = {
 
 export const RULES = {
   title: 'House rules',
-  tagline: 'Pinned open on the lectern, as museums do.',
   description: 'You are a small hovering droid in a museum of things Harish '
-    + 'has built. There is no way out and nothing to lose — walk into any wing '
-    + 'and read whatever is in it.',
+    + 'has built. So go ahead explore all the wings and try interacting with '
+    + 'everything you find!',
   highlights: [
     'Arrow keys or WASD to walk.',
     'E, Enter or Space to look at whatever you are standing in front of.',
-    'Esc closes anything that is open.',
-    'The plinth in the middle of a wing opens that wing\'s work.',
-    'Sit in the cinema chair in the About Me wing and the film starts.',
-    'Leave the droid alone for a while and it powers down. Any key wakes it.',
+    'Esc or E closes anything that is open.',
   ],
 };
 

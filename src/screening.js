@@ -24,7 +24,7 @@ export function initScreening() {
     if (e.target === reelRoot) closeScreening();
   });
   reelRoot.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' || e.code === 'KeyE') {
       e.preventDefault();
       e.stopPropagation();
       closeScreening();

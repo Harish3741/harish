@@ -71,15 +71,6 @@ function openSingle(entry, blurb, closedCallback) {
   listEl.focus();
 }
 
-/** A framed picture off a wall. */
-export function openArtwork(art, closedCallback) {
-  openSingle({
-    title: art.title,
-    tagline: art.caption,
-    image: art.image || null,
-  }, 'On the wall', closedCallback);
-}
-
 /**
  * A document — the résumé off the atrium wall, or the rules off the lectern.
  * These arrive already in entry shape, so they pass straight through.
@@ -186,9 +177,13 @@ function renderDetail() {
   const entry = entries[index];
   if (!entry) return;
 
-  const h = document.createElement('h3');
-  h.textContent = entry.title;
-  detailEl.appendChild(h);
+  // A one-item window already carries the title in its header, so repeating it
+  // here just says the same thing twice.
+  if (!root.classList.contains('is-single')) {
+    const h = document.createElement('h3');
+    h.textContent = entry.title;
+    detailEl.appendChild(h);
+  }
 
   if (entry.tagline) {
     const t = document.createElement('p');
@@ -197,10 +192,14 @@ function renderDetail() {
     detailEl.appendChild(t);
   }
 
-  const plate = document.createElement('div');
-  plate.className = 'detail-plate';
-  plate.setAttribute('aria-hidden', 'true');
-  detailEl.appendChild(plate);
+  // the brass rule separates a heading from the body; with no heading above it
+  // there is nothing for it to separate
+  if (detailEl.childElementCount) {
+    const plate = document.createElement('div');
+    plate.className = 'detail-plate';
+    plate.setAttribute('aria-hidden', 'true');
+    detailEl.appendChild(plate);
+  }
 
   if (entry.client) {
     const cl = document.createElement('p');
@@ -268,7 +267,9 @@ function renderDetail() {
 function onKeydown(e) {
   if (!open) return;
 
-  if (e.key === 'Escape') {
+  // Escape or E. E is what opened this, and reaching for it again to put it
+  // down is what people try first.
+  if (e.key === 'Escape' || e.code === 'KeyE') {
     e.preventDefault();
     e.stopPropagation();
     closeMenu();

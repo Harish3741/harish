@@ -20,7 +20,7 @@ import {
   player, spawnAt, movePlayer, updatePlayer, drawPlayer, focusY, toggleSeat, rouse,
 } from './player.js';
 import {
-  initMenu, openMenu, openArtwork, openDocument, isMenuOpen, closeMenu,
+  initMenu, openMenu, openDocument, isMenuOpen, closeMenu,
 } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
 import {
@@ -70,7 +70,6 @@ function everyEntry() {
   return [
     ...WINGS.flatMap((w) => w.projects || []),
     RESUME, RULES,
-    ...map.artworks,
   ];
 }
 
@@ -183,9 +182,6 @@ function update(dt, ts) {
       // the résumé on the wall, or the rules open on the lectern
       clearHeldKeys();
       openDocument(near.doc, near.blurb, clearHeldKeys);
-    } else if (near.caption !== undefined) {
-      clearHeldKeys();
-      openArtwork(near, clearHeldKeys);
     } else if (near.theatre) {
       toggleSeat(near);
       startScreening();
@@ -313,7 +309,7 @@ function drawPrompt(ts, ox, oy) {
   const hint = near.hint ? near.hint
     : near.id ? 'PRESS  E'
       : near.wing ? 'PRESS  E  TO  TALK'
-        : near.doc || near.caption !== undefined ? 'PRESS  E  TO  READ'
+        : near.doc ? 'PRESS  E  TO  READ'
           : near.theatre ? 'PRESS  E  TO  WATCH'
             : player.seat ? 'PRESS  E  TO  STAND' : 'PRESS  E  TO  SIT';
   const w = Math.max(textWidth(label), textWidth(hint)) + 12;
@@ -355,9 +351,22 @@ function drawPrompt(ts, ox, oy) {
 
 /* ------------------------------------------------------------------ */
 
-// Esc from anywhere in the game closes whatever is open.
+// Esc or E from anywhere in the game closes whatever is open. E because it is
+// the key that opened the thing, and reaching for it again to put it down is
+// what people try first.
+//
+// This listener is registered before initInput's, so stopping the event here
+// means the game never reads the same keystroke as an interact press — without
+// that, a panel would shut and reopen on one keypress. It also only sees the
+// keystroke at all when the overlay left focus on the body: a wing list keeps
+// focus inside the window and closes through the menu's own handler.
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && isMenuOpen()) closeMenu();
+  if (e.key !== 'Escape' && e.code !== 'KeyE') return;
+  if (!isMenuOpen() && !isScreeningOpen()) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  if (isMenuOpen()) closeMenu();
+  else closeScreening();
 });
 
 boot();

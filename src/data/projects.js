@@ -90,14 +90,11 @@ export const WINGS = [
         images: [
           { src: 'img/automations/spending-tracker-workflow.png',
             caption: 'Reads the card alert, categorises it and logs it to a sheet' },
-          // The two halves of what it produces, in one view rather than two.
-          // Both take their own shape rather than the wide frame the workflow
-          // wants: the summary is square, and squeezed into a 3:1 frame it
-          // would come out a third of the width and unreadable.
-          { src: 'img/automations/spending-tracker-data.png', ratio: 'auto',
-            caption: 'Every transaction, categorised, as it lands in the sheet' },
-          { src: 'img/automations/spending-tracker-graph.png', ratio: 'auto',
-            caption: 'The month against budget, at a glance' },
+          // The two halves of what it produces, composited side by side at a
+          // matched height so they read as one sheet rather than two views.
+          { src: 'img/automations/spending-tracker-sheet.png', ratio: '1600 / 474',
+            caption: 'Every transaction as it lands, and the month against '
+              + 'budget' },
         ],
         tagline: 'An n8n workflow that logs and categorises every card '
           + 'transaction',
@@ -125,7 +122,8 @@ export const WINGS = [
             caption: 'Finds the businesses and pulls their details' },
           // this canvas is a longer, thinner run than the first
           { src: 'img/automations/lead-gen-website-scraper.png', ratio: '4 / 1',
-            caption: 'Digs an email out of each one and sends the first note' },
+            caption: 'Scrapes the website to find email. If successful it '
+              + 'automatically sends an email' },
         ],
         tagline: 'An n8n workflow that finds businesses and their details',
         description:
@@ -252,14 +250,15 @@ export const WINGS = [
           + 'Mathematical Reasoning, Thinking Skills and Writing. It has been '
           + 'live and taking paying subscribers since February 2026, acquired '
           + 'through Google and Meta ads I ran myself.',
+        // Trimmed to the ones that say something about the build. Dropped the
+        // build tool, the component library, the router, the hosting, the mail
+        // service and the model gateway — all real, none of them a decision
+        // anyone would ask about.
         tech: [
-          'React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'shadcn/ui',
-          'React Router v6', 'TanStack Query',
+          'React 18', 'TypeScript', 'Tailwind CSS', 'TanStack Query',
           'Supabase Postgres (21 tables, RLS on all)', 'Supabase Auth',
           'Supabase Edge Functions (Deno)',
           'Stripe (subscriptions + webhooks)', 'n8n',
-          'Gemini 2.5 Flash via Lovable AI Gateway', 'Resend',
-          'Lovable (build + hosting)',
         ],
         highlights: [
           '1,392 visitors and 5,167 pageviews since launch',

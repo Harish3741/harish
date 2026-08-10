@@ -219,7 +219,13 @@ function renderWing(wing) {
     }
 
     if (entry.highlights && entry.highlights.length) {
+      if (entry.highlightsLabel) {
+        const lab = el('p', 'mc-world-label', entry.highlightsLabel);
+        lab.setAttribute('aria-hidden', 'true');
+        text.appendChild(lab);
+      }
       const ul = el('ul', 'mc-world-points');
+      if (entry.highlightsLabel) ul.setAttribute('aria-label', entry.highlightsLabel);
       entry.highlights.forEach((line) => ul.appendChild(el('li', null, line)));
       text.appendChild(ul);
     }

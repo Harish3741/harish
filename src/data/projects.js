@@ -353,6 +353,7 @@ export const WINGS = [
           'Despite not having a technical background, I\'ve always been eager '
           + 'to try new products that can make my life easier.',
         ],
+        highlightsLabel: 'Boring Facts.',
         highlights: [
           'I love playing literally any sport other than cricket (although I '
           + 'suck at every sport)',

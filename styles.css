@@ -307,6 +307,20 @@ body.is-handheld { overflow: auto; }
    above never reaches it; it needs the gap of a new section instead */
 .detail-outro { margin-top: 18px; }
 
+/* Names the list under it without being a heading — same register as the
+   client line, which is the panel's existing way of labelling a thing. */
+.detail-label {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* the label already supplies the gap above */
+.detail-label + .detail-highlights { margin-top: 8px; }
+
 .detail-highlights {
   margin: 14px 0 0;
   padding: 0;
@@ -607,6 +621,16 @@ body.is-handheld { overflow: auto; }
   line-height: 1.7;
   color: #D6D2C8;
 }
+
+.mc-world-label {
+  margin: 12px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9A9A9A;
+}
+
+.mc-world-label + .mc-world-points { margin-top: 6px; }
 
 .mc-world-points {
   margin: 10px 0 0;

@@ -232,8 +232,21 @@ function renderDetail() {
   }
 
   if (entry.highlights && entry.highlights.length) {
+    // Not a heading — the panel's headings are the entry titles, and a second
+    // level of them over two bullet points would be pure ceremony. This is the
+    // same small mono label the client line uses: it names the list without
+    // claiming to open a section.
+    if (entry.highlightsLabel) {
+      const lab = document.createElement('p');
+      lab.className = 'detail-label';
+      lab.textContent = entry.highlightsLabel;
+      lab.setAttribute('aria-hidden', 'true');   // the list below carries it
+      detailEl.appendChild(lab);
+    }
+
     const ul = document.createElement('ul');
     ul.className = 'detail-highlights';
+    if (entry.highlightsLabel) ul.setAttribute('aria-label', entry.highlightsLabel);
     entry.highlights.forEach((line) => {
       const li = document.createElement('li');
       li.textContent = line;

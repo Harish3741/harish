@@ -42,6 +42,7 @@ you leave out simply doesn't render.
              + 'what happened after.',   // or an array, for two paragraphs
   tech:        ['Python', 'n8n', 'Postgres'],
   highlights:  ['Cut a 6-hour week to 20 minutes'],
+  highlightsLabel: 'What came of it',   // names the list; not a heading
   outro:       'A closing line, under the pictures.',
   links:       [{ label: 'Repo', url: 'https://…' }],
   images:      [{ src: 'img/automations/dashboard.png',
@@ -126,6 +127,13 @@ The left rail is for choosing between exhibits. A wing holding a single entry
 has nothing to choose, so the rail collapses and the entry takes the whole
 window — the same shape the résumé and the rules already open in. The entry's
 own title is dropped there too, because the window header is already saying it.
+
+`highlightsLabel` names the bullet list when "here are some facts" needs
+saying out loud. It renders in the panel's small mono register — the one the
+client line already uses — rather than as a heading: the headings in that
+window are entry titles, and a second level of them over two bullet points is
+ceremony. The list takes the label as its accessible name, so it is announced
+once rather than twice.
 
 `outro` is for the line that belongs *after* the pictures rather than before
 them. A description paragraph renders above the highlights, which is too early

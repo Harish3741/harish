@@ -32,6 +32,7 @@ const DETAIL_EVENTS = {
   panel: 'detail-event',
   body: 'detail-body',
   date: 'detail-date',
+  status: 'detail-status',
   label: 'detail-label',
   points: 'detail-highlights',
 };

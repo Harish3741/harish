@@ -207,14 +207,11 @@ export const WINGS = [
               + 'healthcare and invisible to everyone else. Healthack put both '
               + 'in the same room for a weekend.',
               'Builders, clinicians and industry leaders worked together on '
-              + 'real healthcare problems at Stone & Chalk in Tech Central. '
-              + 'Two tracks meant you could enter as a coder or as a pitcher, '
-              + 'so a good idea did not need a technical team behind it to go '
-              + 'anywhere. Teams of two to six had clinicians and healthtech '
-              + 'mentors on hand the whole way through.',
+              + 'real healthcare problems.',
             ],
             highlights: [
-              'over $15K in prizes, topped by $10,000 USD in Codex credits',
+              '120 attendees across UNSW and general public',
+              'over $15K USD in prizes',
               'ChatGPT Pro for a year for the top five teams',
               'hosted at Stone & Chalk, Tech Central',
             ],
@@ -223,24 +220,19 @@ export const WINGS = [
           {
             name: 'Hack for Humanity',
             date: '5-6 September 2026',
+            status: 'Event in progress',
             description: [
               'Non-profits have real software problems and no budget to solve '
               + 'them. Students have the time and, now, the tools. Hack for '
               + 'Humanity puts the two together for a weekend.',
               'Cross-university teams pick one of three non-profit partners, '
               + 'work from a brief that organisation wrote themselves, and '
-              + 'build a working MVP on Base44 across two days. Mentors from '
-              + 'Base44 and the non-profits circulate the whole time. On the '
-              + 'second day every team pitches, first to judges from the '
-              + 'partner societies and then to the non-profit itself.',
+              + 'build a working MVP on Base44 across two days.',
             ],
             highlights: [
-              'three tracks, one per non-profit partner',
-              'teams of two to four, capped at 200 participants',
               'judged by Omer Shai, CMO at Wix',
-              'winning teams that keep building with their non-profit get '
-              + 'Base44 credits and mentorship',
-              'run with Base44, Enactus UNSW, AISOC MQ and UTS TechSoc',
+              'supporting winning teams to keep building with non-profits',
+              'coordinating with Base44, Enactus UNSW, AISOC MQ and UTS TechSoc',
             ],
             images: [],
           },

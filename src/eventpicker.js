@@ -8,8 +8,8 @@
 //
 // An entry declares them instead of `images`:
 //
-//   events: [{ name: 'Notion Workshop', date: '…', description: '…',
-//              highlights: [ … ], images: [ … ] }]
+//   events: [{ name: 'Notion Workshop', date: '…', status: '…',
+//              description: '…', highlights: [ … ], images: [ … ] }]
 //
 // Each event is a picture slot in its own right, so everything the strip does —
 // captions, per-picture `ratio`, the dashed placeholder before the photos
@@ -93,10 +93,18 @@ export function buildEvents(entry, cls, picCls) {
 
     // When it ran, above the write-up. The tabs are names only — four dates in
     // the row would make it a timetable and cost the names their room.
-    if (ev.date) {
+    if (ev.date || ev.status) {
       const d = document.createElement('p');
       d.className = cls.date;
-      d.textContent = ev.date;
+      if (ev.date) d.append(ev.date);
+      // An event still running says so beside its date. A future date on its
+      // own reads as a typo by the time someone lands on it in October.
+      if (ev.status) {
+        const tag = document.createElement('span');
+        tag.className = cls.status;
+        tag.textContent = ev.status;
+        d.appendChild(tag);
+      }
       body.appendChild(d);
     }
 

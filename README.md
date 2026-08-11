@@ -114,11 +114,15 @@ events: [
   { name: 'Notion Workshop', date: '19 March 2026', description: '…',
     highlightsLabel: 'What everyone built', highlights: [ … ], images: [ … ] },
   { name: 'Debugged', date: '6 June 2026', description: '…', images: [ … ] },
+  { name: 'Something upcoming', date: '5-6 September 2026',
+    status: 'Event in progress', description: '…' },
 ]
 ```
 
 An event takes most of what an entry takes: a date above the write-up, bullet
-points under it, and pictures below those. The date lives in the panel rather
+points under it, and pictures below those. `status` is a brass tag beside the
+date, for an event that hasn't finished — a future date on its own reads as a
+typo by the time someone lands on it in October. The date lives in the panel rather
 than on the tab — four dates in the row would make it a timetable and cost the
 names their room.
 

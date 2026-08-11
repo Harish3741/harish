@@ -36,6 +36,7 @@ const WORLD_EVENTS = {
   panel: 'mc-world-event',
   body: 'mc-world-desc',
   date: 'mc-world-date',
+  status: 'mc-world-status',
   label: 'mc-world-label',
   points: 'mc-world-points',
 };

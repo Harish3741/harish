@@ -318,6 +318,19 @@ body.is-handheld { overflow: auto; }
   text-transform: uppercase;
 }
 
+/* "Event in progress", beside the date. Filled rather than outlined, because
+   everything else in this register is outlined and this one is meant to catch
+   the eye — it is the difference between something that happened and something
+   that is happening. */
+.detail-status {
+  margin-left: 8px;
+  padding: 2px 7px;
+  background: var(--brass);
+  color: #1B120C;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
 /* Names the list under it without being a heading — same register as the
    client line, which is the panel's existing way of labelling a thing. */
 .detail-label {
@@ -639,6 +652,15 @@ body.is-handheld { overflow: auto; }
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #9A9A9A;
+}
+
+.mc-world-status {
+  margin-left: 7px;
+  padding: 2px 6px;
+  background: #FFD85C;
+  color: #241A15;
+  font-size: 10px;
+  letter-spacing: 0.08em;
 }
 
 .mc-world-label {

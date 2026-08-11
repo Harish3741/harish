@@ -126,9 +126,14 @@ typo by the time someone lands on it in October. The date lives in the panel rat
 than on the tab — four dates in the row would make it a timetable and cost the
 names their room.
 
-Picking one scrolls it into view when it was below the fold. Without that,
-clicking a tab in a long entry looked like nothing had happened: the tabs sat
-half-cut at the bottom edge and the write-up you asked for was off-screen.
+Picking one moves nothing. The tab row is sticky, so it pins to the top of the
+pane once you reach it and stays there while you read whatever is under it. An
+earlier version scrolled the picker into view instead, which read as the panel
+bouncing: events differ in length, a short one cannot scroll as far as a long
+one, and every pick settled somewhere new. The event body also keeps the
+tallest height it has held, so switching to a shorter event never shrinks what
+there is to scroll and never gets the scroll position clamped out from under
+you.
 
 Each event is a picture slot in its own right, so captions, per-picture `ratio`
 and the dashed placeholder all work inside one. The row is a proper tablist:

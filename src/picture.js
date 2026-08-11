@@ -40,9 +40,19 @@ export function pictureList(entry) {
  */
 export function preloadPictures(entries) {
   const seen = new Set();
+  // An entry with `events` keeps its pictures inside them, so walking only the
+  // top level would have quietly skipped every event photo — the one place the
+  // dropping-into-place this preload exists to prevent would still happen.
+  const sources = [];
   for (const entry of entries) {
-    if (!entry || !hasPictures(entry)) continue;
-    for (const pic of pictureList(entry)) {
+    if (!entry) continue;
+    sources.push(entry);
+    if (Array.isArray(entry.events)) sources.push(...entry.events);
+  }
+
+  for (const src of sources) {
+    if (!hasPictures(src)) continue;
+    for (const pic of pictureList(src)) {
       if (seen.has(pic.src)) continue;
       seen.add(pic.src);
       const img = new Image();
@@ -136,7 +146,12 @@ function addNav(wrap, strip, track, count, cls) {
   // pictures arriving, and the window changing size, both change the fit
   track.addEventListener('load', () => sync(), true);
   window.addEventListener('resize', sync);
+
+  // Once for the arrows and dots, which need no layout, and again on the next
+  // frame for the height, by which time the caller has put the strip in the
+  // document and there is something to measure.
   sync();
+  requestAnimationFrame(sync);
 }
 
 /**
@@ -146,8 +161,17 @@ function addNav(wrap, strip, track, count, cls) {
  * was a full-page screenshot — and pushed the writing that far down with it.
  */
 function fitHeight(track, i) {
+  // Nothing is measurable until the strip is in the document. Measured before
+  // that, every height is a wrong number that gets corrected the moment the
+  // strip lands — and that correction is the drop you could see.
+  if (!track.clientWidth) return;
   const slide = track.children[i];
-  if (slide) track.style.height = `${slide.scrollHeight}px`;
+  if (!slide) return;
+  track.style.height = `${slide.scrollHeight}px`;
+  // The transition exists for swiping between pictures of different heights.
+  // On the first fit there is no previous height to travel from, so animating
+  // it is 180ms of the picture visibly falling into its frame.
+  track.classList.add('is-live');
 }
 
 function arrowButton(glyph, label, cls, where) {

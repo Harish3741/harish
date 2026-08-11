@@ -39,13 +39,16 @@ export function buildEvents(entry, cls, picCls) {
   body.className = cls.panel;
   body.setAttribute('role', 'tabpanel');
 
+  // The tallest event this picker has shown. See show().
+  let tallest = 0;
+
   const buttons = entry.events.map((ev, i) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = cls.tab;
     b.textContent = ev.name;
     b.setAttribute('role', 'tab');
-    b.addEventListener('click', () => show(i, true));
+    b.addEventListener('click', () => show(i));
     tabs.appendChild(b);
     return b;
   });
@@ -62,31 +65,28 @@ export function buildEvents(entry, cls, picCls) {
     return null;
   }
 
-  // Picking an event when the picker is below the fold looked like nothing had
-  // happened: the tabs sat half-cut at the bottom edge, the panel did not move,
-  // and the write-up you just asked for was off-screen. So bring it up — but
-  // only when it isn't already all there, and never on first render, which
-  // would yank the panel down the moment an entry opened.
-  function reveal() {
-    const pane = scrollParent(wrap);
-    if (!pane) return;
-    const box = wrap.getBoundingClientRect();
-    const view = pane.getBoundingClientRect();
-    if (box.top >= view.top && box.bottom <= view.bottom) return;
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    pane.scrollTo({
-      top: pane.scrollTop + (box.top - view.top) - 8,
-      behavior: still ? 'auto' : 'smooth',
-    });
+  /** Where the tab row sits inside the thing that scrolls it. */
+  function tabsOffset(pane) {
+    return tabs.getBoundingClientRect().top - pane.getBoundingClientRect().top;
   }
 
-  function show(i, bringIntoView) {
+  // Nothing here scrolls the pane. An earlier version brought the picker up
+  // when it was below the fold, which fixed one thing and broke a worse one:
+  // a short event cannot scroll as far as a long one, so the pane clamped and
+  // every pick settled somewhere new — the panel appeared to bounce. The tab
+  // row is sticky in the stylesheet instead, so it stays put once you reach it
+  // and picking an event moves nothing at all.
+
+  function show(i) {
     buttons.forEach((b, n) => {
       const on = n === i;
       b.setAttribute('aria-selected', String(on));
       // only the selected tab is a tab stop; the arrows move between them
       b.tabIndex = on ? 0 : -1;
     });
+
+    const pane = scrollParent(wrap);
+    const anchor = pane ? tabsOffset(pane) : 0;
 
     body.innerHTML = '';
     const ev = entry.events[i];
@@ -120,7 +120,19 @@ export function buildEvents(entry, cls, picCls) {
     if (hasHighlights(ev)) body.appendChild(buildHighlights(ev, cls));
     if (hasPictures(ev)) body.appendChild(buildGallery(ev, picCls));
 
-    if (bringIntoView) reveal();
+    // Events differ in length, and that was the last thing still moving the
+    // panel: picking a shorter one shrinks what there is to scroll, the browser
+    // clamps scrollTop to the new maximum, and the tab row slides up even
+    // though nothing above it changed. So the body keeps the tallest height it
+    // has ever held. Growing never clamps anything, and it never shrinks.
+    body.style.minHeight = '';
+    tallest = Math.max(tallest, body.scrollHeight);
+    body.style.minHeight = `${tallest}px`;
+
+    // Belt and braces: if a clamp got in anyway, undo it.
+    if (!pane) return;
+    const moved = tabsOffset(pane) - anchor;
+    if (Math.abs(moved) > 0.5) pane.scrollTop += moved;
   }
 
   // Arrows walk the row when focus is in it, which is what a row of tabs is
@@ -133,7 +145,7 @@ export function buildEvents(entry, cls, picCls) {
     e.stopPropagation();
     const at = buttons.findIndex((b) => b.getAttribute('aria-selected') === 'true');
     const to = (at + (fwd ? 1 : -1) + buttons.length) % buttons.length;
-    show(to, true);
+    show(to);
     buttons[to].focus();
   });
 

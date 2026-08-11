@@ -118,10 +118,14 @@ export const WINGS = [
         title: 'Lead Gen',
         ratio: '3 / 1',
         images: [
+          // Both sit in the entry's 3:1 frame even though the second canvas is
+          // a longer, thinner run. It used to declare its own 4:1, which was a
+          // truer fit for that one picture and meant the frame changed height
+          // as you swiped between them. One frame that stays put beats two that
+          // each fit perfectly; the wider canvas letterboxes into the dark.
           { src: 'img/automations/lead-gen-maps-scraper.png',
             caption: 'Finds the businesses and pulls their details' },
-          // this canvas is a longer, thinner run than the first
-          { src: 'img/automations/lead-gen-website-scraper.png', ratio: '4 / 1',
+          { src: 'img/automations/lead-gen-website-scraper.png',
             caption: 'Scrapes the website to find email. If successful it '
               + 'automatically sends an email' },
         ],
@@ -338,9 +342,7 @@ export const WINGS = [
         // anyone would ask about.
         tech: [
           'React 18', 'TypeScript', 'Tailwind CSS', 'TanStack Query',
-          'Supabase Postgres (21 tables, RLS on all)', 'Supabase Auth',
-          'Supabase Edge Functions (Deno)',
-          'Stripe (subscriptions + webhooks)', 'n8n',
+          'Supabase', 'Stripe', 'n8n',
         ],
         highlights: [
           '1,392 visitors and 5,167 pageviews since launch',

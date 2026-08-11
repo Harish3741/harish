@@ -80,7 +80,7 @@ function boot() {
     // No game on a phone: a thumb is a bad D-pad. Serve the same content flat.
     document.body.classList.add('is-handheld');
     initListView({ standalone: true });
-    preloadPictures([...WINGS.flatMap((w) => w.projects || []), RESUME, RULES]);
+    preloadPictures(everyEntry());
     return;
   }
 

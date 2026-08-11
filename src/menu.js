@@ -193,6 +193,10 @@ function select(i) {
 
 function renderDetail() {
   detailEl.innerHTML = '';
+  // Arrowing to the next exhibit kept the scroll position of the last one, so
+  // a short entry after a long one opened halfway down itself, or at its own
+  // bottom. You should always land at the top of what you just chose.
+  detailEl.scrollTop = 0;
   const entry = entries[index];
   if (!entry) return;
 

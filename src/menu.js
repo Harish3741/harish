@@ -9,6 +9,7 @@
 import { wingById } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
 import { hasEvents, buildEvents } from './eventpicker.js';
+import { hasHighlights, buildHighlights } from './highlights.js';
 
 // what the shared picture slot calls itself in here
 const DETAIL_PICS = {
@@ -29,8 +30,13 @@ const DETAIL_EVENTS = {
   tabs: 'detail-tabs',
   tab: 'detail-tab',
   panel: 'detail-event',
-  body: 'detail-desc',
+  body: 'detail-body',
+  date: 'detail-date',
+  label: 'detail-label',
+  points: 'detail-highlights',
 };
+
+const DETAIL_POINTS = { label: 'detail-label', points: 'detail-highlights' };
 
 let root, listEl, detailEl, titleEl, blurbEl;
 let entries = [];
@@ -231,28 +237,8 @@ function renderDetail() {
     }
   }
 
-  if (entry.highlights && entry.highlights.length) {
-    // Not a heading — the panel's headings are the entry titles, and a second
-    // level of them over two bullet points would be pure ceremony. This is the
-    // same small mono label the client line uses: it names the list without
-    // claiming to open a section.
-    if (entry.highlightsLabel) {
-      const lab = document.createElement('p');
-      lab.className = 'detail-label';
-      lab.textContent = entry.highlightsLabel;
-      lab.setAttribute('aria-hidden', 'true');   // the list below carries it
-      detailEl.appendChild(lab);
-    }
-
-    const ul = document.createElement('ul');
-    ul.className = 'detail-highlights';
-    if (entry.highlightsLabel) ul.setAttribute('aria-label', entry.highlightsLabel);
-    entry.highlights.forEach((line) => {
-      const li = document.createElement('li');
-      li.textContent = line;
-      ul.appendChild(li);
-    });
-    detailEl.appendChild(ul);
+  if (hasHighlights(entry)) {
+    detailEl.appendChild(buildHighlights(entry, DETAIL_POINTS));
   }
 
   // The pictures come after the writing. At the top they were the first thing

@@ -13,6 +13,7 @@
 import { SITE, WINGS, RESUME } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
 import { hasEvents, buildEvents } from './eventpicker.js';
+import { hasHighlights, buildHighlights } from './highlights.js';
 
 // what the shared picture slot calls itself out here
 const WORLD_PICS = {
@@ -34,7 +35,12 @@ const WORLD_EVENTS = {
   tab: 'mc-world-tab',
   panel: 'mc-world-event',
   body: 'mc-world-desc',
+  date: 'mc-world-date',
+  label: 'mc-world-label',
+  points: 'mc-world-points',
 };
+
+const WORLD_POINTS = { label: 'mc-world-label', points: 'mc-world-points' };
 
 let listRoot, bodyEl, openBtn, closeBtn;
 let isOpen = false;
@@ -218,17 +224,7 @@ function renderWing(wing) {
       }
     }
 
-    if (entry.highlights && entry.highlights.length) {
-      if (entry.highlightsLabel) {
-        const lab = el('p', 'mc-world-label', entry.highlightsLabel);
-        lab.setAttribute('aria-hidden', 'true');
-        text.appendChild(lab);
-      }
-      const ul = el('ul', 'mc-world-points');
-      if (entry.highlightsLabel) ul.setAttribute('aria-label', entry.highlightsLabel);
-      entry.highlights.forEach((line) => ul.appendChild(el('li', null, line)));
-      text.appendChild(ul);
-    }
+    if (hasHighlights(entry)) text.appendChild(buildHighlights(entry, WORLD_POINTS));
 
     // the same picture slot the exhibit panel shows, filled or waiting, and in
     // the same place: after the writing rather than in front of it

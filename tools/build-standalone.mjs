@@ -29,6 +29,7 @@ const MODULES = [
   'renderer',
   'input',
   'player',
+  'highlights',
   'picture',
   'eventpicker',
   'menu',

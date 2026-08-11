@@ -111,10 +111,20 @@ you pick from, under the entry's own description:
 
 ```js
 events: [
-  { name: 'Notion Workshop', description: '…', images: [ … ] },
-  { name: 'Debugged',        description: '…', images: [ … ] },
+  { name: 'Notion Workshop', date: '19 March 2026', description: '…',
+    highlightsLabel: 'What everyone built', highlights: [ … ], images: [ … ] },
+  { name: 'Debugged', date: '6 June 2026', description: '…', images: [ … ] },
 ]
 ```
+
+An event takes most of what an entry takes: a date above the write-up, bullet
+points under it, and pictures below those. The date lives in the panel rather
+than on the tab — four dates in the row would make it a timetable and cost the
+names their room.
+
+Picking one scrolls it into view when it was below the fold. Without that,
+clicking a tab in a long entry looked like nothing had happened: the tabs sat
+half-cut at the bottom edge and the write-up you asked for was off-screen.
 
 Each event is a picture slot in its own right, so captions, per-picture `ratio`
 and the dashed placeholder all work inside one. The row is a proper tablist:

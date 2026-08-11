@@ -307,6 +307,17 @@ body.is-handheld { overflow: auto; }
    above never reaches it; it needs the gap of a new section instead */
 .detail-outro { margin-top: 18px; }
 
+/* When an event ran, at the top of its panel. Brass-dim because that is what a
+   date already looks like in this window — the launch column in the rail. */
+.detail-date {
+  margin: 0 0 8px;
+  color: var(--brass-d);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 /* Names the list under it without being a heading — same register as the
    client line, which is the panel's existing way of labelling a thing. */
 .detail-label {
@@ -620,6 +631,14 @@ body.is-handheld { overflow: auto; }
   font-size: 13px;
   line-height: 1.7;
   color: #D6D2C8;
+}
+
+.mc-world-date {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9A9A9A;
 }
 
 .mc-world-label {

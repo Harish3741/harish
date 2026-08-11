@@ -173,9 +173,9 @@ function renderMenu(standalone) {
 
   if (standalone) {
     const note = el('p', 'mc-note',
-      'There is a version of this you can walk around in — a pixel museum with '
-      + 'four wings. It needs a keyboard, so it lives on desktop. Everything in '
-      + 'it is also here.');
+      'This list is the boring version. The real one is a game you walk around '
+      + '— same museum, four wings, except you actually explore it. It needs a '
+      + 'keyboard, so open this on a laptop and go have a look.');
     bodyEl.appendChild(note);
   }
 

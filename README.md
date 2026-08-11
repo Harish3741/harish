@@ -150,8 +150,19 @@ arrows belong to the row rather than to the project list beside it.
 
 The left rail is for choosing between exhibits. A wing holding a single entry
 has nothing to choose, so the rail collapses and the entry takes the whole
-window — the same shape the résumé and the rules already open in. The entry's
-own title is dropped there too, because the window header is already saying it.
+window. The entry's own title is dropped there too, because the window header
+is already saying it.
+
+The window itself stays the size every other wing gets — `is-single` hides the
+rail, and a separate `is-document` is what lets a window shrink to fit its
+contents. Only the résumé and the house rules take that: they are not wings,
+and three lines of rules in a 660px frame is mostly empty frame. Everything you
+reach from a plinth is the same rectangle, so the frame doesn't resize as you
+move between rooms.
+
+That rectangle's minimum width is set by the widest single row the panel has to
+hold: five event tabs come to 664px, and the rail and padding take 320px of
+whatever the window is.
 
 `highlightsLabel` names the bullet list when "here are some facts" needs
 saying out loud. It renders in the panel's small mono register — the one the

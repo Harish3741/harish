@@ -80,7 +80,9 @@ function openSingle(entry, blurb, closedCallback) {
 
   titleEl.textContent = entry.title;
   blurbEl.textContent = blurb;
-  root.classList.add('is-single');
+  // is-single hides the rail; is-document also lets the window shrink to what
+  // is in it, which only makes sense for something that is not a wing.
+  root.classList.add('is-single', 'is-document');
 
   renderList();
   renderDetail();
@@ -110,6 +112,7 @@ function openEntries(title, blurb, list, closedCallback) {
   // A rail is for choosing between things. With one entry there is nothing to
   // choose, so it collapses to the same full-width panel a document gets.
   root.classList.toggle('is-single', entries.length === 1);
+  root.classList.remove('is-document');
 
   renderList();
   renderDetail();

@@ -121,7 +121,11 @@ body.is-handheld { overflow: auto; }
    filled its share, and the caps stop a very wide screen stretching the
    pictures past the point of being worth looking at. */
 .window {
-  width: min(100%, max(920px, min(65vw, 1500px)));
+  /* The floor is set by the widest row the panel has to hold on one line: five
+     event tabs come to 664px, and the rail and padding take 320px of whatever
+     the window is. At 920 the fifth tab wrapped to a second row on any laptop
+     narrower than about 1680. */
+  width: min(100%, max(1020px, min(65vw, 1500px)));
   height: min(100%, max(660px, min(72vh, 940px)));
   overflow: hidden;
   display: flex;
@@ -815,14 +819,18 @@ body.is-handheld { overflow: auto; }
 
 /* --------------------------------------------------------- artwork -- */
 
-/* a single picture uses the whole window; the one-row rail would be silly */
+/* One thing to look at, so the one-row rail would be silly. This is about the
+   rail only — a wing holding a single entry is still a wing, and gets the same
+   window as the other three so the frame does not change size as you move
+   between rooms. */
 .overlay.is-single .entry-list { display: none; }
 .overlay.is-single .window-body { grid-template-columns: 1fr; }
-/* A single picture or document has nothing to move between, so it keeps a
-   content-driven height — a two-line caption in a 660px frame is mostly empty
-   frame. */
-.overlay.is-single .window {
-  width: min(100%, 920px);            /* one document; no need for the extra */
+
+/* A document is not a wing. The résumé and the house rules have nothing to move
+   between and no list to hold, so they take their own height — three lines of
+   rules in a 660px frame is mostly empty frame. */
+.overlay.is-document .window {
+  width: min(100%, 920px);
   height: auto;
   max-height: min(560px, 100%);
 }
@@ -979,20 +987,27 @@ body.is-handheld { overflow: auto; }
    brass-ruled rectangles rather than the usual underline, because everything
    else in this window is a bordered box and an underline would be the odd one
    out. */
-.detail-events { margin: 10px 0 0; }
+.detail-events { margin: 18px 0 0; }
 
-/* Pinned to the top of the pane. The row used to scroll away while you read the
-   event under it, so switching events meant scrolling back up to find the tabs
-   — and having the panel scroll itself to them was worse. Sticky costs nothing
-   and moves nothing. */
+/* Pinned to the top of the pane, so the row stays reachable while you read the
+   event under it.
+   Sticky offsets are measured from the scrollport's padding edge, not its
+   border edge — so a plain `top: 0` pins the row 24px down and leaves a band
+   above it that the writing scrolls through in full view. The row therefore
+   pulls itself up by exactly the pane's own padding and pads it back on:
+   -24px top margin and 24px top padding cancel out when it is sitting in the
+   flow, and when it pins, that padding is what fills the band.
+   The side margins do the same job horizontally, so nothing scrolls past in
+   the gutters either. */
 .detail-tabs {
   position: sticky;
-  top: 0;
+  top: -24px;
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 8px 0;
+  margin: -24px -26px 0;
+  padding: 24px 26px 10px;
   background: var(--ink);
 }
 

@@ -60,6 +60,11 @@ screenshot pushed the writing most of a panel down, and the writing is the part
 people came to read. Captions are optional. For a single picture,
 `image: 'img/…'` says the same thing more briefly and no strip furniture shows.
 
+A caption is printed under the picture and doubles as its alt text. `alt`
+instead describes the picture to a screen reader without printing anything —
+which is what a photo wants when the wing it is in has no commentary under its
+pictures. Neither, and the alt falls back to the entry's own name.
+
 Pictures sit in a 3:2 frame and are letterboxed, never cropped — screenshots
 arrive in every shape and cropping a UI loses the part that explains it. An
 entry whose pictures are all a different shape says so with `ratio`:

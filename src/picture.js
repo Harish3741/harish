@@ -15,7 +15,9 @@
 // photos arrive, and reads as somewhere to put something rather than as an
 // image that failed.
 //
-// Each picture is a path, or a `{ src, caption }` if it needs a line under it.
+// Each picture is a path, or a `{ src, caption }` if it needs a line under it,
+// or a `{ src, alt }` if it should be described to a screen reader without
+// anything being printed under it on the page.
 // Paths are relative to the page when the folder is served; the standalone
 // build rewrites them to data URIs, so one content file works both ways.
 
@@ -214,7 +216,11 @@ function pictureFigure(pic, entry, cls) {
 
   const img = document.createElement('img');
   img.src = pic.src;
-  img.alt = pic.caption || entry.title || '';
+  // A caption is on the page; alt is for the people who cannot see the picture.
+  // They are usually the same sentence, but a picture can carry alt without a
+  // caption — which is what a wing that wants no commentary under its photos
+  // needs, rather than six pictures described to nobody.
+  img.alt = pic.alt || pic.caption || entry.title || entry.name || '';
   // Not lazy. These are preloaded at boot and there are a handful of them, so
   // deferring only bought a panel that filled itself in while you watched.
   img.decoding = 'sync';

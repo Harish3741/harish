@@ -41,9 +41,6 @@ export function buildEvents(entry, cls, picCls) {
   body.className = cls.panel;
   body.setAttribute('role', 'tabpanel');
 
-  // The tallest event this picker has shown. See show().
-  let tallest = 0;
-
   const buttons = entry.events.map((ev, i) => {
     const b = document.createElement('button');
     b.type = 'button';
@@ -67,11 +64,6 @@ export function buildEvents(entry, cls, picCls) {
     return null;
   }
 
-  /** Where the tab row sits inside the thing that scrolls it. */
-  function tabsOffset(pane) {
-    return tabs.getBoundingClientRect().top - pane.getBoundingClientRect().top;
-  }
-
   // Nothing here scrolls the pane. An earlier version brought the picker up
   // when it was below the fold, which fixed one thing and broke a worse one:
   // a short event cannot scroll as far as a long one, so the pane clamped and
@@ -87,9 +79,14 @@ export function buildEvents(entry, cls, picCls) {
       b.tabIndex = on ? 0 : -1;
     });
 
+    // Nothing above the tab row changes when you pick an event, so the reader
+    // should not move at all. Remember where they are before the body under
+    // the tabs changes height — once it is empty the browser has already
+    // clamped the scroll, and reading it then just locks the clamp in.
     const pane = scrollParent(wrap);
-    const anchor = pane ? tabsOffset(pane) : 0;
+    const wanted = pane ? pane.scrollTop : 0;
 
+    body.style.minHeight = '';
     body.innerHTML = '';
     const ev = entry.events[i];
 
@@ -123,19 +120,24 @@ export function buildEvents(entry, cls, picCls) {
     if (hasPictures(ev)) body.appendChild(buildGallery(ev, picCls));
     if (hasLinks(ev)) body.appendChild(buildLinks(ev, cls));
 
-    // Events differ in length, and that was the last thing still moving the
-    // panel: picking a shorter one shrinks what there is to scroll, the browser
-    // clamps scrollTop to the new maximum, and the tab row slides up even
-    // though nothing above it changed. So the body keeps the tallest height it
-    // has ever held. Growing never clamps anything, and it never shrinks.
-    body.style.minHeight = '';
-    tallest = Math.max(tallest, body.scrollHeight);
-    body.style.minHeight = `${tallest}px`;
-
-    // Belt and braces: if a clamp got in anyway, undo it.
     if (!pane) return;
-    const moved = tabsOffset(pane) - anchor;
-    if (Math.abs(moved) > 0.5) pane.scrollTop += moved;
+
+    // Events differ in length, and that was the last thing still moving the
+    // panel: picking a shorter one shrinks what there is to scroll, so the
+    // browser clamps the scroll and the tab row slides up even though nothing
+    // above it changed. Reserve just enough room under the tabs to keep where
+    // the reader already was a legal place to be — and not a pixel more.
+    // Holding the tallest event's height would do the same job and leave a
+    // short event sitting above a screenful of nothing.
+    //
+    // bodyTop is an offset inside the scrolling content, so it does not care
+    // where the pane is scrolled to at the moment it is measured.
+    const bodyTop = pane.scrollTop
+      + (body.getBoundingClientRect().top - pane.getBoundingClientRect().top);
+    const need = wanted + pane.clientHeight - bodyTop;
+    if (need > 0) body.style.minHeight = `${need}px`;
+
+    pane.scrollTop = wanted;
   }
 
   // Arrows walk the row when focus is in it, which is what a row of tabs is

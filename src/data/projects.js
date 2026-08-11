@@ -19,6 +19,8 @@
 //     highlights:  ['Cut a 6-hour week to 20 minutes'],
 //     links:       [{ label: 'Repo', url: 'https://…' }],
 //     images:      [{ src: 'img/…', caption: 'What you are looking at.' }],
+//                  // `alt` instead of `caption` describes the picture without
+//                  // printing a line under it
 //   }
 //
 // PICTURES. `images` takes as many as you like; several become a filmstrip you
@@ -188,7 +190,6 @@ export const WINGS = [
               'shared workspaces for group assignments',
               'templates to reuse all semester',
             ],
-            images: [],
             links: [{ label: 'Read the post',
               url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_build-your-notion-workspace-ncsunsw-x-notion-share-7439486172327813120-NSZB/' }],
           },
@@ -217,14 +218,35 @@ export const WINGS = [
             // 1600 wide — twice what the panel can ever show one at.
             images: [
               { src: 'img/personal/debugged-hacking-2.jpg',
-                caption: 'The floor, a few hours in' },
+                alt: 'The floor, a few hours in' },
               { src: 'img/personal/debugged-hacking-1.jpg',
-                caption: 'A team building their app' },
+                alt: 'A team building their app' },
               { src: 'img/personal/debugged-judging.jpg',
-                caption: 'Judging the pitches at the end of the day' },
+                alt: 'Judging the pitches at the end of the day' },
             ],
             links: [{ label: 'Read the post',
               url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_holy-moly-we-broke-a1zap-by-a1base-yc-w25-ugcPost-7469957528953552897-pJ9r/' }],
+          },
+          {
+            name: 'Framer Workshop',
+            date: '25 June 2026',
+            description: [
+              'Everyone applying for the same roles hands in the same '
+              + 'document. A resume says what you have done in the shape '
+              + 'everyone else says it in, and none of it is yours. We wanted '
+              + 'to give students something that was.',
+              'A two-hour evening session in the Tyree Tech Building, building '
+              + 'a personal site in Framer from nothing. Everyone arrived with '
+              + 'a laptop and left with a site that was actually live, rather '
+              + 'than a half-finished tutorial to come back to.',
+            ],
+            highlights: [
+              'everyone left with a live portfolio site',
+              'built in Framer, start to finish, in two hours',
+            ],
+            links: [{ label: 'Read the post',
+              url: 'https://www.linkedin.com/posts/no-code-society_unsw-job-'
+                + 'resume-activity-7473589089993400320-bh6E' }],
           },
           {
             name: 'Healthack',
@@ -246,9 +268,9 @@ export const WINGS = [
             ],
             images: [
               { src: 'img/personal/healthack-2.jpg',
-                caption: 'Teams building, deep into the weekend' },
+                alt: 'Teams building, deep into the weekend' },
               { src: 'img/personal/healthack-1.jpg',
-                caption: 'Builders and clinicians in the same room' },
+                alt: 'Builders and clinicians in the same room' },
             ],
             links: [{ label: 'Read the post',
               url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_healthhack-sydney-luma-share-7477531462825795584-6_k9/' }],
@@ -270,7 +292,6 @@ export const WINGS = [
               'supporting winning teams to keep building with non-profits',
               'coordinating with Base44, Enactus UNSW, AISOC MQ and UTS TechSoc',
             ],
-            images: [],
           },
         ],
         tagline: 'Co-founded a tech society for building apps and automations '
@@ -390,12 +411,12 @@ export const WINGS = [
         client: 'Hannah',
         images: [
           { src: 'img/client/01-home-hero-desktop.jpg',
-            caption: 'The landing page' },
+            alt: 'The landing page' },
           { src: 'img/client/08-booking-form-conditional-desktop.png',
-            caption: 'The waiting list form. It posts to Apps Script which '
+            alt: 'The waiting list form. It posts to Apps Script which '
               + 'notifies the owner.' },
           { src: 'img/client/nail-studio-gallery.jpg',
-            caption: 'A gallery of recent work. User can tap any image to '
+            alt: 'A gallery of recent work. User can tap any image to '
               + 'view.' },
         ],
         tagline: 'A customised website to suit a nail techs need.',
@@ -423,11 +444,11 @@ export const WINGS = [
         ratio: '8 / 5',
         images: [
           { src: 'img/client/this-museum-title.png',
-            caption: 'Where you come in' },
+            alt: 'Where you come in' },
           { src: 'img/client/this-museum-atrium.png',
-            caption: 'The atrium, with a way into each of the four rooms' },
+            alt: 'The atrium, with a way into each of the four rooms' },
           { src: 'img/client/this-museum-wing.png',
-            caption: 'Inside a room, standing at something you can press' },
+            alt: 'Inside a room, standing at something you can press' },
         ],
         tagline: 'A portfolio of things I\'ve built in a 2D game.',
         description:

@@ -113,14 +113,15 @@ you pick from, under the entry's own description:
 events: [
   { name: 'Notion Workshop', date: '19 March 2026', description: '…',
     highlightsLabel: 'What everyone built', highlights: [ … ], images: [ … ] },
-  { name: 'Debugged', date: '6 June 2026', description: '…', images: [ … ] },
+  { name: 'Debugged', date: '6 June 2026', description: '…', images: [ … ],
+    links: [{ label: 'Read the post', url: '…' }] },
   { name: 'Something upcoming', date: '5-6 September 2026',
     status: 'Event in progress', description: '…' },
 ]
 ```
 
 An event takes most of what an entry takes: a date above the write-up, bullet
-points under it, and pictures below those. `status` is a brass tag beside the
+points under it, pictures below those, and `links` at the bottom. `status` is a brass tag beside the
 date, for an event that hasn't finished — a future date on its own reads as a
 typo by the time someone lands on it in October. The date lives in the panel rather
 than on the tab — four dates in the row would make it a timetable and cost the
@@ -158,6 +159,26 @@ once rather than twice.
 them. A description paragraph renders above the highlights, which is too early
 for a sign-off: "reach me here" three sections above the button it means leaves
 the reader pointing at something they cannot see yet.
+
+### Pictures off a camera
+
+Resize before committing. A phone or a mirrorless shoots 4000-7000px, and the
+single-file build inlines every picture as base64 at 1.33x its size — three
+photos straight off a camera came to 17MB, which is most of an artifact's whole
+budget spent on detail no one can see. The panel shows a picture at 780px at
+most, so 1600px wide at JPEG quality 82 is twice what it can use:
+
+```
+python3 -c "
+from PIL import Image, ImageOps
+im = ImageOps.exif_transpose(Image.open('in.jpg'))
+w, h = im.size
+im.convert('RGB').resize((1600, round(h * 1600 / w)), Image.LANCZOS) \
+  .save('img/personal/out.jpg', 'JPEG', quality=82, optimize=True, progressive=True)"
+```
+
+`exif_transpose` matters: a phone photo carries its rotation as metadata, and
+resizing without honouring it lands the picture on its side.
 
 ### The résumé and the rules
 

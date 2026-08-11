@@ -189,6 +189,8 @@ export const WINGS = [
               'templates to reuse all semester',
             ],
             images: [],
+            links: [{ label: 'Read the post',
+              url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_build-your-notion-workspace-ncsunsw-x-notion-share-7439486172327813120-NSZB/' }],
           },
           {
             name: 'Debugged',
@@ -221,6 +223,8 @@ export const WINGS = [
               { src: 'img/personal/debugged-judging.jpg',
                 caption: 'Judging the pitches at the end of the day' },
             ],
+            links: [{ label: 'Read the post',
+              url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_holy-moly-we-broke-a1zap-by-a1base-yc-w25-ugcPost-7469957528953552897-pJ9r/' }],
           },
           {
             name: 'Healthack',
@@ -240,7 +244,14 @@ export const WINGS = [
               'sponsored by Codex, Base44, What The Health',
               'hosted at Stone & Chalk, Tech Central',
             ],
-            images: [],
+            images: [
+              { src: 'img/personal/healthack-2.jpg',
+                caption: 'Teams building, deep into the weekend' },
+              { src: 'img/personal/healthack-1.jpg',
+                caption: 'Builders and clinicians in the same room' },
+            ],
+            links: [{ label: 'Read the post',
+              url: 'https://www.linkedin.com/posts/harish-prabhu-9a93b0284_healthhack-sydney-luma-share-7477531462825795584-6_k9/' }],
           },
           {
             name: 'Hack for Humanity',

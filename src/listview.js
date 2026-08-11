@@ -14,6 +14,7 @@ import { SITE, WINGS, RESUME } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
 import { hasEvents, buildEvents } from './eventpicker.js';
 import { hasHighlights, buildHighlights } from './highlights.js';
+import { hasLinks, buildLinks } from './links.js';
 
 // what the shared picture slot calls itself out here
 const WORLD_PICS = {
@@ -37,6 +38,8 @@ const WORLD_EVENTS = {
   body: 'mc-world-desc',
   date: 'mc-world-date',
   status: 'mc-world-status',
+  links: 'mc-world-links',
+  link: 'mc-btn mc-btn-small',
   label: 'mc-world-label',
   points: 'mc-world-points',
 };
@@ -237,17 +240,7 @@ function renderWing(wing) {
 
     if (entry.outro) text.appendChild(el('p', 'mc-world-desc', entry.outro));
 
-    if (entry.links && entry.links.length) {
-      const wrap = el('p', 'mc-world-links');
-      entry.links.forEach((link) => {
-        const a = el('a', 'mc-btn mc-btn-small', link.label);
-        a.href = link.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        wrap.appendChild(a);
-      });
-      text.appendChild(wrap);
-    }
+    if (hasLinks(entry)) text.appendChild(buildLinks(entry, WORLD_EVENTS));
 
     row.appendChild(text);
     list.appendChild(row);

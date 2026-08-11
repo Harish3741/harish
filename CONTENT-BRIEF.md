@@ -115,7 +115,7 @@ write-ups and screenshots can arrive separately.
 | `images` | a filmstrip at the top of the panel; a dashed *photo goes here* until then |
 | `description`, `highlights`, `tech`, `links` | the body of the panel |
 | `highlightsLabel` | a small label naming the bullet list |
-| `events` | a row of tabs; each takes `date`, `status`, `description`, `highlights`, `images` |
+| `events` | a row of tabs; each takes `date`, `status`, `description`, `highlights`, `images`, `links` |
 | `outro` | a closing line under the pictures, beside the links |
 | `client` | a small line above the description, and in the skip-to-list |
 

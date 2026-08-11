@@ -10,6 +10,7 @@ import { wingById } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
 import { hasEvents, buildEvents } from './eventpicker.js';
 import { hasHighlights, buildHighlights } from './highlights.js';
+import { hasLinks, buildLinks } from './links.js';
 
 // what the shared picture slot calls itself in here
 const DETAIL_PICS = {
@@ -33,6 +34,8 @@ const DETAIL_EVENTS = {
   body: 'detail-body',
   date: 'detail-date',
   status: 'detail-status',
+  links: 'detail-links',
+  link: '',
   label: 'detail-label',
   points: 'detail-highlights',
 };
@@ -279,19 +282,7 @@ function renderDetail() {
     detailEl.appendChild(o);
   }
 
-  if (entry.links && entry.links.length) {
-    const wrap = document.createElement('div');
-    wrap.className = 'detail-links';
-    entry.links.forEach((link) => {
-      const a = document.createElement('a');
-      a.href = link.url;
-      a.textContent = link.label;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      wrap.appendChild(a);
-    });
-    detailEl.appendChild(wrap);
-  }
+  if (hasLinks(entry)) detailEl.appendChild(buildLinks(entry, DETAIL_EVENTS));
 }
 
 function onKeydown(e) {

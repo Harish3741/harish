@@ -9,7 +9,8 @@
 // An entry declares them instead of `images`:
 //
 //   events: [{ name: 'Notion Workshop', date: '…', status: '…',
-//              description: '…', highlights: [ … ], images: [ … ] }]
+//              description: '…', highlights: [ … ], images: [ … ],
+//              links: [ … ] }]
 //
 // Each event is a picture slot in its own right, so everything the strip does —
 // captions, per-picture `ratio`, the dashed placeholder before the photos
@@ -17,6 +18,7 @@
 
 import { hasPictures, buildGallery } from './picture.js';
 import { hasHighlights, buildHighlights } from './highlights.js';
+import { hasLinks, buildLinks } from './links.js';
 
 export function hasEvents(entry) {
   return Array.isArray(entry.events) && entry.events.length > 0;
@@ -119,6 +121,7 @@ export function buildEvents(entry, cls, picCls) {
 
     if (hasHighlights(ev)) body.appendChild(buildHighlights(ev, cls));
     if (hasPictures(ev)) body.appendChild(buildGallery(ev, picCls));
+    if (hasLinks(ev)) body.appendChild(buildLinks(ev, cls));
 
     // Events differ in length, and that was the last thing still moving the
     // panel: picking a shorter one shrinks what there is to scroll, the browser

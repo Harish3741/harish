@@ -136,10 +136,10 @@ Picking one moves nothing. The tab row is sticky, so it pins to the top of the
 pane once you reach it and stays there while you read whatever is under it. An
 earlier version scrolled the picker into view instead, which read as the panel
 bouncing: events differ in length, a short one cannot scroll as far as a long
-one, and every pick settled somewhere new. The event body also keeps the
-tallest height it has held, so switching to a shorter event never shrinks what
-there is to scroll and never gets the scroll position clamped out from under
-you.
+one, and every pick settled somewhere new. The event body also reserves just
+enough room to keep where the reader already is a legal scroll position, so a
+shorter event never shrinks the scrollable area out from under them — and no
+more than that, or a two-bullet event sits above a screenful of nothing.
 
 Each event is a picture slot in its own right, so captions, per-picture `ratio`
 and the dashed placeholder all work inside one. The row is a proper tablist:
@@ -256,8 +256,9 @@ Three is what the room is built for — fewer leaves a place at the table
 empty. They don't have to correspond to three real clients, and with the table
 holding one list they no longer do.
 
-`CLIENTS` still carries `name`, `role` and `greeting` from when each figure was
-its own conversation. Nothing reads them now.
+`CLIENTS` used to carry `name`, `role` and `greeting` from when each figure was
+its own conversation. Nothing read them, and they were still shipping their
+placeholder text inside the published page, so they are gone.
 
 ### The screening room
 

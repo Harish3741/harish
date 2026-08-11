@@ -59,11 +59,12 @@ export function openScreening(closedCallback) {
     videoEl = null;
     const note = document.createElement('div');
     note.className = 'reel-empty';
+    // Whoever sits in this chair is a visitor, not whoever is building the
+    // place. The instructions for putting a film in belong in the README.
     note.innerHTML =
-      '<strong>NO REEL LOADED</strong>'
-      + 'The projector is threaded and waiting. Drop a file in and set '
-      + '<code>ABOUT.video</code> in <code>src/data/projects.js</code> — a path '
-      + 'next to the page, or a data URI if it needs to travel with the file.';
+      '<strong>NOTHING SHOWING</strong>'
+      + 'No film yet. The chair is comfortable though, and the rest of the '
+      + 'museum is back through the door behind you.';
     reelStage.appendChild(note);
   }
 

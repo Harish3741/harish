@@ -144,6 +144,20 @@ function addNav(wrap, strip, track, count, cls) {
 
   prev.addEventListener('click', () => scrollTo(track, current(track) - 1));
   next.addEventListener('click', () => scrollTo(track, current(track) + 1));
+
+  // The strip is a scroll container, so arrow keys would scroll it for free —
+  // except the game swallows every arrow on window to stop the droid walking
+  // off while you read. So the strip has to move itself, and stop the event
+  // before it reaches either the droid or the list of exhibits beside it.
+  track.addEventListener('keydown', (e) => {
+    const back = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
+    const fwd = e.key === 'ArrowRight' || e.key === 'ArrowDown';
+    if (!back && !fwd) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const to = Math.min(count - 1, Math.max(0, current(track) + (fwd ? 1 : -1)));
+    scrollTo(track, to);
+  });
   track.addEventListener('scroll', sync, { passive: true });
   // pictures arriving, and the window changing size, both change the fit
   track.addEventListener('load', () => sync(), true);

@@ -506,12 +506,13 @@ export const WINGS = [
 // ---------------------------------------------------------------------------
 // THE BOARDROOM
 //
-// The Projects wing is a boardroom rather than a gallery: three clients
-// standing round a table, and pressing E on one shows the work you did for
-// them. There is no plinth in that room — the people are the exhibit.
+// The Projects wing is a boardroom rather than a gallery: three figures round a
+// table, and the table itself is what opens the wing's work.
 //
-// `name` has to match the `client` field on the projects above; that is the
-// whole wiring. A client with nothing matching still stands there and says so.
+// The figures are scenery. They carried a name, a role and a greeting once, for
+// a version where you pressed E on a person to see their project — that never
+// shipped, and the fields sat unread in the content file and in the published
+// page for months afterwards. What is left is what is actually drawn.
 //
 // Three is the number the room is built for. Fewer and a place at the table
 // stands empty; more and they queue up along the wall.
@@ -522,23 +523,14 @@ export const WINGS = [
 
 export const CLIENTS = [
   {
-    name: 'Placeholder — first client',
-    role: 'What they do, in three words',
-    greeting: 'You built the thing that runs our mornings. Have a look.',
     hair: 'short',
     palette: { K: '#2E2018', S: '#C98F63', T: '#3A5A78', P: '#2A2E38' },
   },
   {
-    name: 'Placeholder — second client',
-    role: 'And what they do',
-    greeting: 'Six months of spreadsheets, gone. Here is what replaced them.',
     hair: 'long',
     palette: { K: '#4A2418', S: '#8A5A3A', T: '#6B4A2E', P: '#33302C' },
   },
   {
-    name: 'Placeholder — third client',
-    role: 'Likewise',
-    greeting: 'We had a deadline and no idea. Mostly the second part.',
     hair: 'short',
     palette: { K: '#1E1A18', S: '#E0B08A', T: '#4A5A46', P: '#2C2A30' },
   },
@@ -558,15 +550,24 @@ export const CLIENTS = [
 export const RESUME = {
   title: 'Harish — résumé',
   tagline: 'The short version, on one page.',
-  description: 'Replace this paragraph with the summary you would put at the '
-    + 'top of a CV: what you do, who you do it for, and what you are looking '
-    + 'for next. Everything below is the same shape as a project entry.',
+  // Drawn from what is already in the museum rather than invented. `links` is
+  // where the PDF goes when there is one — a file next to the page, a data URI,
+  // or wherever it already lives.
+  description: 'UNSW Actuarial student, graduating at the end of 2026. I build '
+    + 'things: a subscription platform with paying users, websites for small '
+    + 'businesses, and n8n automations that take jobs off my own to-do list. '
+    + 'Alongside that I co-founded two societies at UNSW and look after the '
+    + 'money at a third.',
   highlights: [
-    'A line per role, or per thing you are proud of.',
-    'Delete any of these fields and they simply stop rendering.',
+    'Co-Founder and Co-President, No-Code UNSW',
+    'Co-Founder and President, RAPSOC UNSW',
+    'Treasurer, Toastmasters UNSW',
+    'Founded Scorify, taking paying subscribers since February 2026',
   ],
-  tech: ['Python', 'JavaScript', 'n8n', 'Postgres'],
-  links: [],
+  tech: ['n8n', 'JavaScript', 'TypeScript', 'React', 'Supabase', 'Stripe',
+    'HTML', 'CSS'],
+  links: [{ label: 'LinkedIn',
+    url: 'https://www.linkedin.com/in/harish-prabhu-9a93b0284' }],
 };
 
 export const RULES = {

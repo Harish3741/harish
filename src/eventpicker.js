@@ -95,7 +95,10 @@ export function buildEvents(entry, cls, picCls) {
     if (ev.date || ev.status) {
       const d = document.createElement('p');
       d.className = cls.date;
-      if (ev.date) d.append(ev.date);
+      // The trailing space is not decoration: the tag is a separate element with
+      // a margin, so on screen the two are clearly apart — but read aloud they
+      // ran together as "September 2026Event in progress".
+      if (ev.date) d.append(ev.status ? `${ev.date} ` : ev.date);
       // An event still running says so beside its date. A future date on its
       // own reads as a typo by the time someone lands on it in October.
       if (ev.status) {

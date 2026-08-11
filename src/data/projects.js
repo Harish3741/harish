@@ -156,10 +156,94 @@ export const WINGS = [
         // The society is its events, so they get a row of their own rather
         // than one description trying to cover four things at once.
         events: [
-          { name: 'Notion Workshop', description: 'Write-up coming.', images: [] },
-          { name: 'Debugged', description: 'Write-up coming.', images: [] },
-          { name: 'Healthack', description: 'Write-up coming.', images: [] },
-          { name: 'Hack for Humanity', description: 'Write-up coming.', images: [] },
+          {
+            name: 'Notion Workshop',
+            date: '19 March 2026',
+            description: [
+              'Most students run a whole degree without a system. Notes '
+              + 'scattered across three apps, deadlines that turn up out of '
+              + 'nowhere, and a group assignment nobody can find the plan for.',
+              'So we ran a workshop that walked students through building one '
+              + 'from scratch. Everyone left with a Notion workspace they had '
+              + 'built themselves and could keep using for the rest of the '
+              + 'semester, rather than a template we handed over.',
+            ],
+            highlightsLabel: 'What everyone built',
+            highlights: [
+              'assignment and deadline dashboards',
+              'class note systems',
+              'databases with filters, sorts and relations',
+              'kanban boards for projects',
+              'shared workspaces for group assignments',
+              'templates to reuse all semester',
+            ],
+            images: [],
+          },
+          {
+            name: 'Debugged',
+            date: '6 June 2026',
+            description: [
+              'Every student has a list of things about their campus that '
+              + 'annoy them, and almost none of those complaints ever becomes '
+              + 'anything. Debugged was a one-day hackathon built on the idea '
+              + 'that they should.',
+              'Teams picked a real social or community problem on campus and '
+              + 'built a working mini-app for it, start to finish, in a single '
+              + 'day. Some of the best ideas of the day were things people had '
+              + 'been walking past for years.',
+            ],
+            highlights: [
+              'a campus complaint to a working app in one day',
+              'built on A1Zap, so no team needed to write code',
+              'run with NCSS UNSW, A1Zap and UNSW Founders',
+            ],
+            images: [],
+          },
+          {
+            name: 'Healthack',
+            date: '18-19 July 2026',
+            description: [
+              'Healthcare problems are obvious to the people working in '
+              + 'healthcare and invisible to everyone else. Healthack put both '
+              + 'in the same room for a weekend.',
+              'Builders, clinicians and industry leaders worked together on '
+              + 'real healthcare problems at Stone & Chalk in Tech Central. '
+              + 'Two tracks meant you could enter as a coder or as a pitcher, '
+              + 'so a good idea did not need a technical team behind it to go '
+              + 'anywhere. Teams of two to six had clinicians and healthtech '
+              + 'mentors on hand the whole way through.',
+            ],
+            highlights: [
+              'over $15K in prizes, topped by $10,000 USD in Codex credits',
+              'ChatGPT Pro for a year for the top five teams',
+              'hosted at Stone & Chalk, Tech Central',
+            ],
+            images: [],
+          },
+          {
+            name: 'Hack for Humanity',
+            date: '5-6 September 2026',
+            description: [
+              'Non-profits have real software problems and no budget to solve '
+              + 'them. Students have the time and, now, the tools. Hack for '
+              + 'Humanity puts the two together for a weekend.',
+              'Cross-university teams pick one of three non-profit partners, '
+              + 'work from a brief that organisation wrote themselves, and '
+              + 'build a working MVP on Base44 across two days. Mentors from '
+              + 'Base44 and the non-profits circulate the whole time. On the '
+              + 'second day every team pitches, first to judges from the '
+              + 'partner societies and then to the non-profit itself.',
+            ],
+            highlights: [
+              'three tracks, one per non-profit partner',
+              'teams of two to four, capped at 200 participants',
+              'judged by Omer Shai, CMO at Wix',
+              'winning teams that keep building with their non-profit get '
+              + 'Base44 credits and mentorship',
+              'run with Base44, Enactus UNSW, AISOC MQ and UTS TechSoc',
+            ],
+            images: [],
+          },
         ],
         tagline: 'Co-founded a tech society for building apps and automations '
           + 'without code',

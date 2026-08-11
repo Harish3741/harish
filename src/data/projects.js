@@ -54,8 +54,10 @@ export const WINGS = [
         title: 'Job Scraper',
         // A workflow canvas is about three times as wide as it is tall, so the
         // picture frame is too. In the default 3:2 the canvas rendered at the
-        // same size with 200px of empty frame under it.
-        ratio: '3 / 1',
+        // same size with 200px of empty frame under it. The frame is this
+        // canvas's own shape rather than a round 3:1, which left a tenth of it
+        // dark above and below for nothing.
+        ratio: '1200 / 352',
         images: [{ src: 'img/automations/job-scraper-workflow.png',
           caption: 'Searches jobs, scores them and stores them in a sheet' }],
         tagline: 'An n8n workflow that finds job postings and scores them '
@@ -86,13 +88,18 @@ export const WINGS = [
 
       {
         title: 'Spending Tracker',
-        ratio: '3 / 1',
+        // Both pictures are within a whisker of this shape — the canvas is
+        // 3.35:1 and the sheet 3.38:1 — so one frame fits the pair and neither
+        // is boxed. The sheet used to declare its own, which changed the
+        // frame's height as you swiped; the entry's old 3:1 fitted neither and
+        // cost them both a tenth of their height to dark.
+        ratio: '1600 / 474',
         images: [
           { src: 'img/automations/spending-tracker-workflow.png',
             caption: 'Reads the card alert, categorises it and logs it to a sheet' },
           // The two halves of what it produces, composited side by side at a
           // matched height so they read as one sheet rather than two views.
-          { src: 'img/automations/spending-tracker-sheet.png', ratio: '1600 / 474',
+          { src: 'img/automations/spending-tracker-sheet.png',
             caption: 'Every transaction as it lands, and the month against '
               + 'budget' },
         ],

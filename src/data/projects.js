@@ -205,10 +205,22 @@ export const WINGS = [
             ],
             highlights: [
               'a campus complaint to a working app in one day',
-              'built on A1Zap, so no team needed to write code',
+              'partnered with A1Zap a YC backed startup focused on bringing AI '
+              + 'into our social lives',
               'run with NCSS UNSW, A1Zap and UNSW Founders',
+              'judged the final pitches',
             ],
-            images: [],
+            // Straight off the camera at 7008px and 17MB for the three, which
+            // is more base64 than the single-file build can carry. Resized to
+            // 1600 wide — twice what the panel can ever show one at.
+            images: [
+              { src: 'img/personal/debugged-hacking-2.jpg',
+                caption: 'The floor, a few hours in' },
+              { src: 'img/personal/debugged-hacking-1.jpg',
+                caption: 'A team building their app' },
+              { src: 'img/personal/debugged-judging.jpg',
+                caption: 'Judging the pitches at the end of the day' },
+            ],
           },
           {
             name: 'Healthack',
@@ -224,6 +236,8 @@ export const WINGS = [
               '120 attendees across UNSW and general public',
               'over $15K USD in prizes',
               'ChatGPT Pro for a year for the top five teams',
+              'partnered with MLAI and StatDoctor',
+              'sponsored by Codex, Base44, What The Health',
               'hosted at Stone & Chalk, Tech Central',
             ],
             images: [],

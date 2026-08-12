@@ -320,7 +320,12 @@ function onKeydown(e) {
     e.preventDefault();
     select(entries.length - 1);
   } else if (e.key === 'Enter') {
-    // Enter follows the first link, if the exhibit has one
+    // Enter follows the first link, if the exhibit has one. No longer
+    // advertised in the footer, but still there for anyone who tries it.
+    // Not when focus is already on something Enter activates by itself — the
+    // browser follows that one, and this would follow the first as well, which
+    // on an entry with two links opens two tabs from one keypress.
+    if (e.target.closest && e.target.closest('a[href], button')) return;
     const link = detailEl.querySelector('.detail-links a');
     if (link) {
       e.preventDefault();

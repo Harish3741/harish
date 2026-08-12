@@ -210,7 +210,7 @@ export const WINGS = [
               'a campus complaint to a working app in one day',
               'partnered with A1Zap a YC backed startup focused on bringing AI '
               + 'into our social lives',
-              'run with NCSS UNSW, A1Zap and UNSW Founders',
+              'run with AI UNSW, A1Zap and UNSW Founders',
               'judged the final pitches',
             ],
             // Straight off the camera at 7008px and 17MB for the three, which
@@ -328,7 +328,7 @@ export const WINGS = [
           + 'sharing the beat they made when they were 12 or the rap they '
           + 'randomly sang in the shower.',
           'As Co-Founder and President I helped bring the society to life and '
-          + 'grew it from a small exec only team of 7 person team to now a 45 '
+          + 'grew it from a small exec only team of 7 to now a 45 '
           + 'member team. I oversee all planning and decision making across '
           + 'marketing, HR, creatives and events.',
         ],
@@ -361,7 +361,7 @@ export const WINGS = [
           + 'reimbursements and records were accurate so the club can keep '
           + 'running smoothly.',
         highlights: [
-          'increased the societies profits by 12%',
+          'increased the society\'s profits by 12%',
           'maintained well organised financials',
           'built a custom flow to track spending and income',
         ],
@@ -419,7 +419,7 @@ export const WINGS = [
             alt: 'A gallery of recent work. User can tap any image to '
               + 'view.' },
         ],
-        tagline: 'A customised website to suit a nail techs need.',
+        tagline: 'A customised website to suit a nail tech\'s need.',
         description:
           'Designed and built a website for Hannah that streamlines her '
           + 'booking process, with clear, upfront pricing and a portfolio '

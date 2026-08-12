@@ -15,12 +15,24 @@ const SWALLOW = new Set([
   ...Object.keys(MOVE), 'Space', 'Enter', 'KeyE', 'Escape',
 ]);
 
+// Keys that activate whatever has focus, and the things they activate.
+const ACTIVATORS = new Set(['Enter', 'Space']);
+const CONTROL = 'a[href], button, input, select, textarea, [contenteditable]';
+
 let anyKeyListeners = [];
 
 export function initInput() {
   window.addEventListener('keydown', (e) => {
     // let the browser have its shortcuts back
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    // And let a focused control have the keys that activate it. Enter and Space
+    // are swallowed so they don't re-trigger whatever the droid is standing at,
+    // but taking them off a button or a link means every arrow, dot and tab in
+    // an open panel can be reached by keyboard and then not used. The droid
+    // isn't going anywhere while a panel is up.
+    if (ACTIVATORS.has(e.code) && e.target.closest && e.target.closest(CONTROL)) {
+      return;
+    }
     if (SWALLOW.has(e.code)) e.preventDefault();
     if (!down.has(e.code)) pressedThisFrame.add(e.code);
     down.add(e.code);

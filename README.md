@@ -54,7 +54,8 @@ you leave out simply doesn't render.
 
 `images` takes as many as a project deserves. Several become a filmstrip you
 swipe sideways — trackpad, touch, the arrows on the picture, the dots under it,
-or the arrow keys once the strip has focus — one picture at a time, with
+or the arrow keys once the strip has focus, which the strip handles itself
+because the game takes the arrows off the window — one picture at a time, with
 everything else about the entry stacked underneath. Stacked instead, the third
 screenshot pushed the writing most of a panel down, and the writing is the part
 people came to read. Captions are optional. For a single picture,

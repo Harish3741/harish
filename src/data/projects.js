@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Every wing holds real entries. RESUME is still placeholder, and ABOUT.video
-// is empty — the cinema says so rather than breaking.
+// Every wing holds real entries. RESUME is deliberately blank — title only —
+// and ABOUT.video is empty; the cinema says so rather than breaking.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //
@@ -518,7 +518,7 @@ export const WINGS = [
 
       {
         title: 'This Museum',
-        launch: '2026',
+        launch: 'Aug 2026',
         // the captures are 1200x750, so the frame is their own shape exactly
         ratio: '8 / 5',
         images: [
@@ -627,26 +627,11 @@ export const CLIENTS = [
 // ---------------------------------------------------------------------------
 
 export const RESUME = {
+  // Blank on purpose. The title is the window's header and the plain list's
+  // button label, so it stays; everything below it is Harish's to write.
+  // Add `tagline`, `description`, `highlights`, `tech` and `links` back and
+  // they render in that order — `links` is where a PDF goes when there is one.
   title: 'Harish — résumé',
-  tagline: 'The short version, on one page.',
-  // Drawn from what is already in the museum rather than invented. `links` is
-  // where the PDF goes when there is one — a file next to the page, a data URI,
-  // or wherever it already lives.
-  description: 'UNSW Actuarial student, graduating at the end of 2026. I build '
-    + 'things: a subscription platform with paying users, websites for small '
-    + 'businesses, and n8n automations that take jobs off my own to-do list. '
-    + 'Alongside that I co-founded two societies at UNSW and look after the '
-    + 'money at a third.',
-  highlights: [
-    'Co-Founder and Co-President, No-Code UNSW',
-    'Co-Founder and President, RAPSOC UNSW',
-    'Treasurer, Toastmasters UNSW',
-    'Founded Scorify, taking paying subscribers since February 2026',
-  ],
-  tech: ['n8n', 'JavaScript', 'TypeScript', 'React', 'Supabase', 'Stripe',
-    'HTML', 'CSS'],
-  links: [{ label: 'LinkedIn',
-    url: 'https://www.linkedin.com/in/harish-prabhu-9a93b0284' }],
 };
 
 export const RULES = {

@@ -162,7 +162,11 @@ function renderMenu(standalone) {
     const b = el('button', 'mc-btn');
     b.type = 'button';
     b.appendChild(el('span', 'mc-btn-label', RESUME.title));
-    b.appendChild(el('span', 'mc-btn-sub', RESUME.tagline || 'One page'));
+    // No fallback line. This used to read "One page" when there was no
+    // tagline, which is a claim about the contents, and the résumé is blank
+    // until Harish writes it. A button that says nothing beats one that says
+    // something untrue.
+    if (RESUME.tagline) b.appendChild(el('span', 'mc-btn-sub', RESUME.tagline));
     b.addEventListener('click', () => renderWing({
       title: RESUME.title, blurb: RESUME.tagline, projects: [RESUME],
     }));

@@ -47,6 +47,16 @@ const WORLD_EVENTS = {
 const WORLD_POINTS = { label: 'mc-world-label', points: 'mc-world-points' };
 
 let listRoot, bodyEl, openBtn, closeBtn;
+
+/* Both screens are drawn into the same scrollport, so a new one inherits
+   wherever the last one was left. Reset it, and do it before focusing
+   anything — focus() scrolls its target into view, which is how opening a
+   wing used to land 1287px down: the Back button is the last thing on the
+   screen, and focusing it dragged the whole sheet to the bottom. */
+function toTop() {
+  const sheet = listRoot && listRoot.querySelector('.sheet');
+  if (sheet) sheet.scrollTop = 0;
+}
 let isOpen = false;
 let lastFocus = null;
 let dirtUrl = null;
@@ -185,8 +195,9 @@ function renderMenu(standalone) {
 
   if (SITE.footer) bodyEl.appendChild(el('p', 'mc-footer', SITE.footer));
 
+  toTop();
   const first = menu.querySelector('.mc-btn');
-  if (first && isOpen) first.focus();
+  if (first && isOpen) first.focus({ preventScroll: true });
 }
 
 /** Screen two: that wing's projects, as a list of worlds. */
@@ -256,5 +267,15 @@ function renderWing(wing) {
   back.type = 'button';
   back.addEventListener('click', () => renderMenu(listRoot.classList.contains('is-standalone')));
   bodyEl.appendChild(back);
-  back.focus();
+
+  // The wing's own heading takes focus, not Back. Landing on "Back" is a
+  // strange first thing to be told you are on when you have just opened a
+  // section, and it sits at the very bottom; the title says which wing you
+  // are in and tabbing on from it walks the entries in reading order.
+  toTop();
+  const title = head.querySelector('.mc-title');
+  if (title && isOpen) {
+    title.tabIndex = -1;
+    title.focus({ preventScroll: true });
+  }
 }

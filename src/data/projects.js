@@ -156,6 +156,35 @@ export const WINGS = [
           'Can be edited to find any business',
         ],
       },
+
+      {
+        title: 'Team Task Reminder',
+        // The canvas's own shape, the way the other three workflows are framed.
+        ratio: '2532 / 1144',
+        images: [{ src: 'img/automations/task-reminder.png',
+          caption: 'Checks Notion for tomorrow\u2019s tasks and nudges the '
+            + 'assignee on Discord' }],
+        tagline: 'An n8n workflow that sends reminders for my current team',
+        description: [
+          'Leading a team means checking up on people to ensure they are on '
+          + 'track with their. I hated being a nag and it felt like a waste of '
+          + 'my energy to remember so I built this.',
+          'Every day n8n checks our Notion task board for anything due tomorrow '
+          + 'that isn\'t already done or already chased. If it finds something, '
+          + 'it matches the assignee to their Discord and posts a nudge in the '
+          + 'channel tagging them with the task and a link back to Notion.',
+          'None of this is specific to a team. The database, channel and '
+          + 'assignee map are just fields and I can point it at a different '
+          + 'Notion board and Discord server. This way it runs seamlessly for '
+          + 'whatever event I\'m dealing with next.',
+        ],
+        highlights: [
+          'Saves me the strain of context switching during event organisation',
+          'Sets a healthy culture of team not feeling micromanaged but still '
+          + 'supported',
+          'Can be reused with any team',
+        ],
+      },
     ],
   },
 

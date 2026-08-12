@@ -68,3 +68,29 @@ event photos in `personal/` came to 524 KB, from 16.6 MB.
 - **Cropped tight** to the thing worth seeing. A dense full-screen capture
   reads as grey mush at this size.
 - Blur anything with a real customer record, an email address or a token in it.
+
+## Phone screenshots
+
+They are the wrong shape for the slot and there is no cropping your way out of
+it — a 1170x2532 screen is 0.46 where the frame wants about 1.6. Dropped in
+whole, one fills a third of the frame and the rest goes dark. Measured on the
+tall Scorify writing shot, which is much squarer than a phone: 67%.
+
+So they go in as **sheets**: several phones side by side at a matched height on
+`#16100A`, the letterbox colour, so the margins disappear into the frame. Three
+phones make a landscape sheet at about 1.4, which fills it. That is what
+`client/forkit-*.jpg` is, and what `automations/spending-tracker-sheet.png` was
+before it.
+
+Build every sheet for one entry on **one canvas**, sized from the group with the
+most phones in it, and centre the shorter groups. Otherwise a three-up and a
+two-up are different shapes, the entry's single `ratio` fits neither, and the
+frame changes height as you swipe — the thing the fixed frame exists to stop.
+A two-up on a three-up canvas fills 66% of it and the rest is dark, which is
+what letterboxing would have done anyway; doing it in the file keeps it
+predictable.
+
+JPEG, not PNG, despite the small text: at 100% the two are indistinguishable
+here and the sheet is a quarter of the weight, and the frame shows it at a
+third of 100% anyway. The two ForkIt sheets are 330 KB together; as PNG they
+were 1.6 MB.

@@ -435,6 +435,57 @@ export const WINGS = [
         links: [{ label: 'Visit site', url: 'https://scorify100.com/' }],
       },
       {
+        title: 'ForkIt',
+        launch: 'May 2026',
+        // Phone screenshots, so they are composited into sheets rather than
+        // shown one at a time: a single portrait shot in this frame wastes two
+        // thirds of it to dark. Both sheets are built on one canvas so the
+        // frame keeps its height between them.
+        ratio: '2191 / 1556',
+        images: [
+          { src: 'img/client/forkit-1-start-to-swipe.jpg',
+            alt: 'The home screen, the preferences screen with walking '
+              + 'distance, cuisine, price range and a group session code, and '
+              + 'a restaurant card ready to swipe' },
+          { src: 'img/client/forkit-2-liked-and-match.jpg',
+            alt: 'The sheet listing the places liked so far, and the match '
+              + 'screen once everyone agrees on one' },
+        ],
+        tagline: 'A phone app where groups swipe through restaurants and '
+          + '\u2018match\u2019 on the first one everyone likes.',
+        description: [
+          'Deciding where to eat with my girlfriend or friends turned into '
+          + 'such a hassle as nobody wanted to be the one to pick. So I '
+          + 'decided to build an app to make it easier.',
+          'It\u2019s simple: one person sets a couple metrics like walking '
+          + 'radius and optional cuisine/ price limits. Then the app builds a '
+          + 'deck of the restaurants that fit and generates a code. The code '
+          + 'can be shared so that everyone can swipe right for yes and left '
+          + 'for no on the deck of restaurants till one place has a majority '
+          + 'vote.',
+          'It has been in use since May 2026 with my friends through local '
+          + 'hosting. Soon I will submit it to the app store so that everyone '
+          + 'can use it!.',
+        ],
+        // Same trim as Scorify: the framework, the language, the backend and
+        // the two APIs the app would not work without. Dropped the Expo SDK
+        // version, the navigation library, the gesture and animation
+        // libraries and expo-location \u2014 all real, none of them a decision
+        // anyone would ask about. Firebase is one line rather than its auth
+        // and its database separately.
+        tech: [
+          'React Native', 'TypeScript', 'Firebase',
+          'Google Places API', 'Google Routes API',
+        ],
+        highlights: [
+          'In regular personal use since May 2026, running against a live '
+          + 'Firebase project and Google Places key.',
+          'All information is pulled from Google Places API so it\u2019s '
+          + 'consistently updated and accurate',
+        ],
+      },
+
+      {
         title: 'Nail Studio by H',
         launch: 'Jun 2026',
         client: 'Hannah',

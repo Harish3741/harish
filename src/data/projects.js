@@ -465,7 +465,7 @@ export const WINGS = [
           + 'vote.',
           'It has been in use since May 2026 with my friends through local '
           + 'hosting. Soon I will submit it to the app store so that everyone '
-          + 'can use it!.',
+          + 'can use it!',
         ],
         // Same trim as Scorify: the framework, the language, the backend and
         // the two APIs the app would not work without. Dropped the Expo SDK

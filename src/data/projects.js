@@ -377,7 +377,36 @@ export const WINGS = [
       {
         title: 'Scorify',
         launch: 'Feb 2026',
-        images: [],
+        // The dashboard's own shape. Six of the seven screenshots are within a
+        // few pixels of it, so they sit in the frame almost exactly; the tall
+        // writing-marking one letterboxes sideways rather than making the frame
+        // change height halfway through the tour.
+        ratio: '1934 / 1177',
+        // In the order a student meets them: pick a subject, pick a topic, sit
+        // the questions, get them back marked, and then look at what that says
+        // about you over time.
+        images: [
+          { src: 'img/client/scorify-1-dashboard-home.png',
+            alt: 'The student dashboard, with overall progress and a bar for '
+              + 'each of the four subjects' },
+          { src: 'img/client/scorify-2-topic-selection.png',
+            alt: 'Choosing a topic in Mathematical Reasoning, and how many '
+              + 'questions to practise' },
+          { src: 'img/client/scorify-3-exam-interface.png',
+            alt: 'A question under timed conditions, with the clock, the '
+              + 'question count and a flag button' },
+          { src: 'img/client/scorify-4-instant-feedback.png',
+            alt: 'The same question marked, showing the correct answer and the '
+              + 'working behind it' },
+          { src: 'img/client/scorify-5-ai-writing-marking.png',
+            alt: 'AI marking on a writing task: a score out of 25, a criteria '
+              + 'breakdown, and written feedback on what worked and what to fix' },
+          { src: 'img/client/scorify-6-analytics-history.png',
+            alt: 'Analytics: every past attempt with its score, the time taken '
+              + 'and any violations' },
+          { src: 'img/client/scorify-7-analytics-flagged.png',
+            alt: 'Questions flagged for study, grouped by subject' },
+        ],
         tagline: 'Subscription practice platform for the NSW Selective High '
           + 'School Placement Test.',
         description:

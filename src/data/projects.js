@@ -437,19 +437,18 @@ export const WINGS = [
       {
         title: 'ForkIt',
         launch: 'May 2026',
-        // Phone screenshots, so they are composited into sheets rather than
+        // Phone screenshots, so they are composited into one sheet rather than
         // shown one at a time: a single portrait shot in this frame wastes two
-        // thirds of it to dark. Both sheets are built on one canvas so the
-        // frame keeps its height between them.
-        ratio: '2191 / 1556',
+        // thirds of it to dark. Four side by side fill it, and the whole run
+        // through the app reads in one picture instead of a swipe.
+        ratio: '2912 / 1556',
         images: [
-          { src: 'img/client/forkit-1-start-to-swipe.jpg',
-            alt: 'The home screen, the preferences screen with walking '
-              + 'distance, cuisine, price range and a group session code, and '
-              + 'a restaurant card ready to swipe' },
-          { src: 'img/client/forkit-2-liked-and-match.jpg',
-            alt: 'The sheet listing the places liked so far, and the match '
-              + 'screen once everyone agrees on one' },
+          { src: 'img/client/forkit-home-to-match.jpg',
+            alt: 'Four screens of the app: the home screen, the preferences '
+              + 'screen with walking distance, cuisine, price range and a '
+              + 'group session code, a restaurant card being swiped with three '
+              + 'people in the session, and the match screen once everyone '
+              + 'agrees on one' },
         ],
         tagline: 'A phone app where groups swipe through restaurants and '
           + '\u2018match\u2019 on the first one everyone likes.',

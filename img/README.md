@@ -78,19 +78,23 @@ tall Scorify writing shot, which is much squarer than a phone: 67%.
 
 So they go in as **sheets**: several phones side by side at a matched height on
 `#16100A`, the letterbox colour, so the margins disappear into the frame. Three
-phones make a landscape sheet at about 1.4, which fills it. That is what
-`client/forkit-*.jpg` is, and what `automations/spending-tracker-sheet.png` was
-before it.
+or four phones make a landscape sheet — 1.4 and 1.9 — which fills it. That is
+what `client/forkit-home-to-match.jpg` is, and what
+`automations/spending-tracker-sheet.png` was before it.
 
-Build every sheet for one entry on **one canvas**, sized from the group with the
-most phones in it, and centre the shorter groups. Otherwise a three-up and a
-two-up are different shapes, the entry's single `ratio` fits neither, and the
-frame changes height as you swipe — the thing the fixed frame exists to stop.
-A two-up on a three-up canvas fills 66% of it and the rest is dark, which is
-what letterboxing would have done anyway; doing it in the file keeps it
-predictable.
+Prefer **one sheet per entry** over a strip of several. Four screens side by
+side read as one run through the app; the same four as two sheets are something
+to click through, and the reader has to hold the first half in their head. It
+is also the only layout with no frame problem to solve.
+
+If an entry does need more than one, build them all on **one canvas**, sized
+from the group with the most phones in it, and centre the shorter groups.
+Otherwise a three-up and a two-up are different shapes, the entry's single
+`ratio` fits neither, and the frame changes height as you swipe — the thing the
+fixed frame exists to stop. A two-up on a three-up canvas fills 66% of it and
+the rest is dark, which is what letterboxing would have done anyway; doing it
+in the file keeps it predictable.
 
 JPEG, not PNG, despite the small text: at 100% the two are indistinguishable
 here and the sheet is a quarter of the weight, and the frame shows it at a
-third of 100% anyway. The two ForkIt sheets are 330 KB together; as PNG they
-were 1.6 MB.
+third of 100% anyway. The ForkIt sheet is 266 KB; as PNG it was 1.1 MB.

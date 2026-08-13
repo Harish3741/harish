@@ -127,7 +127,13 @@ const MIME = {
 };
 
 async function inlineImages(src) {
-  const paths = [...new Set([...src.matchAll(IMG_RE)].map((m) => m[1]))];
+  // Commented-out lines don't count. A path parked in a comment while its file
+  // is still on its way is not a picture that failed to turn up, and warning
+  // about it makes the warning worth ignoring — which is the one thing a
+  // warning must never be. Whole-line comments only: slicing at every '//'
+  // would cut through the https:// in a link.
+  const live = src.split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n');
+  const paths = [...new Set([...live.matchAll(IMG_RE)].map((m) => m[1]))];
   const missing = [];
   let out = src;
   let bytes = 0;

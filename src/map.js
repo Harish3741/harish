@@ -29,14 +29,14 @@ import {
   drawWallTop, drawWallFace, drawWallShadow, drawSideShadow,
   drawFloorBorder, drawThreshold,
   drawPlinth, drawPlinthIcon, drawPlant, drawBench, drawRopeLine,
-  drawLightPool, drawInlay, drawBanner, drawNotice, drawLectern, drawSideFrame,
+  drawLightPool, drawInlay, drawBanner, drawLectern, drawSideFrame,
   drawVitrine, drawStatue, drawRug, drawSconce, drawBoardTable, drawDownlight,
   drawMachine, drawBelt, drawPipeRun, drawHazardLine, drawDrums,
   drawScreen, drawCinemaSeat, drawPerson,
 } from './art.js';
 import { drawTextCentered, textWidth } from './font.js';
 import {
-  ABOUT, RESUME, RULES, CLIENTS, wingById,
+  ABOUT, RULES, CLIENTS, wingById,
 } from './data/projects.js';
 
 export const MAP_W = 40;
@@ -627,9 +627,12 @@ function dressBoardroom(c, w, box) {
 }
 
 /**
- * The atrium. A museum hangs its charter by the door; this one hangs the résumé
- * there instead — a single sheet on the wall above the compass — with the house
- * rules lying open on a lectern below it.
+ * The atrium. The house rules lie open on a lectern at the foot of the compass.
+ *
+ * The résumé used to hang on the wall above it. It came down while it is blank
+ * — an empty sheet framed dead centre in the first room is a promise the museum
+ * does not keep. `drawNotice` in art.js still draws it, so putting it back is
+ * the two lines that were here.
  *
  * The pictures go down the side walls. Those walls run away from the camera and
  * have no face to hang anything on, so they are drawn with the same cheated
@@ -637,18 +640,7 @@ function dressBoardroom(c, w, box) {
  * what the pictures replace.
  */
 function dressAtrium(c) {
-  // the résumé, dead centre above the compass
-  drawNotice(c, AXIS, RAIL.atrium * TILE + 4);
-  map.documents.push({
-    x: AXIS,
-    y: (RAIL.atrium + 2) * TILE + 14,     // the floor tile you read it from
-    label: 'Resume',                      // the bitmap font has no accents
-    blurb: 'On the wall',
-    doc: RESUME,
-    top: RAIL.atrium * TILE + 2,
-  });
-
-  // The lectern below it, on the last row of floor. It has to go that low: the
+  // The lectern, on the last row of floor. It has to go that low: the
   // book stands 27px up from its foot, and any higher would park it in the
   // middle of the compass rather than at the foot of it.
   const lx = AXIS;

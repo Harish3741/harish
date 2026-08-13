@@ -188,20 +188,20 @@ export const WINGS = [
 
       {
         title: 'Email Flagger',
-        // No `ratio` yet, and the two paths below have no files behind them:
-        // both canvases are still to come. That draws the dashed "photo goes
-        // here" slot rather than breaking, which is what the slot is for — it
-        // holds the space so the layout does not move when they arrive. The
-        // frame wants their own shape then, the way the other three workflows
-        // are framed; until then it falls back to 3:2, which no canvas fits.
-        images: [
-          { src: 'img/automations/email-flagger-personal.png',
-            caption: 'Checks every email for job-related mail and notifies me '
-              + 'only when it needs a reply' },
-          { src: 'img/automations/email-flagger-society.png',
-            caption: 'Holds each email two days, then pings the right exec on '
-              + 'Discord if nobody replied' },
-        ],
+        // Both canvases are still to come. They are commented out rather than
+        // committed ahead of their files: an unresolved path still fires a
+        // request before the dashed slot replaces it, and measured, that was
+        // four 404s on every page load — noise in the console of anyone who
+        // opens one. Uncomment when the files land, and give the entry the
+        // canvases' own `ratio` the way the other four workflows are framed.
+        // images: [
+        //   { src: 'img/automations/email-flagger-personal.png',
+        //     caption: 'Checks every email for job-related mail and notifies me '
+        //       + 'only when it needs a reply' },
+        //   { src: 'img/automations/email-flagger-society.png',
+        //     caption: 'Holds each email two days, then pings the right exec on '
+        //       + 'Discord if nobody replied' },
+        // ],
         tagline: 'An n8n workflow that reads all incoming emails and flags the '
           + 'ones specified',
         description: [

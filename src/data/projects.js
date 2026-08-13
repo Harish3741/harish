@@ -229,6 +229,37 @@ export const WINGS = [
           'Can be reused for any category',
         ],
       },
+
+      {
+        title: 'News Report',
+        // One sheet, the flow on the left and the routines that feed it on the
+        // right. Built at the routines panel's own height rather than the
+        // canvas's: matching up to the taller canvas would have stretched a
+        // 746px screenshot to 1188, and upscaling text is the one thing that
+        // always looks bad. This way the canvas is the only thing resized, and
+        // resizing down is safe.
+        ratio: '2007 / 650',
+        images: [{ src: 'img/automations/news-report.png',
+          caption: 'Posts the morning brief to Discord, one topic for each '
+            + 'weekday' }],
+        tagline: 'An n8n workflow that researched the most impactful news on '
+          + 'different topics',
+        description: [
+          'I love staying up to date with current affairs but struggle to find '
+          + 'stories relevant to my interest. So I built this custom flow '
+          + 'through Claude Routines and n8n to research different topics on '
+          + 'each weekday and provide me with a detailed brief.',
+          'A custom routine runs and finds the hottest news surrounding sports, '
+          + 'the start-up scene, tech, politics and the finance world on each '
+          + 'respective weekday. It then sends this news to an n8n flow that '
+          + 'sends these as a text on discord each morning.',
+        ],
+        highlights: [
+          'Constantly updated on news',
+          'Less time spent brainrotting by making knowledge more accessible',
+          'Personalised to the type of news I enjoy reading',
+        ],
+      },
     ],
   },
 

@@ -242,7 +242,7 @@ export const WINGS = [
         images: [{ src: 'img/automations/news-report.png',
           caption: 'Posts the morning brief to Discord, one topic for each '
             + 'weekday' }],
-        tagline: 'An n8n workflow that researched the most impactful news on '
+        tagline: 'An n8n workflow that researches the most impactful news on '
           + 'different topics',
         description: [
           'I love staying up to date with current affairs but struggle to find '
@@ -424,6 +424,20 @@ export const WINGS = [
 
       {
         title: 'RAPSOC UNSW',
+        // Two collages from the society's shoot, each an "ESTABLISHED" frame
+        // beside the candid taken with it — the colonnade pair, then the
+        // sunset pair. Stacked rather than striped: they are one set, and half
+        // a set behind a swipe is half a set nobody sees.
+        stack: true,
+        ratio: '1720 / 1256',
+        images: [
+          { src: 'img/personal/rapsoc-columns.jpg',
+            alt: 'RAPSOC members in society hoodies along a colonnade, and the '
+              + 'group photographed from behind against the same columns' },
+          { src: 'img/personal/rapsoc-sunset.jpg',
+            alt: 'Members by the water at sunset, and two of them lying back '
+              + 'on the rocks in society hoodies' },
+        ],
         tagline: 'Co-founded and President of RAPSOC at UNSW',
         description: [
           'We wanted to create a community centred around music, performance '

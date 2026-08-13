@@ -167,7 +167,8 @@ export const WINGS = [
         tagline: 'An n8n workflow that sends reminders for my current team',
         description: [
           'Leading a team means checking up on people to ensure they are on '
-          + 'track with their. I hated being a nag and it felt like a waste of '
+          + 'track with their work. I hated being a nag and it felt like a '
+          + 'waste of '
           + 'my energy to remember so I built this.',
           'Every day n8n checks our Notion task board for anything due tomorrow '
           + 'that isn\'t already done or already chased. If it finds something, '
@@ -188,20 +189,21 @@ export const WINGS = [
 
       {
         title: 'Email Flagger',
-        // Both canvases are still to come. They are commented out rather than
-        // committed ahead of their files: an unresolved path still fires a
-        // request before the dashed slot replaces it, and measured, that was
-        // four 404s on every page load — noise in the console of anyone who
-        // opens one. Uncomment when the files land, and give the entry the
-        // canvases' own `ratio` the way the other four workflows are framed.
-        // images: [
-        //   { src: 'img/automations/email-flagger-personal.png',
-        //     caption: 'Checks every email for job-related mail and notifies me '
-        //       + 'only when it needs a reply' },
-        //   { src: 'img/automations/email-flagger-society.png',
-        //     caption: 'Holds each email two days, then pings the right exec on '
-        //       + 'Discord if nobody replied' },
-        // ],
+        // The first canvas's own shape. The second is a longer, thinner run at
+        // 4:1 and letterboxes into it, the same trade Lead Gen makes: one frame
+        // that stays put beats two that each fit perfectly. Framed the other
+        // way round the frame would be 682x169 and both canvases would be too
+        // short to read; this way it is 682x233 and only the wider one gives
+        // any of that back.
+        ratio: '2586 / 884',
+        images: [
+          { src: 'img/automations/email-flagger-personal.png',
+            caption: 'Checks every email for job-related mail and notifies me '
+              + 'only when it needs a reply' },
+          { src: 'img/automations/email-flagger-society.png',
+            caption: 'Holds each email two days, then pings the right exec on '
+              + 'Discord if nobody replied' },
+        ],
         tagline: 'An n8n workflow that reads all incoming emails and flags the '
           + 'ones specified',
         description: [

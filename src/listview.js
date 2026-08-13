@@ -10,7 +10,7 @@
 // "worlds". It's a joke, but it's also a genuinely good pattern for this — a
 // title, a subtitle line of metadata, and one obvious button per row.
 
-import { SITE, WINGS, RESUME } from './data/projects.js';
+import { SITE, WINGS } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
 import { hasEvents, buildEvents } from './eventpicker.js';
 import { hasHighlights, buildHighlights } from './highlights.js';
@@ -165,23 +165,12 @@ function renderMenu(standalone) {
     menu.appendChild(b);
   });
 
-  // The résumé hangs on the atrium wall, which means it is only reachable by
-  // walking there. It is also the one thing a stranger is most likely to want,
-  // so it gets its own button here rather than being playable-only.
-  if (RESUME) {
-    const b = el('button', 'mc-btn');
-    b.type = 'button';
-    b.appendChild(el('span', 'mc-btn-label', RESUME.title));
-    // No fallback line. This used to read "One page" when there was no
-    // tagline, which is a claim about the contents, and the résumé is blank
-    // until Harish writes it. A button that says nothing beats one that says
-    // something untrue.
-    if (RESUME.tagline) b.appendChild(el('span', 'mc-btn-sub', RESUME.tagline));
-    b.addEventListener('click', () => renderWing({
-      title: RESUME.title, blurb: RESUME.tagline, projects: [RESUME],
-    }));
-    menu.appendChild(b);
-  }
+  // The résumé had a button of its own here, on the reasoning that it is the
+  // one thing a stranger most wants and should not need walking to. It is gone
+  // with the sheet off the atrium wall: an empty document is not worth a button
+  // promising it, and offering it in two places while it says nothing is worse
+  // than not offering it. RESUME still exists, so restoring this is the block
+  // that was here.
 
   bodyEl.appendChild(menu);
 

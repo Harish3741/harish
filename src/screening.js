@@ -60,7 +60,7 @@ export function openScreening(closedCallback) {
     const note = document.createElement('div');
     note.className = 'reel-empty';
     // Whoever sits in this chair is a visitor, not whoever is building the
-    // place. The instructions for putting a film in belong in the README.
+    // place. The instructions for putting a film in belong in DEVELOPING.md.
     note.innerHTML =
       '<strong>coming soon!</strong>'
       + 'The chair is comfortable though, and the rest of the museum is back '

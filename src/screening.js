@@ -62,9 +62,9 @@ export function openScreening(closedCallback) {
     // Whoever sits in this chair is a visitor, not whoever is building the
     // place. The instructions for putting a film in belong in the README.
     note.innerHTML =
-      '<strong>NOTHING SHOWING</strong>'
-      + 'No film yet. The chair is comfortable though, and the rest of the '
-      + 'museum is back through the door behind you.';
+      '<strong>coming soon!</strong>'
+      + 'The chair is comfortable though, and the rest of the museum is back '
+      + 'through the door behind you.';
     reelStage.appendChild(note);
   }
 

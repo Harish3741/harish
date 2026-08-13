@@ -393,7 +393,6 @@ export const WINGS = [
 
       {
         title: 'RAPSOC UNSW',
-        images: [],
         tagline: 'Co-founded and President of RAPSOC at UNSW',
         description: [
           'We wanted to create a community centred around music, performance '
@@ -642,10 +641,10 @@ export const WINGS = [
           + 'suck at every sport)',
           'UNSW Actuarial student graduating EOY 2026 with a distinction WAM',
         ],
-        images: [],
-        // The closing line sits under the pictures, next to the button it is
-        // talking about — a "reach me here" three paragraphs above the link
-        // is pointing at something you cannot see yet.
+        // The closing line sits where the pictures will go when there are
+        // some, next to the button it is talking about — a "reach me here"
+        // three paragraphs above the link is pointing at something you cannot
+        // see yet.
         outro: 'LinkedIn DM is the best. Happy to talk about work, a build you '
           + 'want done or anything in this museum!',
         links: [{ label: 'LinkedIn',
@@ -742,7 +741,7 @@ export const ABOUT = {
   greeting: 'Oh — hello. Come in, sit down, the film is about to start.',
   video: null,
   videoPoster: null,
-  videoCaption: 'A short introduction, recorded badly and with feeling.',
+  videoCaption: 'A short introduction of me',
   palette: {
     '#': '#2A1B1C',   // outline
     K: '#241A16',     // hair

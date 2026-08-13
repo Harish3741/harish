@@ -185,6 +185,48 @@ export const WINGS = [
           'Can be reused with any team',
         ],
       },
+
+      {
+        title: 'Email Flagger',
+        // No `ratio` yet, and the two paths below have no files behind them:
+        // both canvases are still to come. That draws the dashed "photo goes
+        // here" slot rather than breaking, which is what the slot is for — it
+        // holds the space so the layout does not move when they arrive. The
+        // frame wants their own shape then, the way the other three workflows
+        // are framed; until then it falls back to 3:2, which no canvas fits.
+        images: [
+          { src: 'img/automations/email-flagger-personal.png',
+            caption: 'Checks every email for job-related mail and notifies me '
+              + 'only when it needs a reply' },
+          { src: 'img/automations/email-flagger-society.png',
+            caption: 'Holds each email two days, then pings the right exec on '
+              + 'Discord if nobody replied' },
+        ],
+        tagline: 'An n8n workflow that reads all incoming emails and flags the '
+          + 'ones specified',
+        description: [
+          'If you say you\u2019ve never forgotten to reply to an email because '
+          + 'it got drowned in your inbox then you\u2019re just lying to me. So '
+          + 'to deal with this I built this flow.',
+          'The first one watches my personal inbox while I\'m job hunting. '
+          + 'Every email gets checked for whether it\'s job related and if it '
+          + 'is, an AI pass decides whether it actually needs a response from '
+          + 'me. Only those come through to my phone as a separate '
+          + 'notification.',
+          'The second one watches our society inbox, where things get read and '
+          + 'assumed as someone else\'s problem resulting in it never being '
+          + 'answered. It holds each email for two days, goes back to check '
+          + 'whether anyone replied and if nobody did, works out what the '
+          + 'sender wants and pings the related exec member on Discord with a '
+          + 'short summary. Emails from companies get logged to Notion so '
+          + 'there\'s a record.',
+        ],
+        highlights: [
+          'Increased reply rate by 30%',
+          'No more missed opportunities due to missed emails',
+          'Can be reused for any category',
+        ],
+      },
     ],
   },
 

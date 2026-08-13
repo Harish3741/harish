@@ -424,20 +424,18 @@ export const WINGS = [
 
       {
         title: 'RAPSOC UNSW',
-        // Two collages from the society's shoot, each an "ESTABLISHED" frame
-        // beside the candid taken with it — the colonnade pair, then the
-        // sunset pair. Stacked rather than striped: they are one set, and half
-        // a set behind a swipe is half a set nobody sees.
-        stack: true,
-        ratio: '1720 / 1256',
-        images: [
-          { src: 'img/personal/rapsoc-columns.jpg',
-            alt: 'RAPSOC members in society hoodies along a colonnade, and the '
-              + 'group photographed from behind against the same columns' },
-          { src: 'img/personal/rapsoc-sunset.jpg',
-            alt: 'Members by the water at sunset, and two of them lying back '
-              + 'on the rocks in society hoodies' },
-        ],
+        // The whole shoot across one frame: the two "ESTABLISHED" frames each
+        // beside the candid taken with them, colonnade then sunset. Four
+        // portraits in a row come out at 2.7:1, which is the one shape that
+        // fills this frame edge to edge — a 2x2 of the same four is 0.69:1 and
+        // gets capped by height, leaving the photos smaller and most of the
+        // frame dark.
+        ratio: '3411 / 1256',
+        images: [{ src: 'img/personal/rapsoc.jpg',
+          alt: 'Four photos from the society\'s shoot: members along a '
+            + 'colonnade, the group photographed from behind against the same '
+            + 'columns, members by the water at sunset, and two of them lying '
+            + 'back on the rocks in society hoodies' }],
         tagline: 'Co-founded and President of RAPSOC at UNSW',
         description: [
           'We wanted to create a community centred around music, performance '

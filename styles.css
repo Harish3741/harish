@@ -1182,24 +1182,3 @@ body.is-handheld { overflow: auto; }
   font-size: 13px;
   font-style: italic;
 }
-
-/* Pictures stacked instead of striped — `stack: true` on an entry.
-   The track stops being a scroll container and becomes a column: no snapping,
-   no per-slide height, nothing clipped. Both renderers, because an entry looks
-   the same in the panel and in the plain list. */
-.detail-gallery.is-stacked .detail-track,
-.mc-world-gallery.is-stacked .mc-world-track {
-  display: grid;
-  gap: 10px;
-  height: auto;
-  overflow: visible;
-  scroll-snap-type: none;
-}
-
-/* The figures were flex children sized to a whole track. In a grid that basis
-   is ignored, but the snap alignment would still be read by a scroll parent
-   further up, so it goes too. */
-.detail-gallery.is-stacked .detail-figure,
-.mc-world-gallery.is-stacked .mc-world-figure {
-  scroll-snap-align: none;
-}

@@ -103,17 +103,6 @@ export function buildGallery(entry, cls) {
     return wrap;
   }
 
-  // `stack: true` puts the pictures one under another instead of side by side
-  // in a strip. A strip is right when the pictures are alternatives — two views
-  // of one workflow, where you look at either. It is wrong when they are a set
-  // meant to be seen together, because half of it is then hidden behind a swipe
-  // most people never make. Nothing to scroll, so no arrows, no dots, and no
-  // per-slide height to fit.
-  if (entry.stack) {
-    wrap.classList.add('is-stacked');
-    return wrap;
-  }
-
   // Focusable so the strip can be scrolled from the keyboard; the menu leaves
   // the arrow keys alone while focus is in here.
   track.tabIndex = 0;

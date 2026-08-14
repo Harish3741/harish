@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // THIS IS THE ONLY FILE YOU NEED TO EDIT TO PUT YOUR REAL WORK IN.
 //
-// Every wing holds real entries. RESUME is deliberately blank — title only —
-// and ABOUT.video is empty; the cinema says so rather than breaking.
+// Every wing holds real entries and the cinema has its film. RESUME is
+// deliberately blank — title only.
 // The game reads this at load: the museum, the menus and the plain-text
 // fallback list are all generated from it, so nothing else needs touching.
 //
@@ -782,8 +782,8 @@ export const RULES = {
 export const ABOUT = {
   name: 'Harish',
   greeting: 'Oh — hello. Come in, sit down, the film is about to start.',
-  video: null,
-  videoPoster: null,
+  video: 'media/about-me.mp4',
+  videoPoster: 'media/about-me-poster.jpg',
   videoCaption: 'A short introduction of me',
   palette: {
     '#': '#2A1B1C',   // outline

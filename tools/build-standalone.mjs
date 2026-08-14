@@ -110,21 +110,33 @@ function extractBody(html) {
   return body.replace(/^\s*<script\s+type="module"[^>]*><\/script>\s*$/m, '').trim();
 }
 
-// Pictures are referenced by path, which is right for the served folder and
-// useless in a single file — a bundle that fetches three PNGs off a relative
-// path isn't self-contained. So every 'img/…' the content file mentions is read
-// off disk and inlined as a data URI. A path with no file behind it is left
-// alone and warned about; the page falls back to its dashed slot, which is what
-// a picture that hasn't arrived yet is supposed to look like.
+// Media is referenced by path, which is right for the served folder and useless
+// in a single file — a bundle that fetches three PNGs off a relative path isn't
+// self-contained. So every 'img/…' and 'media/…' the content file mentions is
+// read off disk and inlined as a data URI. A path with no file behind it is
+// left alone and warned about; the page falls back to its dashed slot, which is
+// what a picture that hasn't arrived yet is supposed to look like.
 // The extension is part of the pattern on purpose, so prose in a comment —
 // `image: 'img/…'` in the instructions at the top of the content file — is not
 // mistaken for a picture that failed to turn up.
-const IMG_RE = /'(img\/[^']+\.(?:png|jpe?g|gif|webp|avif|svg))'/gi;
+//
+// The film counts too. A relative path to an mp4 works on the served folder and
+// is simply absent from the single file, and the artifact sandbox blocks
+// fetching it from anywhere else, so inlining is the only way the cinema plays
+// outside the served folder. It is also the reason to keep the film small: see
+// CEILING below.
+const IMG_RE = /'((?:img|media)\/[^']+\.(?:png|jpe?g|gif|webp|avif|svg|mp4|webm|m4v))'/gi;
 const MIME = {
   '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.gif': 'image/gif', '.webp': 'image/webp', '.avif': 'image/avif',
   '.svg': 'image/svg+xml',
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.m4v': 'video/x-m4v',
 };
+
+// What a published artifact is allowed to weigh. Everything here is carried as
+// base64, so the file is about a third bigger than the sum of its parts, and
+// the thing most likely to push it over is a film nobody re-encoded.
+const CEILING = 16 * 1024 * 1024;
 
 async function inlineImages(src) {
   // Commented-out lines don't count. A path parked in a comment while its file
@@ -205,7 +217,19 @@ console.log(`dist/index.html  ${kb} KB  (${modules.length} modules, no dependenc
 
 if (pictures.count) {
   const picKb = (pictures.bytes / 1024).toFixed(1);
-  console.log(`  ${pictures.count} picture(s) inlined, ${picKb} KB of it`);
+  console.log(`  ${pictures.count} file(s) inlined, ${picKb} KB of it`);
+}
+
+// Say it here rather than letting the publish fail. Going over is a re-encode
+// of the film or a resize of the heaviest pictures, and it is much easier to
+// hear that now than after a rejected upload.
+const bytes = Buffer.byteLength(page);
+if (bytes > CEILING) {
+  console.warn(`  ! ${(bytes / 1048576).toFixed(1)} MB is over the `
+    + `${CEILING / 1048576} MB artifact ceiling — re-encode the film or shrink a picture`);
+} else if (bytes > CEILING * 0.85) {
+  console.warn(`  ! ${(bytes / 1048576).toFixed(1)} MB, close to the `
+    + `${CEILING / 1048576} MB artifact ceiling`);
 }
 for (const path of pictures.missing) {
   console.warn(`  ! no file at ${path} — it will show as an empty slot`);

@@ -177,8 +177,8 @@ function renderMenu(standalone) {
   if (standalone) {
     const note = el('p', 'mc-note',
       'This list is the boring version. The real one is a game you walk around '
-      + '— same museum, four wings, except you actually explore it. It needs a '
-      + 'keyboard, so open this on a laptop and go have a look.');
+      + 'and explore all the things I\'ve built. It needs a keyboard so open '
+      + 'this on a laptop and go have a look.');
     bodyEl.appendChild(note);
   }
 

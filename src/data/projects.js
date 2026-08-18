@@ -274,7 +274,7 @@ export const WINGS = [
         description: [
           'I got tired of having to check my calendar everyday to update my to '
           + 'do list for each day (on the reminders app cause I needed the '
-          + 'dopamine hit of ticking tasks off). Worst yet, I had no track of '
+          + 'dopamine hit of ticking tasks off). Worse yet, I had no track of '
           + 'if I\u2019m hitting my goals.',
           'So I decided to custom build a dashboard that reads my calendar and '
           + 'updates my to do list every morning at 5am. Each task can be '

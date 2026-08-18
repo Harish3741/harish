@@ -260,6 +260,41 @@ export const WINGS = [
           'Personalised to the type of news I enjoy reading',
         ],
       },
+
+      {
+        title: 'Habit Tracker',
+        launch: 'Aug 2026',
+        // The dashboard's own shape, and resized to 1600 wide the way
+        // img/README.md asks: the panel never shows it wider than 780.
+        ratio: '1600 / 1002',
+        images: [{ src: 'img/automations/habit-tracker.png',
+          caption: 'Rebuilds the day from my calendar at 5am, with habits and '
+            + 'streaks alongside' }],
+        tagline: 'A glorified to-do list that automatically manages my life.',
+        description: [
+          'I got tired of having to check my calendar everyday to update my to '
+          + 'do list for each day (on the reminders app cause I needed the '
+          + 'dopamine hit of ticking tasks off). Worst yet, I had no track of '
+          + 'if I\u2019m hitting my goals.',
+          'So I decided to custom build a dashboard that reads my calendar and '
+          + 'updates my to do list every morning at 5am. Each task can be '
+          + '\u2018completed\u2019 by checking it off in dashboard or on my '
+          + 'reminders app. The idea was to combine my calendars and to do '
+          + 'list.',
+          'But that wasn\u2019t enough for me. I built:',
+        ],
+        highlights: [
+          'a habit monitor that automatically checks if I\u2019ve completed my '
+          + 'set goals for the day.',
+          'a streak board to see how many weeks I\u2019ve been consistent.',
+          'a module that reads all my messages using beeper MCP, pulls out what '
+          + 'I\u2019ve agreed to (plans or tasks) and automatically inputs it.',
+          'a \u2018From Message\u2019 section manually allows me to decline and '
+          + 'approve it',
+          'exporting my step count to track 10k steps (was so painful cause of '
+          + 'apple data privacy)',
+        ],
+      },
     ],
   },
 

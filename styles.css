@@ -1185,64 +1185,121 @@ body.is-handheld { overflow: auto; }
 
 /* ---------------------------------------------------------------------------
    THE PHONE'S MUSEUM
-   A phone cannot walk the museum, so it taps into it instead: four doors, each
-   showing the room behind it, and the room's list once you are through. Every
-   rule here is inside .is-standalone, so the desktop "skip to list" is
-   untouched — it is the accessible path through the same content and shutting
-   half of it behind a tap would make it a worse one.
+   A phone cannot walk the museum, so it taps into it: four doors showing the
+   real rooms, then that room's list.
+
+   It does not borrow the Minecraft world-select the desktop list is dressed as.
+   That skin is a joke about save files, and on a phone — where this is the only
+   version anyone gets — it reads as mud under the artwork. This uses the
+   museum's own palette instead: the near-black of the walls, brass, and the
+   serif the exhibit panels already set their titles in. The phone should look
+   like the building, not like the menu you picked it from.
+
+   Everything here is inside .is-standalone. The desktop "skip to list" keeps
+   its Minecraft dress and its fully-open entries.
    --------------------------------------------------------------------------- */
 
-.mc-doors {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+.is-standalone .sheet {
+  padding: 0 18px 60px;
+  background:
+    radial-gradient(120% 46% at 50% -6%, rgba(220, 166, 70, 0.13), transparent 70%),
+    var(--ground);
+  background-size: auto;
+  image-rendering: auto;
 }
+
+/* --- the title plate ------------------------------------------------------ */
+
+.is-standalone #list-body { padding-top: 34px; gap: 0; }
+
+.is-standalone .mc-head { text-align: left; margin-bottom: 22px; }
+
+.is-standalone .mc-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(30px, 8.5vw, 40px);
+  letter-spacing: 0.01em;
+  color: var(--paper);
+  text-shadow: none;
+}
+
+.is-standalone .mc-splash {
+  margin: 8px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-shadow: none;
+}
+
+/* the hairline that says "a museum made this, not a game menu" */
+.is-standalone .mc-head::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: 18px;
+  background: linear-gradient(90deg, var(--brass), rgba(220, 166, 70, 0.08));
+}
+
+/* --- the four doors ------------------------------------------------------- */
+
+.mc-doors { display: flex; flex-direction: column; gap: 14px; }
 
 .mc-door {
   all: unset;
   position: relative;
   display: block;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid var(--room, #6E5326);
-  box-shadow: 0 0 0 2px #16100A, 0 6px 0 rgba(0, 0, 0, .35);
+  border: 1px solid rgba(220, 166, 70, 0.34);
+  transition: border-color 200ms ease, transform 200ms ease;
 }
+
+.mc-door:active { transform: scale(0.985); border-color: var(--brass); }
+.mc-door:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 
 .mc-door-art {
   position: absolute;
   inset: 0;
   background-size: cover;
   image-rendering: pixelated;      /* it is pixel art; let it stay pixels */
-  transition: transform 260ms ease;
 }
 
-.mc-door:active .mc-door-art { transform: scale(1.06); }
+/* the room's own colour, laid over its art so the four doors are four places */
+.mc-door::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(23, 16, 13, 0) 30%, rgba(23, 16, 13, 0.82) 78%, rgba(23, 16, 13, 0.96) 100%);
+}
 
-/* the name has to survive whatever the art is doing behind it */
 .mc-door-cap {
   position: absolute;
+  z-index: 2;
   inset: auto 0 0 0;
-  padding: 34px 10px 10px;
-  background: linear-gradient(180deg, rgba(16, 10, 5, 0) 0%, rgba(16, 10, 5, .93) 62%);
-  text-align: center;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px 12px;
 }
 
 .mc-door-name {
-  display: block;
-  font-family: var(--mono);
-  font-size: 15px;
-  line-height: 1.2;
-  color: #FFF;
-  text-shadow: 0 2px 0 #16100A;
+  font-family: var(--serif);
+  font-size: 21px;
+  color: var(--paper);
 }
 
 .mc-door-sub {
-  display: block;
-  margin-top: 3px;
+  flex: none;
   font-family: var(--mono);
-  font-size: 11px;
-  color: var(--room, #C9BCA8);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--room, var(--brass));
 }
 
 /* the door opening: the art grows to fill the screen, then hands over */
@@ -1251,42 +1308,84 @@ body.is-handheld { overflow: auto; }
   z-index: 80;
   background-size: cover;
   image-rendering: pixelated;
-  border: 2px solid var(--room, #6E5326);
-  transition: left 300ms ease, top 300ms ease, width 300ms ease,
-              height 300ms ease, opacity 320ms ease 60ms;
+  transition: left 320ms cubic-bezier(.4, 0, .2, 1), top 320ms cubic-bezier(.4, 0, .2, 1),
+              width 320ms cubic-bezier(.4, 0, .2, 1), height 320ms cubic-bezier(.4, 0, .2, 1),
+              opacity 300ms ease 80ms;
   pointer-events: none;
 }
 
-.mc-fly.is-open {
-  left: -2px !important;
-  top: -2px !important;
-  width: 100vw !important;
-  height: 100vh !important;
-}
-
+.mc-fly.is-open { left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; }
 .mc-fly.is-gone { opacity: 0; }
 
 /* --- inside a room -------------------------------------------------------- */
 
-/* the wing's own colour, so the four rooms are four places and not one list */
-.is-standalone #list-body[data-room] .mc-title {
-  border-bottom: 2px solid var(--room);
-  padding-bottom: 10px;
+.is-standalone #list-body[data-room] .mc-head::after {
+  background: linear-gradient(90deg, var(--room), rgba(220, 166, 70, 0.06));
 }
 
-.is-standalone #list-body[data-room] .mc-world {
-  border-left: 3px solid var(--room);
+.is-standalone .mc-worlds { gap: 0; }
+
+/* rows, not boxes. Four bordered cards stacked on a dark ground is a lot of
+   frame for very little picture; hairlines do the same separating job and let
+   the writing be the thing you see. */
+.is-standalone .mc-world {
+  display: block;
+  position: relative;
+  padding: 20px 34px 20px 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(220, 166, 70, 0.16);
+  transition: none;
 }
 
-.is-standalone #list-body[data-room] .mc-world-icon {
-  color: var(--room);
-  border-color: var(--room);
+.is-standalone .mc-world:hover { background: none; border-color: rgba(220, 166, 70, 0.16); }
+.is-standalone .mc-world-icon { display: none; }
+
+.is-standalone .mc-world-name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0;
+  color: var(--paper);
+  text-shadow: none;
 }
 
-.is-standalone #list-body[data-room] .mc-back { border-color: var(--room); }
+.is-standalone .mc-world-meta {
+  margin: 5px 0 0;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 
-/* shut by default: name, date and tagline, then a chevron to open the rest */
-.is-standalone .mc-world { position: relative; }
+.is-standalone .mc-world-tagline {
+  margin: 9px 0 0;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--room, var(--brass));
+}
+
+.is-standalone .mc-world-desc {
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: #D9C9B4;
+}
+
+.is-standalone .mc-world-points,
+.is-standalone .mc-world-caption {
+  font-family: var(--sans);
+  color: #D9C9B4;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.is-standalone .mc-world-caption { font-size: 12.5px; color: var(--muted); }
+
+/* shut by default: name, date and tagline, then a chevron for the rest */
 .is-standalone .mc-world.is-shut .mc-world-more { display: none; }
 
 .is-standalone .mc-world-toggle {
@@ -1299,24 +1398,72 @@ body.is-handheld { overflow: auto; }
 .is-standalone .mc-world-toggle::after {
   content: '';
   position: absolute;
-  right: 16px;
+  right: 8px;
   top: 26px;
-  width: 9px;
-  height: 9px;
-  border-right: 2px solid var(--room, #D6A95A);
-  border-bottom: 2px solid var(--room, #D6A95A);
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--room, var(--brass));
+  border-bottom: 1.5px solid var(--room, var(--brass));
   transform: rotate(45deg);
-  transition: transform 160ms ease;
+  transition: transform 180ms ease;
 }
 
 .is-standalone .mc-world.is-shut .mc-world-toggle::after { transform: rotate(-45deg); }
+.is-standalone .mc-world-toggle:focus-visible { outline: 2px solid var(--brass); outline-offset: -4px; }
 
 /* open: the picture first. Below the writing is right on a desktop, where you
    read then look; on a phone it buries the one thing that proves the project
    exists three screens down, and nobody scrolls that far to find out. */
-.is-standalone .mc-world-more { display: flex; flex-direction: column; }
-.is-standalone .mc-world-more .mc-world-gallery { order: -1; margin: 4px 0 14px; }
+.is-standalone .mc-world-more { display: flex; flex-direction: column; padding-top: 4px; }
+.is-standalone .mc-world-more .mc-world-gallery { order: -1; margin: 14px 0 4px; max-width: none; }
+
+/* --- the furniture -------------------------------------------------------- */
+
+.is-standalone .mc-btn {
+  background: none;
+  border: 1px solid rgba(220, 166, 70, 0.4);
+  box-shadow: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass);
+  padding: 13px 16px;
+}
+
+.is-standalone .mc-btn:hover { background: rgba(220, 166, 70, 0.08); color: var(--brass); }
+.is-standalone .mc-back { margin-top: 26px; }
+
+.is-standalone .mc-note {
+  margin-top: 26px;
+  padding: 0 0 0 14px;
+  background: none;
+  border-left: 1px solid rgba(220, 166, 70, 0.32);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.is-standalone .mc-footer {
+  margin-top: 30px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: #7C6A57;
+  text-shadow: none;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .mc-door-art, .mc-world-toggle::after { transition: none; }
+  .mc-door, .mc-world-toggle::after { transition: none; }
 }
+
+/* The wing title is focused programmatically when you open a room, so the
+   heading is what a screen reader announces rather than the Back button. It
+   carries tabindex="-1", which means it can be focused by code and never
+   reached by Tab — so a focus ring on it indicates nothing to anybody, and
+   the browser's default drew a white box around a 40px serif heading. On the
+   phone the ring survived :focus alone, because the focus lands after the
+   door transition and the browser no longer counts it as pointer-driven. */
+.mc-title:focus,
+.mc-title:focus-visible { outline: none; }

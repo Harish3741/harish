@@ -1182,3 +1182,141 @@ body.is-handheld { overflow: auto; }
   font-size: 13px;
   font-style: italic;
 }
+
+/* ---------------------------------------------------------------------------
+   THE PHONE'S MUSEUM
+   A phone cannot walk the museum, so it taps into it instead: four doors, each
+   showing the room behind it, and the room's list once you are through. Every
+   rule here is inside .is-standalone, so the desktop "skip to list" is
+   untouched — it is the accessible path through the same content and shutting
+   half of it behind a tap would make it a worse one.
+   --------------------------------------------------------------------------- */
+
+.mc-doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.mc-door {
+  all: unset;
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid var(--room, #6E5326);
+  box-shadow: 0 0 0 2px #16100A, 0 6px 0 rgba(0, 0, 0, .35);
+}
+
+.mc-door-art {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  image-rendering: pixelated;      /* it is pixel art; let it stay pixels */
+  transition: transform 260ms ease;
+}
+
+.mc-door:active .mc-door-art { transform: scale(1.06); }
+
+/* the name has to survive whatever the art is doing behind it */
+.mc-door-cap {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 34px 10px 10px;
+  background: linear-gradient(180deg, rgba(16, 10, 5, 0) 0%, rgba(16, 10, 5, .93) 62%);
+  text-align: center;
+}
+
+.mc-door-name {
+  display: block;
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.2;
+  color: #FFF;
+  text-shadow: 0 2px 0 #16100A;
+}
+
+.mc-door-sub {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--room, #C9BCA8);
+}
+
+/* the door opening: the art grows to fill the screen, then hands over */
+.mc-fly {
+  position: fixed;
+  z-index: 80;
+  background-size: cover;
+  image-rendering: pixelated;
+  border: 2px solid var(--room, #6E5326);
+  transition: left 300ms ease, top 300ms ease, width 300ms ease,
+              height 300ms ease, opacity 320ms ease 60ms;
+  pointer-events: none;
+}
+
+.mc-fly.is-open {
+  left: -2px !important;
+  top: -2px !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.mc-fly.is-gone { opacity: 0; }
+
+/* --- inside a room -------------------------------------------------------- */
+
+/* the wing's own colour, so the four rooms are four places and not one list */
+.is-standalone #list-body[data-room] .mc-title {
+  border-bottom: 2px solid var(--room);
+  padding-bottom: 10px;
+}
+
+.is-standalone #list-body[data-room] .mc-world {
+  border-left: 3px solid var(--room);
+}
+
+.is-standalone #list-body[data-room] .mc-world-icon {
+  color: var(--room);
+  border-color: var(--room);
+}
+
+.is-standalone #list-body[data-room] .mc-back { border-color: var(--room); }
+
+/* shut by default: name, date and tagline, then a chevron to open the rest */
+.is-standalone .mc-world { position: relative; }
+.is-standalone .mc-world.is-shut .mc-world-more { display: none; }
+
+.is-standalone .mc-world-toggle {
+  all: unset;
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+
+.is-standalone .mc-world-toggle::after {
+  content: '';
+  position: absolute;
+  right: 16px;
+  top: 26px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--room, #D6A95A);
+  border-bottom: 2px solid var(--room, #D6A95A);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.is-standalone .mc-world.is-shut .mc-world-toggle::after { transform: rotate(-45deg); }
+
+/* open: the picture first. Below the writing is right on a desktop, where you
+   read then look; on a phone it buries the one thing that proves the project
+   exists three screens down, and nobody scrolls that far to find out. */
+.is-standalone .mc-world-more { display: flex; flex-direction: column; }
+.is-standalone .mc-world-more .mc-world-gallery { order: -1; margin: 4px 0 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-door-art, .mc-world-toggle::after { transition: none; }
+}

@@ -46,6 +46,18 @@ const WORLD_EVENTS = {
 
 const WORLD_POINTS = { label: 'mc-world-label', points: 'mc-world-points' };
 
+/* On a phone the four wings are doors you tap rather than buttons you read.
+   The art is the real room, captured from the game itself, so the plain version
+   is looking at the same museum the desktop one walks around. `pos` is where to
+   sit the crop, since each room keeps its interesting half somewhere different.
+   `accent` is the room's own colour, brightened enough to read on dark. */
+const ROOMS = {
+  automations: { art: 'img/rooms/automations.jpg', accent: '#5E93A2', pos: '50% 34%' },
+  personal:    { art: 'img/rooms/personal.jpg',    accent: '#C08A5A', pos: '50% 34%' },
+  client:      { art: 'img/rooms/client.jpg',      accent: '#6D82BC', pos: '50% 62%' },
+  about:       { art: 'img/rooms/about.jpg',       accent: '#C8535F', pos: '50% 55%' },
+};
+
 let listRoot, bodyEl, openBtn, closeBtn;
 
 /* Both screens are drawn into the same scrollport, so a new one inherits
@@ -154,15 +166,34 @@ function renderMenu(standalone) {
   head.appendChild(el('p', 'mc-splash', SITE.tagline));
   bodyEl.appendChild(head);
 
-  const menu = el('div', 'mc-menu');
+  const menu = el('div', standalone ? 'mc-doors' : 'mc-menu');
   WINGS.forEach((wing) => {
-    const b = el('button', 'mc-btn');
-    b.type = 'button';
-    b.appendChild(el('span', 'mc-btn-label', wing.title));
     const n = (wing.projects || []).length;
-    b.appendChild(el('span', 'mc-btn-sub', `${n} ${n === 1 ? 'entry' : 'entries'}`));
-    b.addEventListener('click', () => renderWing(wing));
-    menu.appendChild(b);
+    const count = `${n} ${n === 1 ? 'entry' : 'entries'}`;
+    const room = ROOMS[wing.id];
+
+    if (!standalone || !room) {
+      const b = el('button', 'mc-btn');
+      b.type = 'button';
+      b.appendChild(el('span', 'mc-btn-label', wing.title));
+      b.appendChild(el('span', 'mc-btn-sub', count));
+      b.addEventListener('click', () => renderWing(wing));
+      menu.appendChild(b);
+      return;
+    }
+
+    const d = el('button', 'mc-door');
+    d.type = 'button';
+    d.style.setProperty('--room', room.accent);
+    const art = el('span', 'mc-door-art');
+    art.style.backgroundImage = `url(${room.art})`;
+    art.style.backgroundPosition = room.pos;
+    const cap = el('span', 'mc-door-cap');
+    cap.appendChild(el('span', 'mc-door-name', wing.title));
+    cap.appendChild(el('span', 'mc-door-sub', count));
+    d.append(art, cap);
+    d.addEventListener('click', () => enterRoom(wing, art));
+    menu.appendChild(d);
   });
 
   // The résumé had a button of its own here, on the reasoning that it is the
@@ -189,9 +220,41 @@ function renderMenu(standalone) {
   if (first && isOpen) first.focus({ preventScroll: true });
 }
 
+/**
+ * Tapping a door is how you enter a room on a phone. The art grows out of the
+ * door to fill the screen and then hands over to the room's list, which is the
+ * closest a list can get to the door-and-fade a game does when you walk inside.
+ * Cosmetic only: the room renders whether or not the animation runs, and it is
+ * skipped outright for anyone who has asked for less motion.
+ */
+function enterRoom(wing, art) {
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (still) { renderWing(wing); return; }
+
+  const from = art.getBoundingClientRect();
+  const fly = document.createElement('div');
+  fly.className = 'mc-fly';
+  fly.style.backgroundImage = art.style.backgroundImage;
+  fly.style.backgroundPosition = art.style.backgroundPosition;
+  fly.style.left = `${from.left}px`;
+  fly.style.top = `${from.top}px`;
+  fly.style.width = `${from.width}px`;
+  fly.style.height = `${from.height}px`;
+  document.body.appendChild(fly);
+
+  requestAnimationFrame(() => fly.classList.add('is-open'));
+  // The room is drawn under the cover, so it is already there when it lifts.
+  setTimeout(() => { renderWing(wing); fly.classList.add('is-gone'); }, 300);
+  setTimeout(() => fly.remove(), 720);
+}
+
 /** Screen two: that wing's projects, as a list of worlds. */
 function renderWing(wing) {
+  const standalone = listRoot.classList.contains('is-standalone');
+  const room = ROOMS[wing.id];
   bodyEl.dataset.screen = 'wing';
+  bodyEl.dataset.room = room ? wing.id : '';
+  if (room) bodyEl.style.setProperty('--room', room.accent);
   bodyEl.innerHTML = '';
 
   const head = el('div', 'mc-head');
@@ -225,28 +288,50 @@ function renderWing(wing) {
     if (bits.length) text.appendChild(el('p', 'mc-world-meta', bits.join('  ·  ')));
 
     if (entry.tagline) text.appendChild(el('p', 'mc-world-tagline', entry.tagline));
-    // one string or several; several become paragraphs
+
+    // Everything past the tagline goes in one box so a phone can shut it.
+    // Seven entries fully open is 6,610px of scrolling — nearly eight screens
+    // to reach the last one. Closed, the same wing is one and a half, and you
+    // can see what is in it before deciding what to read.
+    const more = el('div', 'mc-world-more');
+    text.appendChild(more);
     if (entry.description) {
       for (const para of [].concat(entry.description)) {
-        text.appendChild(el('p', 'mc-world-desc', para));
+        more.appendChild(el('p', 'mc-world-desc', para));
       }
     }
 
-    if (hasHighlights(entry)) text.appendChild(buildHighlights(entry, WORLD_POINTS));
+    if (hasHighlights(entry)) more.appendChild(buildHighlights(entry, WORLD_POINTS));
 
     // the same picture slot the exhibit panel shows, filled or waiting, and in
     // the same place: after the writing rather than in front of it
     if (hasEvents(entry)) {
-      text.appendChild(buildEvents(entry, WORLD_EVENTS, WORLD_PICS));
+      more.appendChild(buildEvents(entry, WORLD_EVENTS, WORLD_PICS));
     } else if (hasPictures(entry)) {
-      text.appendChild(buildGallery(entry, WORLD_PICS));
+      more.appendChild(buildGallery(entry, WORLD_PICS));
     }
 
-    if (entry.outro) text.appendChild(el('p', 'mc-world-desc', entry.outro));
+    if (entry.outro) more.appendChild(el('p', 'mc-world-desc', entry.outro));
 
-    if (hasLinks(entry)) text.appendChild(buildLinks(entry, WORLD_EVENTS));
+    if (hasLinks(entry)) more.appendChild(buildLinks(entry, WORLD_EVENTS));
 
     row.appendChild(text);
+
+    // Only on a phone. On a desktop the list is the accessible path through the
+    // museum and hiding half of it behind a tap would make it a worse one.
+    if (standalone && more.childElementCount) {
+      row.classList.add('is-shut');
+      const toggle = el('button', 'mc-world-toggle');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', `${entry.title} — more`);
+      toggle.addEventListener('click', () => {
+        const shut = row.classList.toggle('is-shut');
+        toggle.setAttribute('aria-expanded', String(!shut));
+      });
+      row.appendChild(toggle);
+    }
+
     list.appendChild(row);
   });
 

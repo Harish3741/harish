@@ -972,8 +972,7 @@ body.is-handheld { overflow: auto; }
 
 /* ---- notes and the colophon ---- */
 
-.sheet-empty,
-.sheet-note {
+.sheet-empty {
   margin: 0 18px;
   padding: 16px 18px;
   background: var(--ink);

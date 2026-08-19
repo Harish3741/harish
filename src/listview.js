@@ -1,20 +1,23 @@
-// The museum as a list of wall labels.
+// The museum as the printed guide they hand you at the door.
 //
 // Two jobs, one renderer:
 //   1. Desktop — behind the "Skip to list" button, for anyone who doesn't want
-//      to play, and as the accessible path through the same content.
+//      to play, and as the accessible path through the same content. It gets
+//      both screens: the four wings as a contents page, then a wing.
 //   2. Phone — what you get when you tap an arch in the atrium. There is no
-//      menu screen there: the atrium is the menu, so the phone opens straight
-//      into a wing and its Back button walks you out again.
+//      menu screen there, because the atrium is the menu: the phone opens
+//      straight into one wing and its Back button walks you out again.
 //
 // It used to be dressed as a Minecraft world select — dirt tiling, bevelled
 // stone buttons, a splash line. The joke was good and the *type* was better:
 // chunky monospace with a hard offset shadow, which is what pixels look like
-// when they are letters. What it was not was a museum. So the dirt is gone and
-// the type stayed: every entry is now a placard screwed to the wall, engraved
-// brass on dark plate, numbered the way a catalogue numbers things. The wing
-// titles are drawn with the game's own 5x7 font, the same one the banners over
-// the doorways are set in, so the list and the building read as one place.
+// when they are letters. What it was not was a museum. So the dirt went and the
+// type stayed. There are no cards here either: an index numeral in the gutter,
+// a ruled spine beside it, a dotted leader from each name to its date, and a
+// rule between one entry and the next — a contents page, which is a thing a
+// museum actually hands out. Wing titles and index numerals are cut on canvas
+// with the game's own 5x7 font, the same one the banners over the doorways are
+// set in, so the list and the building read as one place.
 
 import { SITE, WINGS } from './data/projects.js';
 import { hasPictures, buildGallery } from './picture.js';
@@ -241,7 +244,6 @@ function plate(title, sub, tally, room, strap) {
 /** Screen one, desktop only: the four wings. */
 function renderMenu() {
   bodyEl.dataset.screen = 'menu';
-  bodyEl.dataset.room = '';
   bodyEl.innerHTML = '';
 
   bodyEl.appendChild(plate(SITE.name, SITE.tagline, '', null, null));
@@ -284,8 +286,7 @@ function renderWing(wing) {
   const entries = wing.projects || [];
 
   bodyEl.dataset.screen = 'wing';
-  bodyEl.dataset.room = room ? wing.id : '';
-  if (room) bodyEl.style.setProperty('--room', room.accent);
+  bodyEl.style.setProperty('--room', room ? room.accent : '');
   bodyEl.innerHTML = '';
 
   const at = WINGS.indexOf(wing) + 1;
@@ -304,7 +305,7 @@ function renderWing(wing) {
   }
 
   entries.forEach((entry, i) => {
-    list.appendChild(placard(entry, i, standalone));
+    list.appendChild(listing(entry, i, standalone));
   });
 
   bodyEl.appendChild(list);
@@ -332,7 +333,7 @@ function renderWing(wing) {
 }
 
 /** One exhibit, as the guide lists it: index number, name, leader, date. */
-function placard(entry, i, standalone) {
+function listing(entry, i, standalone) {
   const row = el('li', 'exhibit');
   const no = String(i + 1).padStart(2, '0');
 

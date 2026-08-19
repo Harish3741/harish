@@ -58,13 +58,18 @@ let doors = [];
 let running = false;
 let loopId = 0;
 let lastTs = 0;
-let busy = false;
+let busy = false;      // a fade is between the two screens right now
+let inWing = false;    // which of them is up
 let lastDoor = null;
 let relayout = 0;
+let chain = 0;
 
-/** Whoever asked for less motion gets cuts instead of fades. */
+// Asked once and kept, because the draw loop reads it several times a frame.
+const CALM = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/** Whoever asked for less motion gets a still room and cuts between screens. */
 function still() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return CALM.matches;
 }
 
 /* ------------------------------------------------------------------ */
@@ -94,6 +99,10 @@ export function initLobby() {
 
   // Standing on the medallion, facing the room. Same spot the game starts you.
   spawnAt(START_PX.x, START_PX.y, 'down');
+  // Past the blink. The blink frame is the sprite with its visor off, and a
+  // room that never advances the clock would hold the droid there, powered
+  // down, for the whole visit.
+  player.blink = 900;
 
   lobbyEl.hidden = false;
   layoutLobby();
@@ -207,7 +216,7 @@ function layoutLobby() {
     door.el.style.height = `${hot.h * k}px`;
   }
 
-  if (!running) drawLobby(performance.now());
+  if (!running) drawLobby(still() ? 0 : performance.now());
 }
 
 /** The arch, plus a strip of the floor in front of it. */
@@ -243,8 +252,14 @@ function glance(dt) {
 // The loop carries a ticket. Stopping and starting inside one frame would
 // otherwise leave the old callback alive alongside the new one, and the museum
 // would be drawn twice a frame for the rest of the visit.
+//
+// It does not run at all for anyone who asked for less motion. A fade they can
+// skip is one thing; a room that flickers, pulses and looks about forever, with
+// nothing on the page to stop it, is exactly what the setting is for. They get
+// the same room, lit and still.
 function start() {
   if (running) return;
+  if (still()) { paint(); return; }
   running = true;
   loopId += 1;
   lastTs = performance.now();
@@ -259,6 +274,22 @@ function start() {
 function stop() {
   running = false;
 }
+
+/** One frame of the still room, at a fixed moment so nothing is mid-flicker. */
+function paint() {
+  loopId += 1;                  // any loop still in flight gives up its ticket
+  running = false;
+  drawLobby(0);
+}
+
+// The setting can be changed while the page is open, and a room that keeps
+// moving after you have asked it to stop is the whole complaint.
+CALM.addEventListener('change', () => {
+  if (lobbyEl && !lobbyEl.hidden) {
+    if (still()) paint();
+    else start();
+  }
+});
 
 function loopLobby(ts) {
   const dt = Math.min(0.05, (ts - lastTs) / 1000 || 0);
@@ -311,14 +342,19 @@ function isHot(door) {
   return door.down || document.activeElement === door.el;
 }
 
+/** The breath in the lit doorways — held open, not held still, for anyone who
+ *  asked for less motion. */
+function pulse(ts) {
+  return still() ? 1 : (Math.sin(ts / 1100) + 1) / 2;
+}
+
 /** Light from the room beyond, in four hard bands. A smooth ramp would be the
  *  one thing in the building not made of pixels. */
 function drawSpill(c, door, ts, ox, oy) {
   const b = door.box;
   const x = b.x - ox;
   const y = b.y - oy;
-  const pulse = (Math.sin(ts / 1100) + 1) / 2;
-  const lit = isHot(door) ? 1.6 : 0.72 + pulse * 0.28;
+  const lit = isHot(door) ? 1.6 : 0.72 + pulse(ts) * 0.28;
   const band = b.h / 4;
 
   for (let i = 0; i < 4; i++) {
@@ -336,11 +372,9 @@ function drawBracket(c, door, ts, ox, oy) {
   const x = b.x - ox;
   const y = b.y - oy;
   const up = door.facing === 'up';
-  const pulse = (Math.sin(ts / 1100) + 1) / 2;
-  const hot = isHot(door);
 
   c.save();
-  c.globalAlpha = hot ? 1 : 0.52 + pulse * 0.28;
+  c.globalAlpha = isHot(door) ? 1 : 0.52 + pulse(ts) * 0.28;
   c.fillStyle = COL.brass;
 
   // Both jambs the whole depth of the opening, and only the corners of the
@@ -355,7 +389,7 @@ function drawBracket(c, door, ts, ox, oy) {
 
   // and a chevron drifting into the room, two pixels thick so it survives
   // being three device pixels tall on a phone
-  const bob = Math.round(Math.sin(ts / 560));
+  const bob = still() ? 0 : Math.round(Math.sin(ts / 560));
   const cx = x + Math.round(b.w / 2);
   const cy = up ? y + 2 - bob : y + b.h - 8 + bob;
   for (let k = 0; k < 5; k++) {
@@ -401,6 +435,21 @@ function softEdges(c) {
 /* Going in, and coming back out                                       */
 /* ------------------------------------------------------------------ */
 
+/**
+ * The whole transition is one chain of waits, and only ever one of them is
+ * pending — so there is one timer, and scheduling a step cancels whatever was
+ * still owed. Without that, the 700ms lights-up on arrival was still counting
+ * when a quick first tap started the lights-down, and its completion — hide the
+ * curtain — landed on a curtain that had just been told to go black. The lights
+ * never went down on the atrium, the wing cut in, and then the black rose over
+ * the wing and faded off it: the whole cinematic, backwards, on the wrong
+ * screen.
+ */
+function step(ms, fn) {
+  window.clearTimeout(chain);
+  chain = window.setTimeout(fn, ms);
+}
+
 /** Raise or drop the black. `ms` is how long it should take. */
 function fade(dark, ms, done) {
   curtainEl.hidden = false;
@@ -408,14 +457,23 @@ function fade(dark, ms, done) {
   // a curtain that was display:none a moment ago has nothing to animate from
   void curtainEl.offsetWidth;
   curtainEl.classList.toggle('is-dark', dark);
-  window.setTimeout(() => {
+  step(ms, () => {
     if (!dark) curtainEl.hidden = true;
     if (done) done();
-  }, ms);
+  });
 }
 
+/**
+ * `busy` covers the walk, not the whole cinematic: it is set on the tap and
+ * released the moment the destination is on screen, which is 800ms before the
+ * black has finished lifting off it. Held for the full sequence, the Back
+ * button on a wing you were already looking at did nothing for a further
+ * 620ms — visible, enabled, on top of the hit stack, and dead. A tap that
+ * lands during the rise now simply takes the fade over, because `fade` owns
+ * its timer.
+ */
 function enterWing(id) {
-  if (busy) return;
+  if (busy || inWing) return;
   busy = true;
 
   lastDoor = doors.find((d) => d.id === id) || null;
@@ -424,31 +482,31 @@ function enterWing(id) {
     player.dir = lastDoor.facing;
     glanceLeft = (TURN_MS + FADE_MS) / 1000 + 1;
   }
-  for (const d of doors) d.el.disabled = true;
+
+  // The doors are not disabled while this runs — `busy` already refuses a
+  // second tap, and disabling the button you just pressed drops focus on the
+  // floor, so a keyboard visitor spent the whole transition on <body>.
 
   const show = () => {
     stop();
     lobbyEl.hidden = true;
     document.body.classList.add('is-inside');
     openWing(id);
+    inWing = true;
+    busy = false;
   };
 
-  if (still()) { show(); done(); return; }
+  if (still()) { show(); return; }
 
-  window.setTimeout(() => fade(true, FADE_MS, () => {
+  step(TURN_MS, () => fade(true, FADE_MS, () => {
     show();
-    window.setTimeout(() => fade(false, RISE_MS, done), HOLD_MS);
-  }), TURN_MS);
-
-  function done() {
-    busy = false;
-    for (const d of doors) d.el.disabled = false;
-  }
+    step(HOLD_MS, () => fade(false, RISE_MS));
+  }));
 }
 
-/** The Back button at the foot of a wing. */
+/** The Back button at the head and foot of a wing. */
 function leaveWing() {
-  if (busy) return;
+  if (busy || !inWing) return;
   busy = true;
 
   const show = () => {
@@ -457,14 +515,16 @@ function leaveWing() {
     lobbyEl.hidden = false;
     layoutLobby();
     start();
+    inWing = false;
+    busy = false;
     // back where you were standing, not at the top of the page
     if (lastDoor) lastDoor.el.focus({ preventScroll: true });
   };
 
-  if (still()) { show(); busy = false; return; }
+  if (still()) { show(); return; }
 
   fade(true, FADE_MS, () => {
     show();
-    window.setTimeout(() => fade(false, RISE_MS, () => { busy = false; }), HOLD_MS);
+    step(HOLD_MS, () => fade(false, RISE_MS));
   });
 }

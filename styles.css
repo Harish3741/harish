@@ -28,6 +28,9 @@
      The card tones are label stock, for the one bright object on the page. */
   --cut:      #0E0906;
   --body-ink: #E4D5BC;
+  /* the quietest text on the page, and still 5.25:1 on --ground. The greys it
+     replaced were 3.6:1, which is a colophon nobody with tired eyes can read */
+  --muted-d:  #9A8468;
   --brass-hi: #EFC97F;
   --brass-lo: #6E4C15;
   --card:     #E2D2B5;
@@ -723,9 +726,14 @@ body.is-handheld { overflow: auto; }
 
 .exhibit-head { position: relative; }
 
+/* `last baseline`, so a name that wraps takes its leader and its date down to
+   the line it ends on. Aligned to the first, a two-line title left the leader
+   and the date stranded up beside its first word, which is the one thing a
+   contents-page leader exists not to do. */
 .exhibit-line {
   display: flex;
   align-items: baseline;
+  align-items: last baseline;
   gap: 10px;
   margin: 0;
   font-weight: 400;
@@ -767,7 +775,7 @@ body.is-handheld { overflow: auto; }
   letter-spacing: 0.14em;
   line-height: 1.9;
   text-transform: uppercase;
-  color: #7E6A52;
+  color: var(--muted-d);
 }
 
 /* The measure is capped because this is monospace: 760px of it is 100
@@ -887,7 +895,10 @@ body.is-handheld { overflow: auto; }
 .exhibit.is-shut .exhibit-more { display: none; }
 .exhibit-open:focus-visible { outline: 2px solid var(--brass); outline-offset: -8px; }
 
-/* the writing has to keep clear of it */
+/* Everything in the head has to keep clear of it — the name/leader/date row
+   included. The box is opaque and centred on the head, so on a short entry it
+   sat on the leader and ate the last half of the date. */
+.is-standalone .exhibit-line,
 .is-standalone .exhibit-tag,
 .is-standalone .exhibit-meta { padding-right: 46px; }
 
@@ -989,7 +1000,7 @@ body.is-handheld { overflow: auto; }
   font-family: var(--mono);
   font-size: 10.5px;
   letter-spacing: 0.1em;
-  color: #7C6A57;
+  color: var(--muted-d);
 }
 
 /* ---- the picture slot, same idea as the exhibit panel's ---- */
@@ -1571,7 +1582,7 @@ body.is-handheld { overflow: auto; }
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.1em;
-  color: #7C6A57;
+  color: var(--muted-d);
 }
 
 /* --- the lights ---

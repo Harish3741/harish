@@ -64,7 +64,8 @@ const ROOMS = {
   automations: { art: 'img/rooms/automations.jpg', accent: '#5E93A2', pos: '50% 40%' },
   personal: { art: 'img/rooms/personal.jpg', accent: '#C08A5A', pos: '50% 42%' },
   client: { art: 'img/rooms/client.jpg', accent: '#6D82BC', pos: '50% 58%' },
-  about: { art: 'img/rooms/about.jpg', accent: '#C8535F', pos: '50% 52%' },
+  // the cinema's velvet, lifted until it clears 4.5:1 as type on the dark
+  about: { art: 'img/rooms/about.jpg', accent: '#D9707A', pos: '50% 52%' },
 };
 
 let listRoot;

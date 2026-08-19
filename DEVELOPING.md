@@ -373,6 +373,9 @@ src/
   listview.js       the plain list (DOM), for the skip button and for the phone
   lobby.js          the phone's atrium: fixed camera, tappable arches, the fade
   plate.js          headings cut on canvas in the game's own 5x7 font
+tools/
+  build-standalone.mjs   the whole site as one file
+  rooms.mjs              re-renders img/rooms/ out of the game, droid omitted
   picture.js        the picture slot both of those share
   input.js          keyboard
   renderer.js       canvas sizing, integer pixel scale, camera

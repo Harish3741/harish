@@ -493,7 +493,7 @@ export const WINGS = [
   {
     id: 'client',
     title: 'Projects',
-    blurb: 'Built for monetisation',
+    blurb: 'Built to fix pain points',
     projects: [
       {
         title: 'Scorify',
@@ -644,8 +644,8 @@ export const WINGS = [
         // img/README.md asks: the panel never shows it wider than 780.
         ratio: '1600 / 1002',
         images: [{ src: 'img/client/habit-tracker.png',
-          caption: 'Rebuilds the day from my calendar at 5am, with habits and '
-            + 'streaks alongside' }],
+          alt: 'The habit tracker dashboard: the day rebuilt from my calendar, '
+            + 'with habits and streaks alongside' }],
         tagline: 'A glorified to-do list that automatically manages my life.',
         description: [
           'I got tired of having to check my calendar everyday to update my to '

@@ -58,14 +58,19 @@ const POINTS = { label: 'exhibit-label', points: 'exhibit-points' };
 
 /* Each wing's own colour, brightened enough to read on dark, and the capture of
    the real room the phone shows at the head of the list — the same room you
-   were just looking at through the arch. `pos` is where to sit the crop, since
-   each room keeps its interesting half somewhere different. */
+   were just looking at through the arch.
+
+   The captures are re-rendered straight out of the game by tools/rooms.mjs:
+   the same map canvas, the same props, the same torches, drawn with the droid
+   left out. It stands in the atrium on this screen, so a second one asleep in
+   the corner of every photograph was one droid too many. Each one is framed on
+   its room already, so there is nothing for `pos` to correct. */
 const ROOMS = {
-  automations: { art: 'img/rooms/automations.jpg', accent: '#5E93A2', pos: '50% 40%' },
-  personal: { art: 'img/rooms/personal.jpg', accent: '#C08A5A', pos: '50% 42%' },
-  client: { art: 'img/rooms/client.jpg', accent: '#6D82BC', pos: '50% 58%' },
+  automations: { art: 'img/rooms/automations.png', accent: '#5E93A2', pos: '50% 50%' },
+  personal: { art: 'img/rooms/personal.png', accent: '#C08A5A', pos: '50% 50%' },
+  client: { art: 'img/rooms/client.png', accent: '#6D82BC', pos: '50% 50%' },
   // the cinema's velvet, lifted until it clears 4.5:1 as type on the dark
-  about: { art: 'img/rooms/about.jpg', accent: '#D9707A', pos: '50% 52%' },
+  about: { art: 'img/rooms/about.png', accent: '#D9707A', pos: '50% 50%' },
 };
 
 let listRoot;
@@ -290,13 +295,18 @@ function renderWing(wing) {
   bodyEl.style.setProperty('--room', room ? room.accent : '');
   bodyEl.innerHTML = '';
 
+  // The phone has neither strap nor contents line. On a printed guide they say
+  // where in the building you are; on a phone you got here by tapping the arch
+  // thirty seconds ago, the room's own photograph is at the top of the page,
+  // and both lines are furniture between you and what you came to read.
   const at = WINGS.indexOf(wing) + 1;
   bodyEl.appendChild(plate(
     wing.title,
     wing.blurb,
-    count(entries.length),
+    standalone ? '' : count(entries.length),
     standalone ? room : null,
-    `Wing ${String(at).padStart(2, '0')} of ${String(WINGS.length).padStart(2, '0')}`
+    standalone ? null
+      : `Wing ${String(at).padStart(2, '0')} of ${String(WINGS.length).padStart(2, '0')}`
   ));
 
   const list = el('ol', 'exhibits');
@@ -305,8 +315,12 @@ function renderWing(wing) {
     bodyEl.appendChild(el('p', 'sheet-empty', 'This wing is still being hung.'));
   }
 
+  // Nothing to index and nothing to choose between, so the phone gives a wing
+  // with a single exhibit no number and no lid: About Me is one person, and
+  // making you tap a "1" to meet him is a door held shut for the sake of it.
+  const solo = standalone && entries.length === 1;
   entries.forEach((entry, i) => {
-    list.appendChild(listing(entry, i, standalone));
+    list.appendChild(listing(entry, i, standalone, solo));
   });
 
   bodyEl.appendChild(list);
@@ -334,19 +348,28 @@ function renderWing(wing) {
 }
 
 /** One exhibit, as the guide lists it: index number, name, leader, date. */
-function listing(entry, i, standalone) {
-  const row = el('li', 'exhibit');
+function listing(entry, i, standalone, solo = false) {
+  const row = el('li', solo ? 'exhibit is-solo' : 'exhibit');
   const no = String(i + 1).padStart(2, '0');
 
   // The index numeral is cut in the game's font rather than set in the page's.
   // It is the one number in the guide you read as a landmark rather than as a
   // word, and the list is ordered markup, so nothing has to be said about it.
-  const stamp = el('p', 'exhibit-no');
-  const cv = document.createElement('canvas');
-  cv.setAttribute('aria-hidden', 'true');
-  engrave(cv, no, { width: 46, cap: 27, color: '#8C765A', shadow: '#0E0906' });
-  stamp.appendChild(cv);
-  row.appendChild(stamp);
+  // Smaller on a phone, where the gutter it stands in is a fifth of the screen
+  // rather than a twentieth of the page.
+  if (!solo) {
+    const stamp = el('p', 'exhibit-no');
+    const cv = document.createElement('canvas');
+    cv.setAttribute('aria-hidden', 'true');
+    engrave(cv, no, {
+      width: standalone ? 34 : 46,
+      cap: standalone ? 20 : 27,
+      color: '#8C765A',
+      shadow: '#0E0906',
+    });
+    stamp.appendChild(cv);
+    row.appendChild(stamp);
+  }
 
   // The head is its own box because the button that opens the entry is laid
   // over it. Laid over the whole entry — which is what it used to be — it
@@ -399,9 +422,10 @@ function listing(entry, i, standalone) {
   const filled = more.childElementCount > 0;
   if (!filled) more.remove();
 
-  // Only on a phone. On a desktop the list is the accessible path through the
-  // museum and hiding half of it behind a tap would make it a worse one.
-  if (standalone && filled) {
+  // Only on a phone, and only where there is a choice to make. On a desktop the
+  // list is the accessible path through the museum and hiding half of it behind
+  // a tap would make it a worse one.
+  if (standalone && filled && !solo) {
     row.classList.add('is-shut');
     const toggle = el('button', 'exhibit-open');
     toggle.type = 'button';

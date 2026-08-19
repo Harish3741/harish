@@ -895,6 +895,23 @@ body.is-handheld { overflow: auto; }
 .exhibit.is-shut .exhibit-more { display: none; }
 .exhibit-open:focus-visible { outline: 2px solid var(--brass); outline-offset: -8px; }
 
+/* ---- what the phone does differently ----
+   All of it inside .is-standalone: the desktop guide is unchanged. */
+
+/* A smaller numeral wants a narrower gutter, or it stands alone in a fifth of
+   the screen. The spine moves in with it so the two stay a pair. */
+.is-standalone .exhibit { padding-left: 60px; }
+.is-standalone .exhibit::after { left: 46px; }
+.is-standalone .exhibit-no { left: 12px; top: 20px; }
+
+/* A wing holding one exhibit has no index and no lid, so it has no gutter and
+   nothing to rule off against. It is a page, not a contents page. */
+.is-standalone .exhibit.is-solo { padding-left: 18px; }
+.is-standalone .exhibit.is-solo::after { display: none; }
+.is-standalone .exhibit.is-solo .exhibit-line,
+.is-standalone .exhibit.is-solo .exhibit-tag,
+.is-standalone .exhibit.is-solo .exhibit-meta { padding-right: 0; }
+
 /* Everything in the head has to keep clear of it — the name/leader/date row
    included. The box is opaque and centred on the head, so on a short entry it
    sat on the leader and ate the last half of the date. */

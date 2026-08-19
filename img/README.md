@@ -12,9 +12,19 @@ img/
   automations/  Automations
   personal/     Initiatives   (id: personal)
   client/       Projects      (id: client)
+  rooms/        the rooms themselves — see below
 ```
 
 There is no `atrium/`. The frames on the atrium walls are drawn, not loaded.
+
+`rooms/` is not photographs of exhibits but of the four rooms, shown at the
+head of a wing on a phone. Do not hand-edit them: they are rendered out of the
+game itself by `node tools/rooms.mjs` (with the folder served, and Playwright
+resolvable), which blits each room out of the same baked background the game
+draws from and puts its props back on top. The droid is deliberately left out —
+it is already standing in the atrium above these pictures. Re-run it after
+anything that changes how a room looks, and it will produce the same four
+files byte for byte until something does.
 
 Referenced from `src/data/projects.js` by path, relative to the page:
 

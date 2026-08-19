@@ -932,6 +932,15 @@ body.is-handheld { overflow: auto; }
 
 .is-standalone .exhibit-when { margin-left: auto; }
 
+/* The bullets go dark brown — the same --edge the spine, the dividers and the
+   picture frames are ruled in, so they read as part of the page's own ruling
+   rather than as four coloured squares borrowed from the wing. Quiet on
+   purpose: at 1.7:1 on the ground they are a mark beside a line, not a thing
+   to look at, which is what a bullet in a real label is. The list is a real
+   <ul>, so nothing that reads the page rather than looking at it depends on
+   seeing them at all. */
+.is-standalone .exhibit-points li::before { background: var(--edge); }
+
 /* And no dotted leader running out of it. A leader exists to carry your eye to
    a page number; on a phone there is no page number at the end of most of
    these, so the dots were carrying it to nothing. The one wing that keeps them

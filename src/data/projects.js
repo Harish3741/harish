@@ -43,6 +43,11 @@
 export const SITE = {
   name: 'HARISH',
   tagline: 'A museum of things I have built',
+  // Shown under the atrium on a phone, where you can look around the building
+  // but not walk it.
+  note: 'This is the short version. The real one is a game you walk around and '
+    + 'explore all the things I\'ve built. It needs a keyboard so open this on '
+    + 'a laptop and go have a look.',
   footer: 'Built as a game because a list felt like a waste of a good idea.',
 };
 

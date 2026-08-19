@@ -23,6 +23,7 @@ import {
   initMenu, openMenu, openDocument, isMenuOpen, closeMenu,
 } from './menu.js';
 import { initListView, isListOpen } from './listview.js';
+import { initLobby } from './lobby.js';
 import {
   initScreening, openScreening, closeScreening, isScreeningOpen,
 } from './screening.js';
@@ -77,9 +78,13 @@ function boot() {
   const canvas = document.getElementById('game');
 
   if (isHandheld()) {
-    // No game on a phone: a thumb is a bad D-pad. Serve the same content flat.
+    // No walking on a phone: a thumb is a bad D-pad. You stand in the atrium
+    // instead and tap the arches — the same building, the same droid, the same
+    // four rooms, without asking a thumb to steer.
     document.body.classList.add('is-handheld');
-    initListView({ standalone: true });
+    buildSprites(personCast());
+    buildMap();
+    initLobby();
     preloadPictures(everyEntry());
     return;
   }

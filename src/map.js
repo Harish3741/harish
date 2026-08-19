@@ -58,7 +58,7 @@ export const MAP_H = 33;
 const REGIONS = [
   { rect: [10, 5, 9, 6], floor: 'stone', indoor: true, wing: 'automations', theme: 'plant' },
   { rect: [21, 5, 9, 6], floor: 'wood', indoor: true, wing: 'personal' },
-  { rect: [12, 14, 16, 5], floor: 'marble', indoor: true },
+  { rect: [12, 14, 16, 5], floor: 'marble', indoor: true, id: 'atrium' },
   { rect: [10, 22, 9, 6], floor: 'office', indoor: true, wing: 'client', theme: 'office' },
   { rect: [21, 22, 9, 6], floor: 'carpet', indoor: true, wing: 'about', theme: 'theatre' },
 
@@ -309,6 +309,49 @@ function roomBox(id) {
     y1: (ry + rh) * TILE,
     cx: rx * TILE + (rw * TILE) / 2,
     cy: ry * TILE + (rh * TILE) / 2,
+  };
+}
+
+/**
+ * The opening a wing shares with the atrium, in pixels: five tiles across and
+ * three deep, because that is how thick the shared wall is. Derived from the
+ * room rather than typed out, for the same reason roomBox exists — the phone's
+ * lobby hangs its tap targets on these, and a hand-written rectangle would go
+ * stale the next time a wing moves.
+ */
+export function archBox(id) {
+  const w = WING_ROOMS[id];
+  const box = roomBox(id);
+  const h = 3 * TILE;
+  return {
+    x: (w.cx - 2) * TILE,
+    y: w.entry === 'south' ? box.y1 : box.y0 - h,
+    w: 5 * TILE,
+    h,
+  };
+}
+
+/**
+ * What the phone looks at: the atrium wall to wall, and every arch off it from
+ * mouth to mouth. It is the one shot with the whole museum in it — four
+ * doorways and the medallion you stand on.
+ *
+ * Cropped to the floor exactly, with no margin of masonry round it. A phone
+ * only ever draws this at a whole number of device pixels per drawn pixel, so
+ * every tile of wall in the shot is a whole step of scale it might have to give
+ * up: the same 390px of glass fits the atrium at four device pixels and the
+ * atrium-plus-its-walls at three. The pictures down the side walls stand proud
+ * into the room rather than out of it, so nothing in the shot is lost to it.
+ */
+export function atriumFrame() {
+  const [ax, , aw] = REGIONS.find((r) => r.id === 'atrium').rect;
+  const arches = Object.keys(WING_ROOMS).map((id) => archBox(id));
+  const y = Math.min(...arches.map((a) => a.y));
+  return {
+    x: ax * TILE,
+    y,
+    w: aw * TILE,
+    h: Math.max(...arches.map((a) => a.y + a.h)) - y,
   };
 }
 

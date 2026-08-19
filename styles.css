@@ -21,6 +21,19 @@
   --muted:   #B09B80;
   --velvet:  #9C4038;
 
+  /* Cut and card. `--cut` is what an engraving goes down to — every hard
+     offset shadow in the plain list is this rather than pure black, so the
+     type reads as pressed into a warm surface instead of floating over one.
+     `--body-ink` is a step off --paper: full paper at paragraph length glares.
+     The card tones are label stock, for the one bright object on the page. */
+  --cut:      #0E0906;
+  --body-ink: #E4D5BC;
+  --brass-hi: #EFC97F;
+  --brass-lo: #6E4C15;
+  --card:     #E2D2B5;
+  --card-hi:  #F3E8D6;
+  --card-lo:  #C4B08C;
+
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans:  system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --mono:  ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -44,6 +57,21 @@ body {
 }
 
 body.is-handheld { overflow: auto; }
+
+/* Said, not shown. A canvas heading carries the museum's own pixels; the words
+   it spells live here, for anything that reads the page rather than looks at
+   it. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---------------------------------------------------------------- stage -- */
 
@@ -372,8 +400,7 @@ body.is-handheld { overflow: auto; }
   color: var(--brass);
 }
 
-.detail-tech,
-.list-tech {
+.detail-tech {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -390,16 +417,14 @@ body.is-handheld { overflow: auto; }
   text-transform: uppercase;
 }
 
-.detail-links,
-.list-links {
+.detail-links {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin: 20px 0 0;
 }
 
-.detail-links a,
-.list-links a {
+.detail-links a {
   padding: 8px 16px;
   background: var(--brass);
   color: #1B120C;
@@ -411,11 +436,9 @@ body.is-handheld { overflow: auto; }
   transition: background 140ms ease;
 }
 
-.detail-links a:hover,
-.list-links a:hover { background: var(--paper); }
+.detail-links a:hover { background: var(--paper); }
 
-.detail-links a:focus-visible,
-.list-links a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+.detail-links a:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
 
 /* --------------------------------------------------------- win foot -- */
 
@@ -444,17 +467,34 @@ body.is-handheld { overflow: auto; }
 
 .window-foot .sep { padding: 0 4px; color: var(--edge); }
 
-/* ------------------------------------------------- world select (list) --
-   Dressed as a Minecraft world picker: dirt tiling, bevelled stone buttons,
-   a splash line, and one row per project. The joke earns its place — a title,
-   a metadata line and one obvious button per row is genuinely the right shape
-   for this content.
-   ---------------------------------------------------------------------- */
+
+/* -------------------------------------------------------- the floor guide --
+   The museum as the printed guide they hand you at the door.
+
+   This was dressed as a Minecraft world select for a long time — dirt tiling,
+   bevelled stone buttons, a splash line. The joke was good and the *type* was
+   better: chunky monospace with a hard offset shadow, which is what pixels look
+   like when they are letters. What it was not was a museum, and on a phone,
+   where the list is most of the site, the dirt read as mud under the artwork.
+
+   So the dirt went and the type stayed. There are no cards here: the structure
+   is an index numeral in the gutter, an unbroken ruled spine beside it, dotted
+   leaders running from each name to its date, and a dashed rule between one
+   entry and the next. Everything a printed contents page has and a component
+   library does not. The wing title and the index numerals are drawn on canvas
+   with the game's own 5x7 font — the same one the banners over the doorways are
+   set in — with the title printed a hair off-register in the museum's velvet,
+   the way a two-colour press misses.
+
+   Rules of the skin: no rounded corners, no blurred shadows, nothing thinner
+   than the 2px the rules are drawn at, and no gradient that isn't a hard-stop
+   repeat standing in for a dotted line.
+   ------------------------------------------------------------------------- */
 
 #listview {
   align-items: start;
   padding: 0;
-  background: #2A1D12;
+  background: var(--ground);
 }
 
 .sheet {
@@ -462,361 +502,611 @@ body.is-handheld { overflow: auto; }
   min-height: 100vh;
   max-height: 100vh;
   overflow-y: auto;
-  padding: 0 20px 80px;
-  /* the generated dirt tile, darkened the way Minecraft dims its menus */
-  background-image:
-    linear-gradient(rgba(20, 12, 6, 0.62), rgba(20, 12, 6, 0.62)),
-    var(--dirt);
-  background-size: auto, 96px 96px;
-  background-repeat: repeat;
-  image-rendering: pixelated;
+  padding: 0 0 64px;
+  background: var(--ground);
   font-family: var(--mono);
 }
-
-.is-standalone .sheet-close { display: none; }
 
 .sheet-close {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   display: block;
-  width: calc(100% + 40px);
-  margin: 0 -20px 0;
-  padding: 13px 20px;
-  background: rgba(20, 12, 6, 0.85);
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--ink);
   border: 0;
-  border-bottom: 2px solid #16100A;
-  box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.07);
-  color: #C9BCA8;
+  border-bottom: 2px solid var(--brass-d);
+  color: var(--brass);
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   text-align: left;
   cursor: pointer;
 }
 
-.sheet-close:hover { color: #FFF; }
-.sheet-close:focus-visible { outline: 2px solid #FFF; outline-offset: -4px; }
+.sheet-close:hover { color: var(--paper); }
+.sheet-close:focus-visible { outline: 2px solid var(--brass); outline-offset: -4px; }
 
 #list-body {
   max-width: 760px;
   margin: 0 auto;
-  padding-top: 44px;
+  padding: 0;
+}
+
+/* The leader: a run of dots between something and its number, stretched to
+   whatever gap is left. Hard stops, so the dots are square. */
+.leader {
+  flex: 1 1 auto;
+  min-width: 20px;
+  height: 2px;
+  margin-bottom: 3px;
+  background: repeating-linear-gradient(to right,
+    var(--brass-d) 0 2px, transparent 2px 6px);
+}
+
+/* ---- the masthead ---- */
+
+.plate {
+  padding: 20px 18px 22px;
+  border-bottom: 3px solid var(--brass-d);
+}
+
+/* the room you have just walked into, across the top of its own page */
+.plate-room {
+  height: 104px;
+  margin: -20px -18px 20px;
+  border-bottom: 2px solid var(--cut);
+  background-size: cover;
+  image-rendering: pixelated;
+  box-shadow: inset 0 -34px 34px -18px rgba(23, 16, 13, 0.9);
+}
+
+.plate-strap {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 16px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-.mc-head { text-align: center; margin-bottom: 6px; }
+.plate-who { color: var(--brass); font-weight: 700; }
+.plate-what { flex: none; color: var(--muted); }
 
-.mc-title {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: clamp(30px, 6vw, 46px);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #FFFFFF;
-  /* the classic hard drop shadow, no blur */
-  text-shadow: 4px 4px 0 #3A3A3A;
-}
+.plate-title { margin: 0; line-height: 0; }
 
-.mc-splash {
-  margin: 14px 0 0;
-  font-size: 14px;
-  letter-spacing: 0.04em;
-  color: #FFD85C;
-  text-shadow: 2px 2px 0 #3A3A3A;
-}
-
-.mc-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 20px auto 0;
-  width: min(430px, 100%);
-}
-
-/* ---- the stone button ---- */
-
-.mc-btn {
+.plate-title canvas {
   display: block;
-  width: 100%;
-  padding: 12px 16px;
-  background: #6E6E6E;
-  color: #FFFFFF;
-  border: 2px solid #16100A;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+}
+
+/* Focused by code when you open a wing, so the heading is what is announced
+   rather than the Back button. It carries tabindex="-1", so Tab can never
+   reach it and a ring on it indicates nothing to anybody. */
+.plate-title:focus,
+.plate-title:focus-visible { outline: none; }
+
+/* The one bright thing in the building after closing time: the wing's own
+   label, printed on card. Kept to the blurb, which is never more than a line
+   or two — a whole entry on this stock is a torch in a dark room. */
+.plate-sub {
+  display: inline-block;
+  max-width: 100%;
+  margin: 20px 0 0;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 2px solid var(--cut);
   box-shadow:
-    inset  2px  2px 0 rgba(255, 255, 255, 0.30),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.42);
+    inset 0 2px 0 var(--card-hi),
+    inset 0 -2px 0 var(--card-lo),
+    3px 3px 0 var(--cut);
+  color: #2A1C12;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.plate-count {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 20px 0 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+/* ---- the four wings, on the desktop list ---- */
+
+.wings {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 18px;
+}
+
+.wing {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 4px;
+  background: none;
+  border: 0;
+  border-bottom: 2px dashed var(--edge);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wing:hover .wing-name { color: var(--room, var(--brass)); }
+.wing:focus-visible { outline: 2px solid var(--brass); outline-offset: -2px; }
+
+.wing-name {
   font-family: var(--mono);
   font-size: 15px;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-shadow: 2px 2px 0 var(--cut);
+}
+
+.wing-count {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--room, var(--brass-d));
+}
+
+/* ---- the contents ---- */
+
+.exhibits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The gutter holds the index numeral; the spine is the ruled line beside it.
+   Rows abut so the spine never breaks, and the dashed divider between two of
+   them runs the full width so it crosses the spine — that crossing is what
+   makes the page read as ruled rather than as a stack of rows. */
+.exhibit {
+  position: relative;
+  padding: 18px 18px 22px 72px;
+}
+
+.exhibit::after {
+  content: '';
+  position: absolute;
+  left: 56px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: repeating-linear-gradient(to bottom,
+    var(--edge) 0 4px, transparent 4px 8px);
+}
+
+.exhibit + .exhibit::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: repeating-linear-gradient(to right,
+    var(--edge) 0 4px, transparent 4px 8px);
+}
+
+.exhibit-no {
+  position: absolute;
+  left: 14px;
+  top: 18px;
+  margin: 0;
+  line-height: 0;
+}
+
+.exhibit-no canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.exhibit-head { position: relative; }
+
+.exhibit-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.exhibit-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--paper);
+  text-shadow: 2px 2px 0 var(--cut);
+}
+
+.exhibit-when {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.exhibit-tag {
+  margin: 12px 0 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--body-ink);
+}
+
+.exhibit-meta {
+  margin: 12px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+  text-transform: uppercase;
+  color: #7E6A52;
+}
+
+/* The measure is capped because this is monospace: 760px of it is 100
+   characters to a line, which is twice what anybody reads comfortably. */
+.exhibit-more { max-width: 640px; }
+
+/* a groove cut across the page where the entry stops being a listing and
+   starts being a write-up */
+.exhibit-more::before {
+  content: '';
+  display: block;
+  width: 46px;
+  height: 2px;
+  margin: 20px 0 0;
+  background: var(--cut);
+  box-shadow: 0 2px 0 0 rgba(243, 232, 214, 0.09);
+}
+
+.exhibit-desc {
+  margin: 16px 0 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--body-ink);
+}
+
+.exhibit-label {
+  margin: 20px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-d);
+}
+
+.exhibit-label + .exhibit-points { margin-top: 8px; }
+
+.exhibit-points {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--body-ink);
+}
+
+.exhibit-points li {
+  position: relative;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+/* a square bullet, because a round one is the only circle in the building */
+.exhibit-points li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 9px;
+  width: 6px;
+  height: 6px;
+  background: var(--room, var(--brass));
+}
+
+.exhibit-date {
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-d);
+}
+
+.exhibit-status {
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: var(--brass);
+  color: var(--cut);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+/* ---- the box that opens one ---- */
+
+/* Over the head only. Over the whole entry — which is what it used to be —
+   it also covers the links and the picture arrows inside an open one, and a
+   button on top of a link is a link nobody can press. */
+.exhibit-open {
+  all: unset;
+  position: absolute;
+  inset: -18px -18px 0 -72px;
+  cursor: pointer;
+}
+
+/* A plus in a box, not a chevron. Two bars drawn as backgrounds, so the open
+   state is the same box with the upright taken out of it — no glyph, no font,
+   and it stays square at any size. */
+.exhibit-open::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  margin-top: -14px;
+  width: 28px;
+  height: 28px;
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(var(--room, var(--brass)) 0 0),
+    linear-gradient(var(--room, var(--brass)) 0 0);
+  background-size: 12px 2px, 2px 12px;
+  background-position: center, center;
+  background-repeat: no-repeat;
+  border: 2px solid var(--room, var(--brass-d));
+}
+
+.exhibit:not(.is-shut) .exhibit-open::after { background-size: 12px 2px, 0 0; }
+.exhibit.is-shut .exhibit-more { display: none; }
+.exhibit-open:focus-visible { outline: 2px solid var(--brass); outline-offset: -8px; }
+
+/* the writing has to keep clear of it */
+.is-standalone .exhibit-tag,
+.is-standalone .exhibit-meta { padding-right: 46px; }
+
+/* ---- buttons ---- */
+
+.btn {
+  display: block;
+  width: calc(100% - 36px);
+  margin: 0 18px;
+  padding: 14px 18px;
+  background: var(--ink);
+  border: 2px solid;
+  border-color: var(--brass) var(--brass-lo) var(--brass-lo) var(--brass);
+  box-shadow: 4px 4px 0 var(--cut);
+  color: var(--brass);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   text-align: center;
   text-decoration: none;
-  text-shadow: 2px 2px 0 #3A3A3A;
   cursor: pointer;
   transition: background 90ms steps(2), color 90ms steps(2);
 }
 
-.mc-btn:hover { background: #8A8AA0; color: #FFFFA0; }
-.mc-btn:active { box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.42); }
-.mc-btn:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.btn:hover { background: var(--brass); color: var(--cut); }
+.btn:active { box-shadow: 1px 1px 0 var(--cut); transform: translate(3px, 3px); }
+.btn:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
 
-.mc-btn-label { display: block; }
+.btn-back { margin-top: 28px; }
 
-.mc-btn-sub {
-  display: block;
-  margin-top: 3px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: #C9C9C9;
-}
-
-.mc-btn:hover .mc-btn-sub { color: #EDEDC0; }
-
-.mc-btn-small {
+.btn-link {
   display: inline-block;
   width: auto;
-  padding: 7px 14px;
-  font-size: 12px;
-}
-
-.mc-back { width: min(240px, 100%); margin: 10px auto 0; }
-
-/* ---- the world rows ---- */
-
-.mc-worlds { display: flex; flex-direction: column; gap: 2px; }
-
-.mc-world {
-  display: flex;
-  gap: 14px;
-  padding: 14px;
-  background: rgba(0, 0, 0, 0.55);
-  border: 2px solid transparent;
-  transition: border-color 90ms steps(2), background 90ms steps(2);
-}
-
-.mc-world:hover {
-  border-color: #FFFFFF;
-  background: rgba(0, 0, 0, 0.68);
-}
-
-.mc-world-icon {
-  flex: none;
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  background: #4A4A4A;
-  border: 2px solid #16100A;
-  box-shadow:
-    inset  2px  2px 0 rgba(255, 255, 255, 0.18),
-    inset -2px -2px 0 rgba(0, 0, 0, 0.40);
-  color: #FFD85C;
-  font-size: 24px;
-  font-weight: 700;
-  text-shadow: 2px 2px 0 #241A15;
-}
-
-.mc-world-text { min-width: 0; }
-
-.mc-world-name {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: #FFFFFF;
-  text-shadow: 2px 2px 0 #241A15;
-}
-
-.mc-world-meta {
-  margin: 4px 0 0;
-  font-size: 11.5px;
-  letter-spacing: 0.06em;
-  color: #9A9A9A;
-}
-
-.mc-world-tagline {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: #FFD85C;
-}
-
-.mc-world-desc {
-  margin: 8px 0 0;
-  max-width: 60ch;
-  font-size: 13px;
-  line-height: 1.7;
-  color: #D6D2C8;
-}
-
-.mc-world-date {
-  margin: 0 0 6px;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #9A9A9A;
-}
-
-.mc-world-status {
-  margin-left: 7px;
-  padding: 2px 6px;
-  background: #FFD85C;
-  color: #241A15;
+  padding: 10px 14px;
   font-size: 10px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.16em;
 }
 
-.mc-world-label {
-  margin: 12px 0 0;
-  font-size: 11px;
-  letter-spacing: 0.08em;
+.exhibit-links {
+  margin: 20px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---- events, when an entry is several things at once ---- */
+
+.events { margin-top: 18px; }
+
+.events-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.events-tab {
+  padding: 9px 12px;
+  background: none;
+  border: 2px solid var(--edge);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #9A9A9A;
+  cursor: pointer;
 }
 
-.mc-world-label + .mc-world-points { margin-top: 6px; }
+.events-tab:hover { border-color: var(--brass-d); color: var(--paper); }
+.events-tab:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 
-.mc-world-points {
-  margin: 10px 0 0;
-  padding-left: 18px;
-  font-size: 13px;
-  line-height: 1.7;
-  color: #D6D2C8;
+.events-tab[aria-selected="true"] {
+  background: var(--room, var(--brass-d));
+  border-color: var(--room, var(--brass-d));
+  color: var(--cut);
 }
 
-.mc-world-links { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.event { margin-top: 14px; }
+.event .strip { margin-top: 14px; }
 
-.mc-empty, .mc-note, .mc-footer {
-  margin: 0;
-  padding: 14px 16px;
-  background: rgba(0, 0, 0, 0.45);
-  color: #C9BCA8;
-  font-size: 12.5px;
-  line-height: 1.7;
+/* ---- notes and the colophon ---- */
+
+.sheet-empty,
+.sheet-note {
+  margin: 0 18px;
+  padding: 16px 18px;
+  background: var(--ink);
+  border-left: 4px solid var(--brass-d);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.8;
 }
 
-.mc-note { border-left: 4px solid #FFD85C; }
-.mc-footer { background: none; text-align: center; color: #8A7F70; }
-
-@media (max-width: 560px) {
-  .mc-world { flex-direction: column; gap: 10px; }
-  .mc-world-icon { width: 44px; height: 44px; font-size: 20px; }
+.sheet-foot {
+  margin: 26px 18px 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: #7C6A57;
 }
 
-/* the picture slot on a world row, same idea as the exhibit panel's */
-.mc-world-gallery {
-  margin: 12px 0 0;
-  max-width: 420px;
+/* ---- the picture slot, same idea as the exhibit panel's ---- */
+
+.strip {
+  margin: 20px 0 0;
+  max-width: 460px;
   --pic-ratio: 3 / 2;                 /* an entry's `ratio` overrides this */
 }
 
-.mc-world-track {
+.strip-track {
   display: flex;
   align-items: flex-start;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
   scrollbar-width: none;
 }
 
-.mc-world-track.is-live { transition: height 180ms ease; }
+.strip-track.is-live { transition: height 180ms ease; }
+.strip-track::-webkit-scrollbar { display: none; }
+.strip-track:focus { outline: none; }
+.strip-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.strip.is-one .strip-track { overflow-x: hidden; }
 
-.mc-world-track::-webkit-scrollbar { display: none; }
-.mc-world-track:focus { outline: none; }
-.mc-world-track:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-.mc-world-gallery.is-one .mc-world-track { overflow-x: hidden; }
+.strip-frame { position: relative; }
 
-.mc-world-figure {
+.strip-figure {
   flex: 0 0 100%;
-  scroll-snap-align: start;
   margin: 0;
-  padding: 6px;
-  background: rgba(0, 0, 0, 0.28);
-  border: 2px solid #16100A;
+  scroll-snap-align: start;
 }
 
-.mc-world-figure img {
+.strip-figure img {
+  display: block;
+  width: 100%;
   aspect-ratio: var(--pic-ratio);
   object-fit: contain;
-  background: #16100A;
+  background: var(--cut);
+  border: 2px solid var(--edge);
+  image-rendering: auto;
 }
 
-.mc-world-strip { position: relative; }
+.strip-caption {
+  margin: 10px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
 
-.mc-gal-arrow {
+.strip-figure.is-empty {
+  display: flex;
+  aspect-ratio: var(--pic-ratio);
+  border: 2px dashed var(--edge);
+  background: transparent;
+}
+
+.strip-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 84px;
+  color: #9A8A70;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.strip-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 38px;
-  padding: 0;
-  background: rgba(10, 7, 4, 0.82);
-  border: 2px solid var(--brass-d);
-  color: #F0E6D2;
-  font-family: var(--mono);
-  font-size: 15px;
+  z-index: 2;
+  width: 34px;
+  height: 44px;
+  background: rgba(15, 10, 7, 0.86);
+  border: 2px solid var(--edge);
+  color: var(--paper);
+  font-size: 17px;
   line-height: 1;
   cursor: pointer;
 }
 
-.mc-gal-arrow.is-prev { left: 8px; }
-.mc-gal-arrow.is-next { right: 8px; }
-.mc-gal-arrow:hover:not(:disabled) { border-color: var(--brass); color: var(--brass); }
-.mc-gal-arrow:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-.mc-gal-arrow:disabled { opacity: 0.25; cursor: default; }
+.strip-arrow.is-prev { left: 8px; }
+.strip-arrow.is-next { right: 8px; }
+.strip-arrow:hover:not(:disabled) { border-color: var(--brass); color: var(--brass); }
+.strip-arrow:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.strip-arrow:disabled { opacity: 0.25; cursor: default; }
 
-.mc-gal-dots {
+.strip-dots {
   display: flex;
-  gap: 5px;
-  margin-top: 8px;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 12px;
 }
 
-.mc-gal-dot {
-  width: 7px;
-  height: 7px;
+.strip-dot {
+  width: 8px;
+  height: 8px;
   padding: 0;
-  background: #4A3B29;
+  background: var(--edge);
   border: 0;
   cursor: pointer;
 }
 
-.mc-gal-dot:hover { background: var(--brass-d); }
-.mc-gal-dot[aria-current="true"] { background: var(--brass); }
-.mc-gal-dot:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.strip-dot:hover { background: var(--brass-d); }
+.strip-dot[aria-current="true"] { background: var(--brass); }
+.strip-dot:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
 
-.mc-world-caption {
-  margin: 6px 2px 0;
-  color: #9A8A70;
-  font-size: 11px;
-  line-height: 1.45;
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
 }
-
-.mc-world-figure img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.mc-world-figure.is-empty {
-  border-style: dashed;
-  border-color: #6B5A44;
-  background: transparent;
-}
-
-.mc-world-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 84px;
-  color: #9A8A70;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 /* --------------------------------------------------------- artwork -- */
 
 /* One thing to look at, so the one-row rail would be silly. This is about the
@@ -949,8 +1239,8 @@ body.is-handheld { overflow: auto; }
 @media (prefers-reduced-motion: reduce) {
   /* .is-live carries the height transition, so it has to be named here too or
      it out-specifies this rule and animates for the people who asked it not to. */
-  .detail-track, .mc-world-track,
-  .detail-track.is-live, .mc-world-track.is-live {
+  .detail-track, .strip-track,
+  .detail-track.is-live, .strip-track.is-live {
     scroll-behavior: auto;
     transition: none;
   }
@@ -1036,32 +1326,6 @@ body.is-handheld { overflow: auto; }
 .detail-event { margin-top: 14px; }
 .detail-event .detail-gallery { margin-top: 12px; }
 
-/* the list view's own, in its blockier register */
-.mc-world-events { margin: 12px 0 0; max-width: 420px; }
-
-.mc-world-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.mc-world-tab {
-  padding: 6px 10px;
-  background: rgba(0, 0, 0, 0.28);
-  border: 2px solid #16100A;
-  color: #C9BCA4;
-  font-family: var(--mono);
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.mc-world-tab:hover { border-color: var(--brass-d); color: var(--paper); }
-.mc-world-tab:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-.mc-world-tab[aria-selected="true"] { border-color: var(--brass); color: var(--paper); }
-
-.mc-world-event { margin-top: 10px; }
-.mc-world-event .mc-world-gallery { margin-top: 10px; }
-
 /* ---------------------------------------------------------- noscript -- */
 
 .noscript {
@@ -1085,11 +1349,6 @@ body.is-handheld { overflow: auto; }
   .window-body { grid-template-columns: 1fr; grid-template-rows: minmax(120px, 34%) 1fr; }
   .entry-list { border-right: 0; border-bottom: 2px solid var(--edge); }
   .window { max-height: 100%; }
-}
-
-@media (max-width: 560px) {
-  #list-body { padding-top: 40px; }
-  .list-entry { padding-left: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1182,288 +1441,175 @@ body.is-handheld { overflow: auto; }
   font-size: 13px;
   font-style: italic;
 }
-
 /* ---------------------------------------------------------------------------
    THE PHONE'S MUSEUM
-   A phone cannot walk the museum, so it taps into it: four doors showing the
-   real rooms, then that room's list.
+   A phone cannot walk the building, so it stands in the middle of it instead:
+   the atrium as the game draws it, on a canvas, with the four arches off it as
+   the things you tap. Everything in the scene is the game's own art at the
+   game's own scale, so the only thing this stylesheet has to do is frame it,
+   place the invisible tap targets over the arches, and get out of the way.
 
-   It does not borrow the Minecraft world-select the desktop list is dressed as.
-   That skin is a joke about save files, and on a phone — where this is the only
-   version anyone gets — it reads as mud under the artwork. This uses the
-   museum's own palette instead: the near-black of the walls, brass, and the
-   serif the exhibit panels already set their titles in. The phone should look
-   like the building, not like the menu you picked it from.
-
-   Everything here is inside .is-standalone. The desktop "skip to list" keeps
-   its Minecraft dress and its fully-open entries.
+   The chrome around it is the museum's: brass hairlines, the near-black of the
+   walls, and the site's own name cut in the 5x7 font the banners use.
    --------------------------------------------------------------------------- */
 
-.is-standalone .sheet {
-  padding: 0 18px 60px;
-  background:
-    radial-gradient(120% 46% at 50% -6%, rgba(220, 166, 70, 0.13), transparent 70%),
-    var(--ground);
-  background-size: auto;
-  image-rendering: auto;
-}
+.lobby { display: none; }
 
-/* --- the title plate ------------------------------------------------------ */
-
-.is-standalone #list-body { padding-top: 34px; gap: 0; }
-
-.is-standalone .mc-head { text-align: left; margin-bottom: 22px; }
-
-.is-standalone .mc-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(30px, 8.5vw, 40px);
-  letter-spacing: 0.01em;
-  color: var(--paper);
-  text-shadow: none;
-}
-
-.is-standalone .mc-splash {
-  margin: 8px 0 0;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  text-shadow: none;
-}
-
-/* the hairline that says "a museum made this, not a game menu" */
-.is-standalone .mc-head::after {
-  content: '';
-  display: block;
-  height: 1px;
-  margin-top: 18px;
-  background: linear-gradient(90deg, var(--brass), rgba(220, 166, 70, 0.08));
-}
-
-/* --- the four doors ------------------------------------------------------- */
-
-.mc-doors { display: flex; flex-direction: column; gap: 14px; }
-
-.mc-door {
-  all: unset;
-  position: relative;
-  display: block;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid rgba(220, 166, 70, 0.34);
-  transition: border-color 200ms ease, transform 200ms ease;
-}
-
-.mc-door:active { transform: scale(0.985); border-color: var(--brass); }
-.mc-door:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
-
-.mc-door-art {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  image-rendering: pixelated;      /* it is pixel art; let it stay pixels */
-}
-
-/* the room's own colour, laid over its art so the four doors are four places */
-.mc-door::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
-    rgba(23, 16, 13, 0) 30%, rgba(23, 16, 13, 0.82) 78%, rgba(23, 16, 13, 0.96) 100%);
-}
-
-.mc-door-cap {
-  position: absolute;
-  z-index: 2;
-  inset: auto 0 0 0;
+.is-handheld .lobby:not([hidden]) {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 14px 12px;
+  flex-direction: column;
+  /* `safe` so that a viewport too short for the whole lobby scrolls from the
+     top instead of centring the overflow and putting the museum's own name
+     above the top of the page, where nothing can scroll to it. */
+  justify-content: center;
+  justify-content: safe center;
+  min-height: 100svh;
+  padding: 26px 18px calc(22px + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(120% 44% at 50% 4%, rgba(220, 166, 70, 0.11), transparent 74%),
+    var(--ground);
 }
 
-.mc-door-name {
-  font-family: var(--serif);
-  font-size: 21px;
-  color: var(--paper);
-}
+/* --- the name over the door --- */
 
-.mc-door-sub {
+.lobby-head {
   flex: none;
+  text-align: center;
+}
+
+.lobby-title {
+  display: block;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.lobby-tagline {
+  margin: 14px 0 0;
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--room, var(--brass));
+  color: var(--brass-d);
 }
 
-/* the door opening: the art grows to fill the screen, then hands over */
-.mc-fly {
-  position: fixed;
-  z-index: 80;
-  background-size: cover;
-  image-rendering: pixelated;
-  transition: left 320ms cubic-bezier(.4, 0, .2, 1), top 320ms cubic-bezier(.4, 0, .2, 1),
-              width 320ms cubic-bezier(.4, 0, .2, 1), height 320ms cubic-bezier(.4, 0, .2, 1),
-              opacity 300ms ease 80ms;
-  pointer-events: none;
-}
+/* --- the room --- */
 
-.mc-fly.is-open { left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; }
-.mc-fly.is-gone { opacity: 0; }
-
-/* --- inside a room -------------------------------------------------------- */
-
-.is-standalone #list-body[data-room] .mc-head::after {
-  background: linear-gradient(90deg, var(--room), rgba(220, 166, 70, 0.06));
-}
-
-.is-standalone .mc-worlds { gap: 0; }
-
-/* rows, not boxes. Four bordered cards stacked on a dark ground is a lot of
-   frame for very little picture; hairlines do the same separating job and let
-   the writing be the thing you see. */
-.is-standalone .mc-world {
-  display: block;
+/* The canvas is measured against this box and then taken out of flow, so that
+   sizing it can never resize the thing it was just measured against. */
+/* Full width, out past the page's own gutter. The scene only ever draws at a
+   whole number of device pixels per drawn pixel, so 36px of padding is often
+   the difference between three of them and four — which is the difference
+   between a room you are looking into and a postage stamp. */
+.lobby-stage {
   position: relative;
-  padding: 20px 34px 20px 0;
+  flex: 0 1 auto;
+  min-height: 140px;
+  /* The stage is given the shot's own shape by lobby.js. Capped, because a
+     phone turned on its side is 390px tall and that shape is 600 of them. */
+  max-height: 56svh;
+  margin: 24px -18px;
+}
+
+.lobby-room { position: absolute; }
+
+.lobby-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  box-shadow:
+    0 0 0 1px rgba(220, 166, 70, 0.3),
+    0 0 0 5px var(--ink),
+    0 18px 44px rgba(0, 0, 0, 0.6);
+}
+
+/* The tap targets. Deliberately invisible: the arches are already lit and
+   bracketed on the canvas, in the same pixels as the room, and a second
+   rectangle drawn over the top in CSS would be a control about a control.
+   They are real buttons all the same, so the four rooms can be reached with a
+   keyboard and announce themselves with a name and a count. */
+.door {
+  position: absolute;
+  margin: 0;
+  padding: 0;
   background: none;
   border: 0;
-  border-bottom: 1px solid rgba(220, 166, 70, 0.16);
-  transition: none;
-}
-
-.is-standalone .mc-world:hover { background: none; border-color: rgba(220, 166, 70, 0.16); }
-.is-standalone .mc-world-icon { display: none; }
-
-.is-standalone .mc-world-name {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 20px;
-  letter-spacing: 0;
-  color: var(--paper);
-  text-shadow: none;
-}
-
-.is-standalone .mc-world-meta {
-  margin: 5px 0 0;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.is-standalone .mc-world-tagline {
-  margin: 9px 0 0;
-  font-family: var(--serif);
-  font-size: 15px;
-  font-style: italic;
-  line-height: 1.5;
-  color: var(--room, var(--brass));
-}
-
-.is-standalone .mc-world-desc {
-  font-family: var(--sans);
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: #D9C9B4;
-}
-
-.is-standalone .mc-world-points,
-.is-standalone .mc-world-caption {
-  font-family: var(--sans);
-  color: #D9C9B4;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.is-standalone .mc-world-caption { font-size: 12.5px; color: var(--muted); }
-
-/* shut by default: name, date and tagline, then a chevron for the rest */
-.is-standalone .mc-world.is-shut .mc-world-more { display: none; }
-
-.is-standalone .mc-world-toggle {
-  all: unset;
-  position: absolute;
-  inset: 0;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
 }
 
-.is-standalone .mc-world-toggle::after {
-  content: '';
-  position: absolute;
-  right: 8px;
-  top: 26px;
-  width: 8px;
-  height: 8px;
-  border-right: 1.5px solid var(--room, var(--brass));
-  border-bottom: 1.5px solid var(--room, var(--brass));
-  transform: rotate(45deg);
-  transition: transform 180ms ease;
+.door:focus { outline: none; }
+.door:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* --- what to do about it --- */
+
+.lobby-foot {
+  flex: none;
+  text-align: center;
 }
 
-.is-standalone .mc-world.is-shut .mc-world-toggle::after { transform: rotate(-45deg); }
-.is-standalone .mc-world-toggle:focus-visible { outline: 2px solid var(--brass); outline-offset: -4px; }
-
-/* open: the picture first. Below the writing is right on a desktop, where you
-   read then look; on a phone it buries the one thing that proves the project
-   exists three screens down, and nobody scrolls that far to find out. */
-.is-standalone .mc-world-more { display: flex; flex-direction: column; padding-top: 4px; }
-.is-standalone .mc-world-more .mc-world-gallery { order: -1; margin: 14px 0 4px; max-width: none; }
-
-/* --- the furniture -------------------------------------------------------- */
-
-.is-standalone .mc-btn {
-  background: none;
-  border: 1px solid rgba(220, 166, 70, 0.4);
-  box-shadow: none;
+.lobby-hint {
+  margin: 0 0 18px;
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  font-size: 10px;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
   color: var(--brass);
-  padding: 13px 16px;
 }
 
-.is-standalone .mc-btn:hover { background: rgba(220, 166, 70, 0.08); color: var(--brass); }
-.is-standalone .mc-back { margin-top: 26px; }
-
-.is-standalone .mc-note {
-  margin-top: 26px;
-  padding: 0 0 0 14px;
-  background: none;
-  border-left: 1px solid rgba(220, 166, 70, 0.32);
-  font-family: var(--sans);
-  font-size: 13.5px;
-  line-height: 1.65;
+.lobby-note {
+  margin: 0 auto;
+  max-width: 44ch;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.85;
   color: var(--muted);
 }
 
-.is-standalone .mc-footer {
-  margin-top: 30px;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 13px;
+.lobby-credit {
+  margin: 16px 0 0;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
   color: #7C6A57;
-  text-shadow: none;
 }
+
+/* --- the lights ---
+   Going into a wing is a fade, not a cut: the atrium goes to black, the black
+   holds for a beat, and the wing's list comes up out of it. The durations are
+   set from lobby.js, so the sequence is described in one place rather than
+   half here and half there. */
+
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms ease;
+}
+
+.curtain.is-dark {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.curtain[hidden] { display: none; }
+
+/* the atrium is behind the list, and neither of them should scroll the other */
+body.is-inside { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mc-door, .mc-world-toggle::after { transition: none; }
+  .curtain { transition: none; }
 }
 
-/* The wing title is focused programmatically when you open a room, so the
-   heading is what a screen reader announces rather than the Back button. It
-   carries tabindex="-1", which means it can be focused by code and never
-   reached by Tab — so a focus ring on it indicates nothing to anybody, and
-   the browser's default drew a white box around a 40px serif heading. On the
-   phone the ring survived :focus alone, because the focus lands after the
-   door transition and the browser no longer counts it as pointer-driven. */
-.mc-title:focus,
-.mc-title:focus-visible { outline: none; }
+/* A short phone in landscape has no room for a stage that insists on 44vh of a
+   very short viewport plus a name and three lines of note. Give the room what
+   is left and let the note fall below the fold. */
+@media (max-height: 620px) {
+  .is-handheld .lobby:not([hidden]) { padding-top: 16px; }
+  .lobby-stage { min-height: 120px; margin: 14px -18px; }
+  .lobby-note { display: none; }
+}

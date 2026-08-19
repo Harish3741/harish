@@ -20,6 +20,33 @@
     <span aria-hidden="true">☰</span> Skip to list
   </button>
 
+  <!-- The phone's museum. A thumb is a bad D-pad, so instead of walking the
+       building you stand in the middle of it: the atrium as the game draws it,
+       with the four arches off it as the things you tap. -->
+  <div id="lobby" class="lobby" hidden>
+    <header class="lobby-head">
+      <canvas id="lobby-title" class="lobby-title" aria-hidden="true"></canvas>
+      <h1 class="sr-only" id="lobby-name"></h1>
+      <p class="lobby-tagline"></p>
+    </header>
+
+    <div class="lobby-stage">
+      <div id="lobby-room" class="lobby-room">
+        <canvas id="atrium" class="lobby-canvas"
+                aria-label="The museum atrium seen from above: a small droid hovers over the compass in the middle of the marble floor, with a lit archway into each of the four wings."></canvas>
+      </div>
+    </div>
+
+    <footer class="lobby-foot">
+      <p class="lobby-hint">Pick a doorway</p>
+      <p class="lobby-note"></p>
+      <p class="lobby-credit"></p>
+    </footer>
+  </div>
+
+  <!-- The lights, for going from one room to the next. -->
+  <div id="curtain" class="curtain" hidden aria-hidden="true"></div>
+
   <!-- The exhibit menu: opens at a plinth. Pixel chrome, real text. -->
   <div id="menu" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="menu-wing">
     <div class="window">

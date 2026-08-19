@@ -873,25 +873,28 @@ body.is-handheld { overflow: auto; }
 /* A plus in a box, not a chevron. Two bars drawn as backgrounds, so the open
    state is the same box with the upright taken out of it — no glyph, no font,
    and it stays square at any size. */
+/* Brass, not the wing's own colour. Everything else you can press on this page
+   — the leaders, the counts, the Back button, the dates — is brass; a teal box
+   in a brass column read as a control borrowed from somewhere else. */
 .exhibit-open::after {
   content: '';
   position: absolute;
   right: 18px;
   top: 50%;
-  margin-top: -14px;
-  width: 28px;
-  height: 28px;
+  margin-top: -12px;
+  width: 24px;
+  height: 24px;
   background-color: var(--ink);
   background-image:
-    linear-gradient(var(--room, var(--brass)) 0 0),
-    linear-gradient(var(--room, var(--brass)) 0 0);
-  background-size: 12px 2px, 2px 12px;
+    linear-gradient(var(--brass) 0 0),
+    linear-gradient(var(--brass) 0 0);
+  background-size: 10px 2px, 2px 10px;
   background-position: center, center;
   background-repeat: no-repeat;
-  border: 2px solid var(--room, var(--brass-d));
+  border: 2px solid var(--brass-d);
 }
 
-.exhibit:not(.is-shut) .exhibit-open::after { background-size: 12px 2px, 0 0; }
+.exhibit:not(.is-shut) .exhibit-open::after { background-size: 10px 2px, 0 0; }
 .exhibit.is-shut .exhibit-more { display: none; }
 .exhibit-open:focus-visible { outline: 2px solid var(--brass); outline-offset: -8px; }
 
@@ -903,6 +906,41 @@ body.is-handheld { overflow: auto; }
 .is-standalone .exhibit { padding-left: 60px; }
 .is-standalone .exhibit::after { left: 46px; }
 .is-standalone .exhibit-no { left: 12px; top: 20px; }
+
+/* A name is a name: it goes on one line. Monospace at 15px with wide tracking
+   is a wide word, and the phone's column is narrow, so both come down a little
+   and the name stops wrapping — "Nail Studio by H" was the one that broke, and
+   "Team Task Reminder" is the longest there is. The ellipsis is a backstop for
+   a title longer than anything here: truncating a name is bad, but a name that
+   pushes the page sideways is worse. */
+.is-standalone .exhibit-line { flex-wrap: wrap; }
+
+.is-standalone .exhibit-name {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  /* Never shrinks, so it can never be the thing that gets clipped. On a screen
+     too narrow for the name and its date together it is the date that gives
+     way and drops to the line below, right where it was. max-width is the
+     backstop: a title wider than the whole row would otherwise push the page
+     sideways, and an ellipsis is better than that. */
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.is-standalone .exhibit-when { margin-left: auto; }
+
+/* And no dotted leader running out of it. A leader exists to carry your eye to
+   a page number; on a phone there is no page number at the end of most of
+   these, so the dots were carrying it to nothing. The one wing that keeps them
+   is the one with a single name in it, where the run of dots is the rule under
+   the heading rather than a leader at all. */
+.is-standalone .exhibit:not(.is-solo) .exhibit-line .leader {
+  background: none;
+  min-width: 0;
+}
 
 /* A wing holding one exhibit has no index and no lid, so it has no gutter and
    nothing to rule off against. It is a page, not a contents page. */
@@ -917,7 +955,7 @@ body.is-handheld { overflow: auto; }
    sat on the leader and ate the last half of the date. */
 .is-standalone .exhibit-line,
 .is-standalone .exhibit-tag,
-.is-standalone .exhibit-meta { padding-right: 46px; }
+.is-standalone .exhibit-meta { padding-right: 42px; }
 
 /* ---- buttons ---- */
 

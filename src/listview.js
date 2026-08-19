@@ -217,12 +217,13 @@ function plate(title, sub, tally, room, strap) {
   head.appendChild(el('span', 'sr-only', title));
   wrap.appendChild(head);
 
-  // Printed slightly off-register, the second colour a hair below the first.
-  // It is the one thing a press does that a screen never does by accident.
+  // Printed slightly off-register, the museum's velvet a hair below the paper.
+  // It is the one thing a two-colour press does that a screen never does by
+  // accident, and it costs one extra pass of the same glyphs.
   heading = {
     cv,
     text: title,
-    opts: { cap: 44, color: '#F3E8D6', shadow: '#8A3A34' },
+    opts: { cap: 44, color: '#F3E8D6', shadow: '#9C4038' },
   };
 
   if (sub) wrap.appendChild(el('p', 'plate-sub', sub));

@@ -340,12 +340,17 @@ at first, which meant the front door showed once per browser ever.
 ## Who gets what
 
 - **Desktop** gets the game, with a permanent *Skip to list* button in the
-  corner for anyone who doesn't want to play. The list is dressed as a
-  Minecraft world picker: the four wings and the résumé as a menu, then each
-  one's entries as a list of worlds. It is also the accessible path through the
-  content — real text, real links, real headings, reachable by keyboard.
-- **Phones** get the list only, plus a note that the full thing is on desktop.
-  Walking a top-down character with a thumb is miserable, so it isn't offered.
+  corner for anyone who doesn't want to play. The list is dressed as the
+  printed floor guide they hand you at the door: the four wings as a contents
+  page, then that wing's entries numbered down a ruled spine. It is also the
+  accessible path through the content — real text, real links, real headings,
+  reachable by keyboard.
+- **Phones** stand in the atrium instead of walking it. Walking a top-down
+  character with a thumb is miserable, so it isn't offered; the atrium is drawn
+  from the same map at a fixed camera, the droid hovers on the medallion and
+  turns its head on its own, and the four arches are the menu. Tapping one
+  fades the lights down and brings that wing's guide up out of the black. There
+  is a note under the room saying the whole building is on a laptop.
 
 ---
 
@@ -365,7 +370,9 @@ src/
   font.js           a hand-drawn 5×7 bitmap font, for text inside the canvas
   intro.js          the arrival cinematic and title card
   menu.js           the exhibit menu (DOM)
-  listview.js       the plain list (DOM), for the skip button and for mobile
+  listview.js       the plain list (DOM), for the skip button and for the phone
+  lobby.js          the phone's atrium: fixed camera, tappable arches, the fade
+  plate.js          headings cut on canvas in the game's own 5x7 font
   picture.js        the picture slot both of those share
   input.js          keyboard
   renderer.js       canvas sizing, integer pixel scale, camera
@@ -425,7 +432,19 @@ A few decisions worth knowing about, if you come back to this later:
 
 - **The menu is DOM, not canvas.** Bitmap text can't be selected, copied,
   linked, or read by a screen reader. So the chrome around the exhibit list is
-  pixel-art in spirit while the content inside it is real text.
+  pixel-art in spirit while the content inside it is real text. Headings are the
+  one exception, in `plate.js`: a wing title is cut on canvas in the game's own
+  font, with the words themselves on a visually-hidden element beside it. A
+  heading is not something anybody selects, and a system serif at the top of the
+  plain list made it read as a different website from the museum.
+
+- **The phone's scene scales in device pixels, not CSS ones.** Same whole-number
+  rule as the game, applied one level down: a phone is 2x or 3x, so four device
+  pixels per drawn pixel is 1.33 CSS pixels — crisp on the glass and near enough
+  to filling the width, where insisting on whole CSS pixels would leave the
+  museum at a third of the size it could be. The shot is cropped to the atrium's
+  own floor for the same reason; every tile of masonry in it was a whole step of
+  scale it might have had to give up.
 
 - **Single theme, deliberately.** The art has its palette baked into the
   sprites; a light mode would fight it rather than serve it.

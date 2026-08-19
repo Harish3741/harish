@@ -500,12 +500,25 @@ body.is-handheld { overflow: auto; }
   background: var(--ground);
 }
 
+/* The scroller is the *small* viewport tall, not `100vh`.
+   On iOS — Safari and Chrome alike, since Chrome there is WebKit — `100vh` is
+   the LARGE viewport: the height the page would have with the browser's
+   toolbars retracted. The area you can actually see with them showing is about
+   90px shorter. A scroll container sized to 100vh is therefore taller than the
+   window, its last 90px sit permanently behind the bottom bar, and no amount
+   of scrolling reaches them because the scroller is already at its end. The
+   Back button is the last thing in it, so 26px of it was cut off and stayed
+   cut off. `svh` is the height with the toolbars shown, which is the one that
+   is always really there. The `vh` line above it is the fallback for anything
+   too old to know the unit. */
 .sheet {
   width: 100%;
   min-height: 100vh;
   max-height: 100vh;
+  min-height: 100svh;
+  max-height: 100svh;
   overflow-y: auto;
-  padding: 0 0 64px;
+  padding: 0 0 calc(64px + env(safe-area-inset-bottom));
   background: var(--ground);
   font-family: var(--mono);
 }

@@ -463,6 +463,7 @@ export const WINGS = [
           'secured collaborations with established societies such as enactus, '
           + 'CEVsoc, FABsoc, etc.',
         ],
+        links: [{ label: 'Visit the site', url: 'https://rapsocunsw.com' }],
       },
 
       {

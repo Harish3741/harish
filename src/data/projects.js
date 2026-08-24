@@ -676,12 +676,15 @@ export const WINGS = [
       {
         title: 'Focus Monitor',
         launch: 'Aug 2026',
-        // The capture is 1600x800, so the frame is its own shape.
-        ratio: '2 / 1',
+        // The scene is 1600x656; the close-up overrules it with its own.
+        ratio: '1600 / 656',
         images: [
-          { src: 'img/client/focus-monitor-distracted.png',
-            alt: 'A focus session running, YouTube open on the laptop, and the '
-              + 'nag that lands when it gets caught' },
+          { src: 'img/client/focus-monitor-caught.jpg',
+            alt: 'My screen with a session running: the timer and the camera '
+              + 'light in the menu bar, YouTube open, and the nag arriving' },
+          { src: 'img/client/focus-monitor-nag.png', ratio: '1074 / 230',
+            alt: 'The menu bar close up \u2014 camera on, two minutes into a '
+              + 'session, and the notification itself' },
         ],
         tagline: 'A menu bar app that times how long I work before getting '
           + 'distracted.',

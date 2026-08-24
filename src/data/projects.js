@@ -703,13 +703,13 @@ export const WINGS = [
           'iOS Shortcuts', 'Swift'],
         highlightsLabel: 'What it does',
         highlights: [
-          'out of frame detection \u2014 the webcam checks for a person every '
+          'Out of frame detection - the webcam checks for a person every '
           + 'few seconds and about 36 seconds of an empty chair ends the '
           + 'session with \u201CFocus session stopped as you\u2019ve left\u201D',
-          'phone use detection \u2014 through the camera and through custom '
+          'Phone use detection - through the camera and through custom '
           + 'built shortcuts that ping the Mac over Wi-Fi and end the session '
           + 'with a nag on both screens',
-          'content I\u2019m consuming on my laptop \u2014 just sitting in '
+          'Content I\u2019m consuming on my laptop - just sitting in '
           + 'front of a screen doesn\u2019t count as work',
         ],
       },

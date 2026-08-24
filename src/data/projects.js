@@ -674,6 +674,47 @@ export const WINGS = [
       },
 
       {
+        title: 'Focus Monitor',
+        launch: 'Aug 2026',
+        // The capture is 1600x800, so the frame is its own shape.
+        ratio: '2 / 1',
+        images: [
+          { src: 'img/client/focus-monitor-distracted.png',
+            alt: 'A focus session running, YouTube open on the laptop, and the '
+              + 'nag that lands when it gets caught' },
+        ],
+        tagline: 'A menu bar app that times how long I work before getting '
+          + 'distracted.',
+        description: [
+          'I had no honest number for how much deep work I actually did in a '
+          + 'day. Hours at the desk aren\u2019t hours of work. Sometimes '
+          + 'I\u2019d sit down at 9, pick up my phone at 9:04 while '
+          + 'Claude\u2019s thinking and still count the whole morning as '
+          + 'productive.',
+          'So I built a menu bar app that times it properly. I start a focus '
+          + 'session by hand and the clock ticks in the menu bar. The first '
+          + 'distraction stops it and logs the record onto my habits app. The '
+          + 'point isn\u2019t to catch one kind of distraction. It\u2019s to '
+          + 'catch all the ways I actually lose a morning; walking off, '
+          + 'reaching for my phone or sitting perfectly still at my laptop '
+          + 'watching YouTube.',
+        ],
+        tech: ['Python', 'rumps', 'YOLOv8', 'AVFoundation', 'SQLite',
+          'iOS Shortcuts', 'Swift'],
+        highlightsLabel: 'What it does',
+        highlights: [
+          'out of frame detection \u2014 the webcam checks for a person every '
+          + 'few seconds and about 36 seconds of an empty chair ends the '
+          + 'session with \u201CFocus session stopped as you\u2019ve left\u201D',
+          'phone use detection \u2014 through the camera and through custom '
+          + 'built shortcuts that ping the Mac over Wi-Fi and end the session '
+          + 'with a nag on both screens',
+          'content I\u2019m consuming on my laptop \u2014 just sitting in '
+          + 'front of a screen doesn\u2019t count as work',
+        ],
+      },
+
+      {
         title: 'This Museum',
         launch: 'Aug 2026',
         // the captures are 1200x750, so the frame is their own shape exactly

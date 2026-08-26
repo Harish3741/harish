@@ -426,6 +426,8 @@ export const WINGS = [
           + 'locations such as stone and chalk',
           'coordinated interuniversity with USYD, MQ and UTS to organise events',
         ],
+        links: [{ label: 'Visit the site',
+          url: 'https://ncsweb-theta.vercel.app/#partner' }],
       },
 
       {
